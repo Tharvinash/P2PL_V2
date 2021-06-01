@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
+  Alert,
   FlatList,
   TouchableOpacity,
   ScrollView,
@@ -21,7 +21,7 @@ function EditDeleteDiscussion(props) {
   const [user, setUser] = useState(null);
 
   const discussionId = props.route.params.did;
-  console.log(discussionId)
+  // console.log(discussionId)
   const userId = firebase.auth().currentUser.uid;
 
   useEffect(() => {
@@ -38,20 +38,38 @@ function EditDeleteDiscussion(props) {
         // console.log(snapshot.data())
         setUserPosts(snapshot.data());
       });
-  }, []);
+  }, [props.route.params.uid]);
 
   if (user === null) {
     return <View />;
   }
 
   const Delete = () => {
-    firebase
-      .firestore()
-      .collection("Discussion")
-      .doc(discussionId)
-      .delete();
-    console.log("delete");
-    props.navigation.goBack();
+
+
+    return Alert.alert(
+      "Are your sure?",
+      "Are you sure you want to delete this comment ?",
+      [
+        // The "Yes" button
+        {
+          text: "Yes",
+          onPress: () => {
+            firebase
+            .firestore()
+            .collection("Discussion")
+            .doc(discussionId)
+            .delete();
+          props.navigation.goBack({ data: 5 });
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "No",
+        },
+      ]
+    );
   };
 
   return (

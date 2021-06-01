@@ -117,6 +117,7 @@ export class App extends Component {
         </NavigationContainer>
       );
     }
+
     return (
       <Provider store={store}>
         <NavigationContainer>

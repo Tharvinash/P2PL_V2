@@ -1,25 +1,45 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image
+  Image,
+  RefreshControl
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 import { timeDifference } from "../../utils";
+import firebase from 'firebase';
+require('firebase/firestore');
+
+
 function Feed(props) {
   const { posts, currentUser } = props;
+  const [post, setPost] = useState(posts);
+  const [refreshing, setRefreshing] = useState(false);
   if (currentUser === null) {
     return <View />;
   }
   const FilterFeed = currentUser.filteredFeed;
 
-      useEffect(() => {
-        
-      }, []);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    firebase.firestore()
+    .collection("Discussion")
+    .get()
+    .then((snapshot) => {
+        let posts = snapshot.docs.map(doc => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data }
+        })
+        setPost(posts)
+        setRefreshing(false)
+    })
+    setRefreshing(false)
+  }, [refreshing]);
 
 
   return (
@@ -48,8 +68,11 @@ function Feed(props) {
 
       <View style={{ paddingTop: 80 }}>
         <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           horizontal={false}
-          data={posts}
+          data={post}
           renderItem={({ item }) =>
             FilterFeed.indexOf(item.faculty) !== -1 ? (
               <View style={styles.card}>

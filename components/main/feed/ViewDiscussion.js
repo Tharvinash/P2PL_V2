@@ -6,7 +6,7 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
-  ScrollView,
+  Alert,
   Image,
   Share,
 } from "react-native";
@@ -178,9 +178,30 @@ function ViewDiscussion(props) {
 
   const Delete = (cid) => {
 
-    firebase.firestore().collection("Comment").doc(cid).delete();
-    console.log("delete");
-    props.navigation.goBack();
+    // firebase.firestore().collection("Comment").doc(cid).delete();
+    // console.log("delete");
+    // props.navigation.goBack();
+
+    return Alert.alert(
+      "Are your sure?",
+      "Are you sure you want to delete this comment ?",
+      [
+        // The "Yes" button
+        {
+          text: "Yes",
+          onPress: () => {
+            firebase.firestore().collection("Comment").doc(cid).delete();
+            setData(4);
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "No",
+        },
+      ]
+    );
+
   };
 
   const addLike = (cid, nol, lb) => {

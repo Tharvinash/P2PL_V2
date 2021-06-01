@@ -20,8 +20,8 @@ function FavDiscussion(props) {
       props.fetchUserPosts()
       const { posts } = props;
       setUserPosts(posts);
-      console.log(posts)
-      console.log(userId);
+      // console.log(posts)
+      // console.log(userId);
     }, [props.route.params.uid]);
 
 

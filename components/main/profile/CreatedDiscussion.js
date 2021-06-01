@@ -12,20 +12,39 @@ import {
 import { connect } from "react-redux";
 import firebase from "firebase";
 import { Icon } from "react-native-elements";
+import { RefreshControlBase } from "react-native";
 
 function Cd(props) {
-  const [ownDiscussion, setOwnDiscussion] = useState([]);
+  const [post, setPost] = useState(null);
   const { posts } = props;
   const userId = firebase.auth().currentUser.uid;
-  //console.log(userId)
+  const [data, setData] = useState(0);
+  const [xxx, setxxx] = useState(8);
+
+
+  useEffect(() => {
+    firebase.firestore()
+    .collection("Discussion")
+    .get()
+    .then((snapshot) => {
+        let posts = snapshot.docs.map(doc => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data }
+        })
+        setPost(posts)
+    })
+      setData(2)
+      // setxxx(props.route.params.data)
+  }, [data, props.route.params.data]);
+  
 
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
       <FlatList
         horizontal={false}
-        extraData={ownDiscussion}
-        data={posts}
-        keyExtractor={ownDiscussion.id}
+        data={post}
+        keyExtractor={posts.id}
         renderItem={({ item }) =>
           item.userId == userId ? (
             <View style={styles.card}>

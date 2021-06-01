@@ -109,10 +109,9 @@ function Profile(props) {
           />
           
         </View>
-
         <TouchableOpacity
           style={styles.button}
-          onPress={() => props.navigation.navigate("Created Discussions")}
+          onPress={() => props.navigation.navigate("Created Discussions", { data: 123 })}
         >
           <Text style={styles.text}>Created Discussion</Text>
           <Icon

@@ -20,7 +20,9 @@ function PostComment(props) {
                 postedBy,
                 discussionId,
                 comment,
-                creation: firebase.firestore.FieldValue.serverTimestamp()
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                likeBy:[],
+                numOfLike:0
             }).then((function () {
 
                 props.navigation.popToTop()
