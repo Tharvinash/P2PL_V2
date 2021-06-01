@@ -163,7 +163,7 @@ export class App extends Component {
               navigation={this.props.navigation}
             />
             <Stack.Screen
-              name="EditDiscussion"
+              name="Edit Discussion"
               component={EditDiscussion}
               navigation={this.props.navigation}
             />

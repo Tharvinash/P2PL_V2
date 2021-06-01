@@ -6,40 +6,158 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 import { timeDifference } from "../../utils";
-import firebase from 'firebase';
-require('firebase/firestore');
-
+import firebase from "firebase";
+require("firebase/firestore");
 
 function Feed(props) {
   const { posts, currentUser } = props;
   const [post, setPost] = useState(posts);
+  console.log(post)
   const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {}, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+  
+      firebase
+      .firestore()
+      .collection("Discussion")
+      .orderBy("creation", "asc")
+      .get()
+      .then((snapshot) => {
+        let posts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setPost(posts);
+        console.log(2323)
+        setRefreshing(false);
+      });
+    setRefreshing(false);
+
+  }, [refreshing]);
+
   if (currentUser === null) {
     return <View />;
   }
-  const FilterFeed = currentUser.filteredFeed;
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    firebase.firestore()
-    .collection("Discussion")
-    .get()
-    .then((snapshot) => {
-        let posts = snapshot.docs.map(doc => {
-            const data = doc.data();
-            const id = doc.id;
-            return { id, ...data }
-        })
-        setPost(posts)
-        setRefreshing(false)
-    })
-    setRefreshing(false)
-  }, [refreshing]);
+  const FilterFeed = currentUser.filteredFeed
+  if(post.length == 0){
+    return(<View style={styles.container}>
+      <View style={styles.appLayout}>
+        <Text style={styles.app}>P2P Learning Platform</Text>
+      </View>
+      <View style={styles.search}>
+        <Icon
+          name="ios-search"
+          type="ionicon"
+          color="#fff"
+          size={30}
+          onPress={() => props.navigation.navigate("Search Results")}
+        />
+      </View>
+
+      <View style={styles.bell}>
+        <Icon
+          name="notifications-outline"
+          type="ionicon"
+          color="#fff"
+          size={30}
+        />
+      </View>
+
+      <View style={{ paddingTop: 80 }}>
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          horizontal={false}
+          data={posts}
+          renderItem={({ item }) =>
+            FilterFeed.indexOf(item.faculty) !== -1 ? (
+              <View style={styles.card}>
+                <View style={styles.cardContent}>
+                  <TouchableOpacity
+                    style={{ flex: 1 }}
+                    onPress={() =>
+                      props.navigation.navigate("DiscussionTitle", {
+                        did: item.id,
+                      })
+                    }
+                  >
+                    <View style={{ flexDirection: "row" }}>
+                      {item.image ? (
+                        <Image
+                          style={{
+                            width: 35,
+                            height: 35,
+                            borderRadius: 35 / 2,
+                            marginBottom: 10,
+                          }}
+                          source={{ uri: item.image }}
+                        />
+                      ) : (
+                        <Image
+                          style={{
+                            width: 35,
+                            height: 35,
+                            borderRadius: 35 / 2,
+                            marginBottom: 10,
+                          }}
+                          source={require("../../../assets/default.jpg")}
+                        />
+                      )}
+                      <View
+                        style={{
+                          marginLeft: 10,
+                          marginTop: 8,
+                          flexDirection: "row",
+                        }}
+                      >
+                        <Text style={styles.userName}>{item.postedBy}</Text>
+                      </View>
+                    </View>
+
+                    <Text numberOfLines={2} style={styles.title}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.faculty}>{item.faculty}</Text>
+                    <Text style={styles.postedTime}>
+                      Posted:{" "}
+                      {timeDifference(new Date(), item.creation.toDate())}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : FilterFeed === null ? (
+              <View style={styles.gridItem}>
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={() =>
+                    props.navigation.navigate("DiscussionTitle", {
+                      did: item.id,
+                    })
+                  }
+                >
+                  <View style={styles.container2}>
+                    <Text style={styles.title}>{item.title}</Text>
+                    <Text style={styles.faculty}>{item.faculty}</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            ) : null
+          }
+        />
+      </View>
+    </View>)
+  }
 
 
   return (
@@ -221,7 +339,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-MediumItalic",
     fontSize: 20,
     color: "#fff",
-    justifyContent:"flex-start"
+    justifyContent: "flex-start",
   },
 
   line: {
@@ -262,7 +380,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 25,
     fontFamily: "Poppins",
-    lineHeight:30
+    lineHeight: 30,
   },
 });
 

@@ -85,7 +85,7 @@ function EditDeleteDiscussion(props) {
             size={28}
             color="#000"
             onPress={() =>
-              props.navigation.navigate("EditDiscussion", { did: discussionId })
+              props.navigation.navigate("Edit Discussion", { did: discussionId })
             }
           />
           <Icon
