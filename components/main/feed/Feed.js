@@ -16,8 +16,17 @@ require("firebase/firestore");
 
 function Feed(props) {
   const { posts, currentUser } = props;
+  
+  if (currentUser === null || currentUser.filteredFeed === null) {
+    return <View />;
+  }
+  
   const [post, setPost] = useState(posts);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
+
+
 
 
   const onRefresh = useCallback(() => {
@@ -54,10 +63,6 @@ function Feed(props) {
 
   }, [refreshing]);
 
-  if (currentUser === null) {
-    return <View />;
-  }
-  const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
 
   if(post.length == 0){
     return(<View style={styles.container}>

@@ -260,13 +260,13 @@ function ViewDiscussion(props) {
       <View
         style={{
           flexDirection: "row",
-          alignContent: "space-around",
+          alignContent: "space-between",
           paddingRight: 35,
         }}
       >
-        <View>
+        
           <Text style={styles.title}>{userPosts.title}</Text>
-        </View>
+       
         <View>
           {user.FavDiscussion.includes(discussionId) ? (
             <Icon
