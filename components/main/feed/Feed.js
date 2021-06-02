@@ -37,6 +37,19 @@ function Feed(props) {
         setPost(posts);
         setRefreshing(false);
       });
+
+      firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          setCu(snapshot.data().filteredFeed);
+        } else {
+          console.log("does not exist");
+        }
+      })
     setRefreshing(false);
 
   }, [refreshing]);
@@ -44,8 +57,8 @@ function Feed(props) {
   if (currentUser === null) {
     return <View />;
   }
+  const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
 
-  const FilterFeed = currentUser.filteredFeed
   if(post.length == 0){
     return(<View style={styles.container}>
       <View style={styles.appLayout}>
@@ -132,22 +145,6 @@ function Feed(props) {
                     </Text>
                   </TouchableOpacity>
                 </View>
-              </View>
-            ) : FilterFeed === null ? (
-              <View style={styles.gridItem}>
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() =>
-                    props.navigation.navigate("DiscussionTitle", {
-                      did: item.id,
-                    })
-                  }
-                >
-                  <View style={styles.container2}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.faculty}>{item.faculty}</Text>
-                  </View>
-                </TouchableOpacity>
               </View>
             ) : null
           }
@@ -243,22 +240,6 @@ function Feed(props) {
                     </Text>
                   </TouchableOpacity>
                 </View>
-              </View>
-            ) : FilterFeed === null ? (
-              <View style={styles.gridItem}>
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() =>
-                    props.navigation.navigate("DiscussionTitle", {
-                      did: item.id,
-                    })
-                  }
-                >
-                  <View style={styles.container2}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.faculty}>{item.faculty}</Text>
-                  </View>
-                </TouchableOpacity>
               </View>
             ) : null
           }
