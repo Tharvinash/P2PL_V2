@@ -73,12 +73,10 @@ function FilterFeed(props) {
         if (snapshot.exists) {
           // console.log(snapshot.data())
           setCu(snapshot.data());
-          console.log(cu);
         } else {
           console.log("does not exist");
         }
       });
-			console.log("function re render")
   }, [data]);
 
   const ff = [];
