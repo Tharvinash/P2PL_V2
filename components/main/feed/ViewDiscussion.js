@@ -76,6 +76,7 @@ function ViewDiscussion(props) {
     firebase
       .firestore()
       .collection("Comment")
+      .orderBy("creation", "asc")
       .get()
       .then((snapshot) => {
         let comment = snapshot.docs.map((doc) => {
@@ -264,9 +265,8 @@ function ViewDiscussion(props) {
           paddingRight: 35,
         }}
       >
-        
-          <Text style={styles.title}>{userPosts.title}</Text>
-       
+        <Text style={styles.title}>{userPosts.title}</Text>
+
         <View>
           {user.FavDiscussion.includes(discussionId) ? (
             <Icon
@@ -302,7 +302,7 @@ function ViewDiscussion(props) {
         extraData={comment}
         data={comment}
         renderItem={({ item }) =>
-          item.discussionId === discussionId && item.userId === userId ? (
+          item.discussionId === discussionId ? (
             <View>
               <View style={{ flexDirection: "row" }}>
                 <View>
@@ -334,8 +334,13 @@ function ViewDiscussion(props) {
                   <View style={{ flexDirection: "row" }}>
                     <Text style={styles.userT}>{item.postedBy} </Text>
                   </View>
+                  <View style={{ flexDirection: "row", justifyContent:"space-between" }}>
+                    <Text style={styles.userC}>{item.comment}</Text>
 
-                  <Text style={styles.userC}>{item.comment}</Text>
+                    <Text style={styles.userC}>
+                      {timeDifference(new Date(), item.creation.toDate())}
+                    </Text>
+                  </View>
 
                   {item.likeBy.includes(userId) ? (
                     <View style={{ flexDirection: "row" }}>
@@ -361,45 +366,39 @@ function ViewDiscussion(props) {
                           removeLike(item.id, item.numOfLike, item.likeBy)
                         }
                       />
-                      <Icon
-                        style={{
-                          flexDirection: "row-reverse",
-                          paddingLeft: 10,
-                        }}
-                        name="trash-outline"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() => Delete(item.id)}
-                      />
-                      <Icon
-                        style={{
-                          flexDirection: "row-reverse",
-                          paddingLeft: 10,
-                        }}
-                        name="create-outline"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          props.navigation.navigate("EditComment", {
-                            cid: item.id,
-                          })
-                        }
-                      />
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          flexDirection: "row",
-                          alignContent: "flex-end",
-                        }}
-                      >
-                        <Text style={styles.userT}>
-                         {timeDifference(new Date(), item.creation.toDate())}
-                        </Text>
-                      </View>
+
+                      {item.userId === userId ? (
+                        <View style={{ flexDirection: "row" }}>
+                          <Icon
+                            style={{
+                              flexDirection: "row-reverse",
+                              paddingLeft: 10,
+                            }}
+                            name="trash-outline"
+                            type="ionicon"
+                            size={20}
+                            color="#000"
+                            onPress={() => Delete(item.id)}
+                          />
+                          <Icon
+                            style={{
+                              flexDirection: "row-reverse",
+                              paddingLeft: 10,
+                            }}
+                            name="create-outline"
+                            type="ionicon"
+                            size={20}
+                            color="#000"
+                            onPress={() =>
+                              props.navigation.navigate("EditComment", {
+                                cid: item.id,
+                              })
+                            }
+                          />
+                        </View>
+                      ) : null}
                     </View>
-                  ) : ( 
+                  ) : (
                     <View style={{ flexDirection: "row" }}>
                       <Text
                         style={{
@@ -423,130 +422,38 @@ function ViewDiscussion(props) {
                           addLike(item.id, item.numOfLike, item.likeBy)
                         }
                       />
-                      <Icon
-                        style={{
-                          flexDirection: "row-reverse",
-                          paddingLeft: 10,
-                        }}
-                        name="trash-outline"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() => Delete(item.id)}
-                      />
-                      <Icon
-                        style={{
-                          flexDirection: "row-reverse",
-                          paddingLeft: 10,
-                        }}
-                        name="create-outline"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          props.navigation.navigate("EditComment", {
-                            cid: item.id,
-                          })
-                        }
-                      />
-                      <Text style={styles.userT}>
-                      {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
+                      {item.userId === userId ? (
+                        <View style={{ flexDirection: "row" }}>
+                          <Icon
+                            style={{
+                              flexDirection: "row-reverse",
+                              paddingLeft: 10,
+                            }}
+                            name="trash-outline"
+                            type="ionicon"
+                            size={20}
+                            color="#000"
+                            onPress={() => Delete(item.id)}
+                          />
+                          <Icon
+                            style={{
+                              flexDirection: "row-reverse",
+                              paddingLeft: 10,
+                            }}
+                            name="create-outline"
+                            type="ionicon"
+                            size={20}
+                            color="#000"
+                            onPress={() =>
+                              props.navigation.navigate("EditComment", {
+                                cid: item.id,
+                              })
+                            }
+                          />
+                        </View>
+                      ) : null}
                     </View>
                   )}
-                </View>
-              </View>
-            </View>
-          ) : item.discussionId === discussionId && item.userId != userId ? (
-            <View style={{ flexDirection: "row" }}>
-              <View>
-                {!item.image ? (
-                  <Image
-                    style={{
-                      marginRight: 15,
-                      width: 35,
-                      height: 35,
-                      borderRadius: 35 / 2,
-                    }}
-                    source={require("../../../assets/newProfile.png")}
-                  />
-                ) : (
-                  <Image
-                    style={{
-                      marginRight: 15,
-                      width: 35,
-                      height: 35,
-                      borderRadius: 35 / 2,
-                    }}
-                    source={{
-                      uri: item.image,
-                    }}
-                  />
-                )}
-              </View>
-              <View style={styles.commentCon}>
-                <Text style={styles.userT}>{item.postedBy}</Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={styles.userC}>{item.comment}</Text>
-                 
-                </View>
-
-                <View style={{ flexDirection: "row"}}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        marginRight: 3,
-                        fontFamily: "Poppins",
-                      }}
-                    >
-                      {item.numOfLike}
-                    </Text>
-                  </View>
-                  <View>
-                    {item.likeBy.includes(userId) ? (
-                      <Icon
-                        style={{
-                          flexDirection: "row-reverse",
-                          paddingLeft: 10,
-                        }}
-                        name="heart"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          removeLike(item.id, item.numOfLike, item.likeBy)
-                        }
-                      />
-                    ) : (
-                      <Icon
-                        style={{
-                          flexDirection: "row-reverse",
-                          paddingLeft: 10,
-                    
-                        }}
-                        name="heart-outline"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          addLike(item.id, item.numOfLike, item.likeBy)
-                        }
-                      />
-                    )}
-                  </View>
-                  <View style={{paddingLeft:5}}>
-                  <Text style={styles.userT}>
-                   {timeDifference(new Date(), item.creation.toDate())}
-                  </Text>
-
-                  </View>
-
                 </View>
               </View>
             </View>
@@ -639,7 +546,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
     fontSize: 15,
   },
-
 
   blogout: {
     width: 160,
