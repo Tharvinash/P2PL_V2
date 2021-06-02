@@ -331,15 +331,14 @@ function ViewDiscussion(props) {
                   )}
                 </View>
                 <View style={styles.commentCon}>
-                  <View style={{ flexDirection: "row" }}>
+                  <View style={{ flexDirection: "row",justifyContent:"space-between"  }}>
                     <Text style={styles.userT}>{item.postedBy} </Text>
+                    <Text style={styles.userC, {marginRight:20}}>
+                      {timeDifference(new Date(), item.creation.toDate())}
+                    </Text>
                   </View>
                   <View style={{ flexDirection: "row", justifyContent:"space-between" }}>
                     <Text style={styles.userC}>{item.comment}</Text>
-
-                    <Text style={styles.userC}>
-                      {timeDifference(new Date(), item.creation.toDate())}
-                    </Text>
                   </View>
 
                   {item.likeBy.includes(userId) ? (
