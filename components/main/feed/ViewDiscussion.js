@@ -10,8 +10,10 @@ import {
   Image,
   Share,
   ScrollView,
+  Button,
 } from "react-native";
 import { Icon } from "react-native-elements";
+import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import firebase from "firebase";
 import * as Linking from "expo-linking";
@@ -20,6 +22,9 @@ import { timeDifference } from "../../utils";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
+  const { currentUser } = props;
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [newComment, setNewComment] = useState("");
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
@@ -27,6 +32,7 @@ function ViewDiscussion(props) {
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   // const discussionId = props.route.params.did;
   const userId = firebase.auth().currentUser.uid;
+  const postedBy = currentUser.name;
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -93,6 +99,30 @@ function ViewDiscussion(props) {
   if (user === null) {
     return <View />;
   }
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const UploadComment = () => {
+   
+    firebase
+      .firestore()
+      .collection("Comment")
+      .add({
+        userId,
+        postedBy,
+        discussionId,
+        comment: newComment,
+        creation: firebase.firestore.FieldValue.serverTimestamp(),
+        likeBy: [],
+        numOfLike: 0,
+      })
+      .then(function () {
+        setModalVisible(!isModalVisible);
+      });
+      setData(57);
+  };
 
   const AddFavDiscussion = () => {
     const FD = user.FavDiscussion;
@@ -331,13 +361,23 @@ function ViewDiscussion(props) {
                   )}
                 </View>
                 <View style={styles.commentCon}>
-                  <View style={{ flexDirection: "row",justifyContent:"space-between"  }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <Text style={styles.userT}>{item.postedBy} </Text>
-                    <Text style={styles.userC, {marginRight:20}}>
+                    <Text style={(styles.userC, { marginRight: 20 })}>
                       {timeDifference(new Date(), item.creation.toDate())}
                     </Text>
                   </View>
-                  <View style={{ flexDirection: "row", justifyContent:"space-between" }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <Text style={styles.userC}>{item.comment}</Text>
                   </View>
 
@@ -460,14 +500,53 @@ function ViewDiscussion(props) {
         }
       />
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity
-          style={styles.blogout}
-          onPress={() =>
-            props.navigation.navigate("Post Comment", { did: discussionId })
-          }
-        >
+        <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
           <Text style={styles.Ltext}>Add Comment</Text>
         </TouchableOpacity>
+
+        <Modal isVisible={isModalVisible}>
+          <View style={{ justifyContent: "center" }}>
+            <View style={{ marginLeft: 8 }}>
+              <TextInput
+                style={styles.input}
+                placeholder="Add comments here"
+                placeholderTextColor="#000"
+                multiline={true}
+                onChangeText={(newComment) => setNewComment(newComment)}
+              />
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.blogout}
+                  onPress={() => UploadComment()}
+                >
+                  <Text style={styles.Ltext}>Add Comment</Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
+                  <Text style={styles.Ltext}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );
@@ -488,6 +567,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
+  input: {
+    height: 60,
+    borderColor: "#E3562A",
+    borderWidth: 1,
+    backgroundColor: "#FFF",
+    width: 340,
+    borderRadius: 12,
+    padding: 10,
+    fontFamily: "Poppins",
+  },
+
   logo: {
     width: 300,
     height: 400,
@@ -547,7 +638,7 @@ const styles = StyleSheet.create({
   },
 
   blogout: {
-    width: 160,
+    width: 140,
     height: 40,
     backgroundColor: "#E3562A",
     borderColor: "#E3562A",

@@ -11,6 +11,7 @@ function PostComment(props) {
     const postedBy = currentUser.name
     const userId = firebase.auth().currentUser.uid
     const [comment, setComments] = useState("")
+    const [isModalVisible, setModalVisible] = useState(false);
     const discussionId = props.route.params.did
     const UploadComment = () => {
         firebase.firestore()
@@ -30,6 +31,8 @@ function PostComment(props) {
      
             }))
     }
+
+
     
     const Cancel = () => {
         props.navigation.goBack()
@@ -37,22 +40,7 @@ function PostComment(props) {
 
     return (
         <View style={styles.container}>
-            <View style={{flexDirection:"row", marginRight:110}}>
-                <Text style={styles.title}>Titleee</Text>
-            </View>
-            <View>
-                
-            </View>
-            <View style={styles.desc}>
-                <Text style={styles.descT}>
-                    Decscription
-                </Text>
-            </View>
-            <View>
-                <Text style={styles.comT}>
-                    Your comments on this post
-                </Text>
-            </View>
+            
             <View style={{paddingTop:10}}>
                 <TextInput
                     style = {styles.input}
