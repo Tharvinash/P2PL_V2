@@ -17,10 +17,8 @@ require("firebase/firestore");
 function Feed(props) {
   const { posts, currentUser } = props;
   const [post, setPost] = useState(posts);
-  console.log(post)
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {}, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -37,7 +35,6 @@ function Feed(props) {
           return { id, ...data };
         });
         setPost(posts);
-        console.log(2323)
         setRefreshing(false);
       });
     setRefreshing(false);
@@ -111,7 +108,7 @@ function Feed(props) {
                             borderRadius: 35 / 2,
                             marginBottom: 10,
                           }}
-                          source={require("../../../assets/default.jpg")}
+                          source={require("../../../assets/newProfile.png")}
                         />
                       )}
                       <View

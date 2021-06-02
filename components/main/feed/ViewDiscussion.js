@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
   Share,
+  ScrollView,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
@@ -27,21 +28,33 @@ function ViewDiscussion(props) {
   // const discussionId = props.route.params.did;
   const userId = firebase.auth().currentUser.uid;
 
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+          <Icon
+            name="alert-circle-outline"
+            type="ionicon"
+            size={30}
+            color="#000"
+          />
+          <Icon
+            name="share-social-outline"
+            type="ionicon"
+            size={30}
+            color="#000"
+            onPress={() => onShare()}
+          />
+        </View>
+      ),
+    });
+  }, []);
 
-  // function handleDeepLink(event) {
-  //     let data = Linking.parse(event.url);
-  //     setData(data);
-  // }
-
-  // useEffect(() => {
-  //     Linking.addEventListener("url", handleDeepLink);
-  //     return () => {
-  //     Linking.removeEventListener("url");
-  //     };
-  // }, []);
+  const xxx = () => {
+    console.log(24);
+  };
 
   useEffect(() => {
-
     const { currentUser, comments } = props;
     if (currentUser.FavDiscussion !== null) {
       setUser(currentUser);
@@ -58,22 +71,22 @@ function ViewDiscussion(props) {
       .get()
       .then((snapshot) => {
         setUserPosts(snapshot.data());
-  
       });
 
-      firebase.firestore()
+    firebase
+      .firestore()
       .collection("Comment")
       .get()
       .then((snapshot) => {
-          let comment = snapshot.docs.map(doc => {
-              const data = doc.data();
-              const id = doc.id;
-              return { id, ...data }
-          })
-          setComment(comment)
-      })
+        let comment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setComment(comment);
+      });
 
-      setData(11)
+    setData(11);
   }, [props.currentUser, props.route.params.did, data]);
 
   if (user === null) {
@@ -118,7 +131,6 @@ function ViewDiscussion(props) {
   const RemoveFavDiscussion = () => {
     const FD = user.FavDiscussion;
 
-
     const index = FD.indexOf(discussionId);
     if (index > -1) {
       FD.splice(index, 1);
@@ -136,7 +148,6 @@ function ViewDiscussion(props) {
       });
 
     const FB = userPosts.favBy;
-
 
     const indexx = FB.indexOf(userId);
     if (indexx > -1) {
@@ -177,7 +188,6 @@ function ViewDiscussion(props) {
   };
 
   const Delete = (cid) => {
-
     // firebase.firestore().collection("Comment").doc(cid).delete();
     // console.log("delete");
     // props.navigation.goBack();
@@ -201,7 +211,6 @@ function ViewDiscussion(props) {
         },
       ]
     );
-
   };
 
   const addLike = (cid, nol, lb) => {
@@ -247,15 +256,23 @@ function ViewDiscussion(props) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection: "row", marginRight: 110 }}>
-        <Text style={styles.title}>{userPosts.title}</Text>
-        <View style={styles.icon}>
+    <ScrollView style={styles.container}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "space-around",
+          paddingRight: 35,
+        }}
+      >
+        <View>
+          <Text style={styles.title}>{userPosts.title}</Text>
+        </View>
+        <View>
           {user.FavDiscussion.includes(discussionId) ? (
             <Icon
               name="bookmark"
               type="ionicon"
-              size={30}
+              size={35}
               Color="#000"
               onPress={() => RemoveFavDiscussion()}
             />
@@ -263,25 +280,11 @@ function ViewDiscussion(props) {
             <Icon
               name="bookmark-outline"
               type="ionicon"
-              size={30}
+              size={35}
               Color="#000"
               onPress={() => AddFavDiscussion()}
             />
           )}
-
-          <Icon
-            name="alert-circle-outline"
-            type="ionicon"
-            size={30}
-            color="#000"
-          />
-          <Icon
-            name="share-social-outline"
-            type="ionicon"
-            size={30}
-            color="#000"
-            onPress={() => onShare()}
-          />
         </View>
       </View>
       <View style={{ flexDirection: "row", paddingBottom: 10 }}>
@@ -311,7 +314,7 @@ function ViewDiscussion(props) {
                         height: 35,
                         borderRadius: 35 / 2,
                       }}
-                      source={require("../../../assets/default.jpg")}
+                      source={require("../../../assets/newProfile.png")}
                     />
                   ) : (
                     <Image
@@ -384,11 +387,19 @@ function ViewDiscussion(props) {
                           })
                         }
                       />
-                      <Text>
-                        ({timeDifference(new Date(), item.creation.toDate())})
-                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flexDirection: "row",
+                          alignContent: "flex-end",
+                        }}
+                      >
+                        <Text style={styles.userT}>
+                         {timeDifference(new Date(), item.creation.toDate())}
+                        </Text>
+                      </View>
                     </View>
-                  ) : (
+                  ) : ( 
                     <View style={{ flexDirection: "row" }}>
                       <Text
                         style={{
@@ -438,8 +449,8 @@ function ViewDiscussion(props) {
                           })
                         }
                       />
-                      <Text>
-                        ({timeDifference(new Date(), item.creation.toDate())})
+                      <Text style={styles.userT}>
+                      {timeDifference(new Date(), item.creation.toDate())}
                       </Text>
                     </View>
                   )}
@@ -457,7 +468,7 @@ function ViewDiscussion(props) {
                       height: 35,
                       borderRadius: 35 / 2,
                     }}
-                    source={require("../../../assets/default.jpg")}
+                    source={require("../../../assets/newProfile.png")}
                   />
                 ) : (
                   <Image
@@ -475,46 +486,67 @@ function ViewDiscussion(props) {
               </View>
               <View style={styles.commentCon}>
                 <Text style={styles.userT}>{item.postedBy}</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={styles.userC}>{item.comment}</Text>
+                 
+                </View>
 
-                <Text style={styles.userC}>{item.comment}</Text>
-
-                <View style={{ flexDirection: "row" }}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      marginRight: 3,
-                      fontFamily: "Poppins",
-                    }}
-                  >
-                    {item.numOfLike}
+                <View style={{ flexDirection: "row"}}>
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginRight: 3,
+                        fontFamily: "Poppins",
+                      }}
+                    >
+                      {item.numOfLike}
+                    </Text>
+                  </View>
+                  <View>
+                    {item.likeBy.includes(userId) ? (
+                      <Icon
+                        style={{
+                          flexDirection: "row-reverse",
+                          paddingLeft: 10,
+                        }}
+                        name="heart"
+                        type="ionicon"
+                        size={20}
+                        color="#000"
+                        onPress={() =>
+                          removeLike(item.id, item.numOfLike, item.likeBy)
+                        }
+                      />
+                    ) : (
+                      <Icon
+                        style={{
+                          flexDirection: "row-reverse",
+                          paddingLeft: 10,
+                    
+                        }}
+                        name="heart-outline"
+                        type="ionicon"
+                        size={20}
+                        color="#000"
+                        onPress={() =>
+                          addLike(item.id, item.numOfLike, item.likeBy)
+                        }
+                      />
+                    )}
+                  </View>
+                  <View style={{paddingLeft:5}}>
+                  <Text style={styles.userT}>
+                   {timeDifference(new Date(), item.creation.toDate())}
                   </Text>
-                  {item.likeBy.includes(userId) ? (
-                    <Icon
-                      style={{ flexDirection: "row-reverse", paddingLeft: 10 }}
-                      name="heart"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() =>
-                        removeLike(item.id, item.numOfLike, item.likeBy)
-                      }
-                    />
-                  ) : (
-                    <Icon
-                      style={{ flexDirection: "row-reverse", paddingLeft: 10 }}
-                      name="heart-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() =>
-                        addLike(item.id, item.numOfLike, item.likeBy)
-                      }
-                    />
-                  )}
 
-                  <Text>
-                    ({timeDifference(new Date(), item.creation.toDate())})
-                  </Text>
+                  </View>
+
                 </View>
               </View>
             </View>
@@ -531,7 +563,7 @@ function ViewDiscussion(props) {
           <Text style={styles.Ltext}>Add Comment</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -540,6 +572,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 20,
+    marginRight: 5,
+    // marginTop: 20,
+    marginBottom: 5,
+    // marginLeft: 20,
+    // marginLeft:20
   },
   container3: {
     justifyContent: "center",
@@ -550,10 +587,8 @@ const styles = StyleSheet.create({
     height: 400,
   },
   title: {
-    // marginTop:20,
     fontSize: 20,
     fontFamily: "Poppins",
-    //paddingRight:190
     lineHeight: 25,
   },
   image: {
@@ -563,31 +598,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 300,
     height: 300,
-    resizeMode: 'contain'
+    resizeMode: "contain",
   },
 
   commentCon: {
     borderColor: "#E3562A",
-    // borderTopColor: "#E3562A",
-    // borderTopWidth: 2,
-    // borderBottomColor: "#E3562A",
     borderBottomWidth: 5,
     width: 300,
     paddingVertical: 3,
   },
 
-  icon: {
-    // position: "relative",
-    marginTop: 5,
-    paddingHorizontal: 3,
-    flexDirection: "row",
-    // alignItems:"flex-end"
-  },
-
   desc: {
     fontSize: 14,
-    justifyContent: "center",
-    alignItems: "center",
   },
 
   descT: {
@@ -609,9 +631,15 @@ const styles = StyleSheet.create({
 
   userC: {
     fontFamily: "Poppins",
-    //   paddingLeft: 10,
+    lineHeight: 20,
     fontSize: 15,
   },
+
+  userT: {
+    fontFamily: "Poppins",
+    fontSize: 15,
+  },
+
 
   blogout: {
     width: 160,
