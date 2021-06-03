@@ -105,7 +105,6 @@ function ViewDiscussion(props) {
   };
 
   const UploadComment = () => {
-   
     firebase
       .firestore()
       .collection("Comment")
@@ -117,11 +116,12 @@ function ViewDiscussion(props) {
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         likeBy: [],
         numOfLike: 0,
+        verify: false,
       })
       .then(function () {
         setModalVisible(!isModalVisible);
       });
-      setData(57);
+    setData(57);
   };
 
   const AddFavDiscussion = () => {
@@ -216,6 +216,35 @@ function ViewDiscussion(props) {
     } catch (error) {
       alert(error.message);
     }
+  };
+
+  const verifyComment = (cid) => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cid)
+      .update({
+        verify: true,
+      })
+      .then(() => {
+        console.log("done");
+      });
+    setData(5);
+  };
+
+
+	const removeVerifyComment = (cid) => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cid)
+      .update({
+        verify: false,
+      })
+      .then(() => {
+        console.log("done");
+      });
+    setData(6);
   };
 
   const Delete = (cid) => {
@@ -359,6 +388,30 @@ function ViewDiscussion(props) {
                       }}
                     />
                   )}
+                  <View
+                    style={{
+                      marginRight: 10,
+                      paddingTop: 10,
+                    }}
+                  >
+                    {item.verify ? (
+                      <Icon
+                        name="checkmark-circle"
+                        type="ionicon"
+                        size={20}
+                        color="#000"
+                        onPress={() => removeVerifyComment(item.id)}
+                      />
+                    ) : (
+                      <Icon
+                        name="checkmark-circle-outline"
+                        type="ionicon"
+                        size={20}
+                        color="#000"
+                        onPress={() => verifyComment(item.id)}
+                      />
+                    )}
+                  </View>
                 </View>
                 <View style={styles.commentCon}>
                   <View
