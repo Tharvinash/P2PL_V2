@@ -359,6 +359,21 @@ function ViewDiscussion(props) {
                       }}
                     />
                   )}
+                                    <View
+                    style={{
+                      marginRight: 10,
+                      paddingTop: 10,
+                    }}
+                                    >
+                    {item.verify ? (
+                      <Icon
+                        name="checkmark-circle"
+                        type="ionicon"
+                        size={25}
+                        color="#140F38"
+                      />
+                    ) : null}
+                  </View>
                 </View>
                 <View style={styles.commentCon}>
                   <View

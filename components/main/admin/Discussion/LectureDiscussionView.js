@@ -398,16 +398,16 @@ function ViewDiscussion(props) {
                       <Icon
                         name="checkmark-circle"
                         type="ionicon"
-                        size={20}
-                        color="#000"
+                        size={25}
+                        color="#140F38"
                         onPress={() => removeVerifyComment(item.id)}
                       />
                     ) : (
                       <Icon
                         name="checkmark-circle-outline"
                         type="ionicon"
-                        size={20}
-                        color="#000"
+                        size={25}
+                        color="#140F38"
                         onPress={() => verifyComment(item.id)}
                       />
                     )}

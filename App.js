@@ -58,7 +58,7 @@ import EditComment from "./components/main/addDiscussion/EditComment";
 //Lecture
 import LectureMainScreen from "./components/main/admin/Main2";
 import ReportedDiscussion from "./components/main/admin/profile/ReportedDiscussion";
-import LectureDiscussionView from './components/main/admin/Discussion/LectureDiscussionView'
+import LectureDiscussionView from "./components/main/admin/Discussion/LectureDiscussionView";
 
 import DiscussionTitle from "./components/main/feed/ViewDiscussion";
 import PostComment from "./components/main/addDiscussion/PostComment";
@@ -85,20 +85,20 @@ export class App extends Component {
           loggedIn: true,
           loaded: true,
         });
-        firebase.firestore()
-        .collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .get()
-        .then((snapshot) => {
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .get()
+          .then((snapshot) => {
             if (snapshot.exists) {
               this.setState({
                 name: snapshot.data().name,
               });
+            } else {
+              console.log("does not exist");
             }
-            else {
-                console.log('does not exist')
-            }
-        })
+          });
       }
     });
 
@@ -133,8 +133,8 @@ export class App extends Component {
         </NavigationContainer>
       );
     }
-
-    if (name === "Lecture1") {
+//Lecture1
+    if (name === "xxx") {
       return (
         <Provider store={store}>
           <NavigationContainer>
@@ -153,6 +153,16 @@ export class App extends Component {
               <Stack.Screen
                 name="ReportedDiscussion"
                 component={ReportedDiscussion}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="EditProfile"
+                component={EditProfile}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Change Password"
+                component={EditPassword}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>
