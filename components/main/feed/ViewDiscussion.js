@@ -19,6 +19,7 @@ import firebase from "firebase";
 import * as Linking from "expo-linking";
 
 import { timeDifference } from "../../utils";
+import { RefreshControlBase } from "react-native";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
@@ -43,21 +44,26 @@ function ViewDiscussion(props) {
             type="ionicon"
             size={30}
             color="#000"
+            onPress={() => xxx()}
           />
-          <Icon
-            name="share-social-outline"
-            type="ionicon"
-            size={30}
-            color="#000"
-            onPress={() => onShare()}
-          />
+          <TouchableOpacity>
+            <Icon
+              name="share-social-outline"
+              type="ionicon"
+              size={30}
+              color="#000"
+              onPress={() => onShare()}
+            />
+          </TouchableOpacity>
         </View>
       ),
     });
   }, []);
 
   const xxx = () => {
-    console.log(24);
+    props.navigation.navigate("Report Discussion", {
+      did: discussionId,
+    });
   };
 
   useEffect(() => {
@@ -105,7 +111,6 @@ function ViewDiscussion(props) {
   };
 
   const UploadComment = () => {
-   
     firebase
       .firestore()
       .collection("Comment")
@@ -121,7 +126,7 @@ function ViewDiscussion(props) {
       .then(function () {
         setModalVisible(!isModalVisible);
       });
-      setData(57);
+    setData(57);
   };
 
   const AddFavDiscussion = () => {
@@ -359,12 +364,12 @@ function ViewDiscussion(props) {
                       }}
                     />
                   )}
-                                    <View
+                  <View
                     style={{
                       marginRight: 10,
                       paddingTop: 10,
                     }}
-                                    >
+                  >
                     {item.verify ? (
                       <Icon
                         name="checkmark-circle"

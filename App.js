@@ -49,6 +49,7 @@ import RegisterScreen from "./components/auth/Register";
 import LoginScreen from "./components/auth/Login";
 import MainScreen from "./components/Main";
 import AddScreen from "./components/main/addDiscussion/Add";
+import ReportDiscussion from "./components/main/feed/ReportDiscussion";
 // import SaveScreen from './components/main/Save'
 // import CommentScreen from './components/main/Comment'
 
@@ -133,7 +134,7 @@ export class App extends Component {
         </NavigationContainer>
       );
     }
-//Lecture1
+    //Lecture1
     if (name === "xxx") {
       return (
         <Provider store={store}>
@@ -243,6 +244,11 @@ export class App extends Component {
             <Stack.Screen
               name="Change Password"
               component={EditPassword}
+              navigation={this.props.navigation}
+            />
+            <Stack.Screen
+              name="Report Discussion"
+              component={ReportDiscussion}
               navigation={this.props.navigation}
             />
           </Stack.Navigator>
