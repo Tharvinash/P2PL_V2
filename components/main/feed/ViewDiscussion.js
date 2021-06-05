@@ -28,6 +28,7 @@ function ViewDiscussion(props) {
   const [isReportVisible, setReportVisible] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [newOption, setOption] = useState(options);
+
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
@@ -61,7 +62,7 @@ function ViewDiscussion(props) {
       ),
     });
   }, []);
-
+  // props.navigation.setParams({ toggleReport: toggleReport })
   useEffect(() => {
     const { currentUser, comments } = props;
     if (currentUser.FavDiscussion !== null) {
@@ -116,7 +117,7 @@ function ViewDiscussion(props) {
         reportedDiscussion: discussionId,
         discussionTitle: userPosts.title,
         timeReported: firebase.firestore.FieldValue.serverTimestamp(),
-        discussionPostedBy : userPosts.userId
+        discussionPostedBy: userPosts.userId,
       })
       .then(function () {
         setReportVisible(!isReportVisible);
@@ -321,7 +322,9 @@ function ViewDiscussion(props) {
           paddingRight: 35,
         }}
       >
-        <Text style={styles.title}>{userPosts.title}</Text>
+        <View>
+          <Text style={styles.title}>{userPosts.title}</Text>
+        </View>
 
         <View>
           {user.FavDiscussion.includes(discussionId) ? (
@@ -343,9 +346,12 @@ function ViewDiscussion(props) {
           )}
         </View>
       </View>
-      <View style={{ flexDirection: "row", paddingBottom: 10 }}>
-        <Image style={styles.image} source={{ uri: userPosts.downloadURL }} />
-      </View>
+
+      {userPosts.downloadURL && (
+        <View style={{ flexDirection: "row", paddingBottom: 10 }}>
+          <Image style={styles.image} source={{ uri: userPosts.downloadURL }} />
+        </View>
+      )}
 
       <View style={styles.desc}>
         <Text style={styles.descT}>{userPosts.description}</Text>
@@ -696,7 +702,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontFamily: "Poppins",
-    lineHeight: 25,
+    lineHeight: 20,
+    fontWeight: "700",
   },
   image: {
     flex: 1,

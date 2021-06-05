@@ -275,7 +275,7 @@ function Add(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38"
+    backgroundColor: "#140F38",
   },
 
   image: {
