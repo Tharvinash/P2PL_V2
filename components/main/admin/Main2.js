@@ -10,6 +10,7 @@ import {
   fetchUser,
   fetchUserPosts,
   fetchUserComment,
+  fetchReportedDiscussion
 } from "../../../redux/actions/index";
 
 import LectureFeed from "../admin/lectureMain/LectureFeed";
@@ -29,7 +30,7 @@ export class Main extends Component {
     this.props.fetchUser();
     this.props.fetchUserPosts();
     this.props.fetchUserComment();
-    //  this.props.fetchUserFeed();
+    this.props.fetchReportedDiscussion();
   }
   render() {
     // const { currentUser } = this.props;
@@ -91,7 +92,7 @@ const mapStateToProps = (store) => ({
 });
 
 const mapDispatchProps = (dispatch) =>
-  bindActionCreators({ fetchUser, fetchUserPosts, fetchUserComment }, dispatch);
+  bindActionCreators({ fetchUser, fetchUserPosts, fetchUserComment, fetchReportedDiscussion }, dispatch);
 //, fetchUserPosts, fetchUserFollowing, clearData
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

@@ -135,7 +135,7 @@ export class App extends Component {
       );
     }
     //Lecture1
-    if (name === "xxx") {
+    if (name === "Lecture1") {
       return (
         <Provider store={store}>
           <NavigationContainer>

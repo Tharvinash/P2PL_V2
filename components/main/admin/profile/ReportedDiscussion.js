@@ -17,6 +17,9 @@ import { RefreshControlBase } from "react-native";
 import { SwipeListView } from "react-native-swipe-list-view";
 
 function ReportedDiscussion(props) {
+
+  const {reportedDiscussion} = props;
+  const [data, setData] = useState(reportedDiscussion);
   const [xxx, setPost] = useState([{ as: "dssd", fs: "ew" }]);
 
   const renderItem = (data) => (
@@ -24,45 +27,44 @@ function ReportedDiscussion(props) {
       <View style={styles.cardContent}>
         <TouchableOpacity
           onPress={() =>
-            props.navigation.navigate("DiscussionTitle", {
-              did: item.id,
+            props.navigation.navigate("LectureDiscussionView", {
+              did: data.item.reportedDiscussion,
             })
           }
         >
           <Text numberOfLines={2} style={styles.title}>
-            xxx
+            {data.item.discussionTitle}
           </Text>
-          <Text style={styles.faculty}>xxxffffffffffdfffffffffffffffffffffffffffff</Text>
+          <Text style={styles.faculty}>{data.item.Reason}</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
   const closeRow = (rowMap, rowKey) => {
-    if (rowMap[rowKey]) {
-      rowMap[rowKey].closeRow();
-    }
+console.log(rowKey)
   };
 
   const deleteRow = (rowMap, rowKey) => {
-    closeRow(rowMap, rowKey);
-    const newData = [...listData];
-    const prevIndex = listData.findIndex((item) => item.key === rowKey);
-    newData.splice(prevIndex, 1);
-    setListData(newData);
+    console.log(rowKey)
+    // closeRow(rowMap, rowKey);
+    // const newData = [...listData];
+    // const prevIndex = listData.findIndex((item) => item.key === rowKey);
+    // newData.splice(prevIndex, 1);
+    // setListData(newData);
   };
 
   const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnLeft]}
-        onPress={() => closeRow(rowMap, data.item.key)}
+        onPress={() => closeRow(rowMap, data.item.id)}
       >
         <Text style={styles.backTextWhite}>Ignore</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
-        onPress={() => deleteRow(rowMap, data.item.key)}
+        onPress={() => deleteRow(data.item.id, data.item.reportedDiscussion)}
       >
         <Text style={styles.backTextWhite}>Delete</Text>
       </TouchableOpacity>
@@ -73,7 +75,7 @@ function ReportedDiscussion(props) {
     <View style={{ justifyContent: "center", alignItems: "center" }}>
       <SwipeListView
         disableRightSwipe
-        data={xxx}
+        data={data}
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
         previewRowKey={"0"}
@@ -167,4 +169,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReportedDiscussion;
+
+
+const mapStateToProps = (store) => ({
+  reportedDiscussion: store.userState.reportedDiscussion,
+});
+
+export default connect(mapStateToProps, null)(ReportedDiscussion);

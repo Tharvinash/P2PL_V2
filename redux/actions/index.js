@@ -1,10 +1,15 @@
-import { USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE,USER_COMMENT_STATE_CHANGE } from '../constants/index'
+import {
+  USER_STATE_CHANGE,
+  USER_POSTS_STATE_CHANGE,
+  USER_COMMENT_STATE_CHANGE,
+  USER_OPTION_STATE_CHANGE,
+  USER_REPORTEDDISCUSSION_STATE_CHANGE
+} from "../constants/index";
 //, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, CLEAR_DATA
 
-import firebase from 'firebase'
+import firebase from "firebase";
 //import { SnapshotViewIOSComponent } from 'react-native'
-require('firebase/firestore')
-
+require("firebase/firestore");
 
 // export function clearData() {
 //     return ((dispatch) => {
@@ -13,85 +18,93 @@ require('firebase/firestore')
 // }
 // ui trigger -> action -> reducer -> dispacth(store) -> value update
 export function fetchUser() {
-    return ((dispatch) => {
-        firebase.firestore()
-            .collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .get()
-            .then((snapshot) => {
-                if (snapshot.exists) {
-               // console.log(snapshot.data())
-                   dispatch({ type: USER_STATE_CHANGE, currentUser: snapshot.data() })
-                }
-                else {
-                    console.log('does not exist')
-                }
-            })
-    })
+  return (dispatch) => {
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          // console.log(snapshot.data())
+          dispatch({ type: USER_STATE_CHANGE, currentUser: snapshot.data() });
+        } else {
+          console.log("does not exist");
+        }
+      });
+  };
 }
 
 export function fetchUserPosts() {
-    return ((dispatch) => {
-        firebase.firestore()
-            .collection("Discussion")
-            .orderBy("creation", "asc")
-            .get()
-            .then((snapshot) => {
-                let posts = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-                dispatch({ type: USER_POSTS_STATE_CHANGE, posts })
-               //console.log(posts)
-            })
-    })
+  return (dispatch) => {
+    firebase
+      .firestore()
+      .collection("Discussion")
+      .orderBy("creation", "asc")
+      .get()
+      .then((snapshot) => {
+        let posts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        dispatch({ type: USER_POSTS_STATE_CHANGE, posts });
+        //console.log(posts)
+      });
+  };
 }
-
 
 export function fetchUserComment() {
-    return ((dispatch) => {
-        firebase.firestore()
-            .collection("Comment")
-            .get()
-            .then((snapshot) => {
-                let comment = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    return { id, ...data }
-                })
-              //  console.log(comment)
-                dispatch({ type: USER_COMMENT_STATE_CHANGE, comment })
-            })
-    })
+  return (dispatch) => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .get()
+      .then((snapshot) => {
+        let comment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        //  console.log(comment)
+        dispatch({ type: USER_COMMENT_STATE_CHANGE, comment });
+      });
+  };
 }
 
-// export function fetchUserFeed() {
-//     return ((dispatch) => {
-//         firebase.firestore()
-//             .collection("users")
-//             .get()
-//             .then((snapshot) => {
-//                 let id = snapshot.docs.map(doc => {
-//                     firebase.firestore()
-//                     .collection("posts")
-//                     .doc(doc.id)
-//                     .collection("userPosts")
-//                     .orderBy("creation", "asc")
-//                     .get()
-//                     .then((snapshot) => {
-//                         let feed = snapshot.docs.map(doc => {
-//                             const data = doc.data();
-//                             const id = doc.id;
-//                             return { id, ...data }
-//                         })
-//                      dispatch({ type: USER_FOLLOWING_STATE_CHANGE, feed })
-//                     })
-//                 })
-//                //  dispatch({ type: USER_FOLLOWING_STATE_CHANGE, doc.id })
-//             })
-//     })
-// }
+export function fetchOption() {
+  return (dispatch) => {
+    firebase
+      .firestore()
+      .collection("ReportOptions")
+      .get()
+      .then((snapshot) => {
+        let option = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        dispatch({ type: USER_OPTION_STATE_CHANGE, option });
+      });
+  };
+}
+
+export function fetchReportedDiscussion() {
+  return (dispatch) => {
+    firebase
+      .firestore()
+      .collection("ReportedDiscussion")
+      .get()
+      .then((snapshot) => {
+        let reportedDiscussion = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        dispatch({ type: USER_REPORTEDDISCUSSION_STATE_CHANGE, reportedDiscussion });
+      });
+  };
+}
 
 // export function fetchUsersData(uid, getPosts) {
 //     return ((dispatch, getState) => {
@@ -130,7 +143,6 @@ export function fetchUserComment() {
 //             .then((snapshot) => {
 //                 const uid = snapshot.query.EP.path.segments[1];
 //                 const user = getState().usersState.users.find(el => el.uid === uid);
-
 
 //                 let posts = snapshot.docs.map(doc => {
 //                     const data = doc.data();

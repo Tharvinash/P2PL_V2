@@ -23,9 +23,11 @@ import { RefreshControlBase } from "react-native";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
-  const { currentUser } = props;
+  const { currentUser, options } = props;
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isReportVisible, setReportVisible] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [newOption, setOption] = useState(options);
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
@@ -44,7 +46,7 @@ function ViewDiscussion(props) {
             type="ionicon"
             size={30}
             color="#000"
-            onPress={() => xxx()}
+            onPress={() => toggleReport()}
           />
           <TouchableOpacity>
             <Icon
@@ -59,12 +61,6 @@ function ViewDiscussion(props) {
       ),
     });
   }, []);
-
-  const xxx = () => {
-    props.navigation.navigate("Report Discussion", {
-      did: discussionId,
-    });
-  };
 
   useEffect(() => {
     const { currentUser, comments } = props;
@@ -106,8 +102,33 @@ function ViewDiscussion(props) {
     return <View />;
   }
 
+  const xxx = () => {
+    console.log(24);
+  };
+
+  const sendReport = (rid) => {
+    firebase
+      .firestore()
+      .collection("ReportedDiscussion")
+      .add({
+        reportedBy: userId,
+        Reason: rid,
+        reportedDiscussion: discussionId,
+        discussionTitle: userPosts.title,
+        timeReported: firebase.firestore.FieldValue.serverTimestamp(),
+        discussionPostedBy : userPosts.userId
+      })
+      .then(function () {
+        setReportVisible(!isReportVisible);
+      });
+  };
+
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  const toggleReport = () => {
+    setReportVisible(!isReportVisible);
   };
 
   const UploadComment = () => {
@@ -567,6 +588,34 @@ function ViewDiscussion(props) {
             </View>
           </View>
         </Modal>
+
+        <Modal isVisible={isReportVisible}>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Text style={styles.titley}>Why are you reporting this post</Text>
+            <FlatList
+              horizontal={false}
+              extraData={newOption}
+              data={newOption}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={() => sendReport(item.Option)}
+                >
+                  <View style={styles.card}>
+                    <View style={styles.cardContent}>
+                      <Text style={styles.titlex}>{item.Option}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <TouchableOpacity style={styles.blogout} onPress={toggleReport}>
+              <Text style={styles.Ltext}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );
@@ -586,6 +635,47 @@ const styles = StyleSheet.create({
   container3: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  titlex: {
+    color: "#fff",
+    fontSize: 20,
+    fontFamily: "Poppins",
+    paddingVertical: 0,
+    //  marginVertical: -5,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+
+  titley: {
+    color: "#fff",
+    fontSize: 25,
+    fontFamily: "Poppins",
+    paddingVertical: 0,
+    //  marginVertical: -5,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    fontWeight: "700",
+    marginBottom: 20,
+  },
+
+  card: {
+    borderRadius: 16,
+    elevation: 5,
+    backgroundColor: "#140F38",
+    shadowOffset: { width: 1, height: 1 },
+    shadowColor: "#333",
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    marginHorizontal: 4,
+    marginVertical: 6,
+    width: 340,
+  },
+
+  cardContent: {
+    marginVertical: 10,
+    marginHorizontal: 18,
   },
 
   input: {
@@ -680,6 +770,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
   comments: store.userState.comment,
+  options: store.userState.option,
 });
 
 export default connect(mapStateToProps, null)(ViewDiscussion);
