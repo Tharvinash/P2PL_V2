@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
+  Alert,
   Dimensions,
   ScrollView,
   FlatList,
@@ -17,10 +17,26 @@ import { RefreshControlBase } from "react-native";
 import { SwipeListView } from "react-native-swipe-list-view";
 
 function ReportedDiscussion(props) {
-
-  const {reportedDiscussion} = props;
+  const { reportedDiscussion } = props;
   const [data, setData] = useState(reportedDiscussion);
-  const [xxx, setPost] = useState([{ as: "dssd", fs: "ew" }]);
+  const [x, setX] = useState(0);
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .collection("ReportedDiscussion")
+      .get()
+      .then((snapshot) => {
+        let reportedDiscussion = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setData(reportedDiscussion);
+      });
+
+    setX(1);
+  }, [x]);
 
   const renderItem = (data) => (
     <View style={styles.card}>
@@ -41,24 +57,49 @@ function ReportedDiscussion(props) {
     </View>
   );
 
-  const closeRow = (rowMap, rowKey) => {
-console.log(rowKey)
+  const closeRow = (rowKey) => {
+    firebase.
+    firestore().
+    collection("ReportedDiscussion").
+    doc(rowKey).
+    delete();
+    setX(2);
   };
 
-  const deleteRow = (rowMap, rowKey) => {
-    console.log(rowKey)
-    // closeRow(rowMap, rowKey);
-    // const newData = [...listData];
-    // const prevIndex = listData.findIndex((item) => item.key === rowKey);
-    // newData.splice(prevIndex, 1);
-    // setListData(newData);
+  const deleteRow = (x,y) => {
+    return Alert.alert(
+      "Are your sure?",
+      "Are you sure you want to remove this Discussion ?",
+      [
+        // The "Yes" button
+        {
+          text: "Yes",
+          onPress: () => {
+            firebase.firestore().collection("Discussion").doc(y).delete();
+            firebase.
+            firestore().
+            collection("ReportedDiscussion").
+            doc(x).
+            delete();
+            setX(3);
+          },
+          
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "No",
+        },
+      ]
+    );
+
   };
 
-  const renderHiddenItem = (data, rowMap) => (
+  const renderHiddenItem = (data) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnLeft]}
-        onPress={() => closeRow(rowMap, data.item.id)}
+        onPress={() => closeRow(data.item.id)}
       >
         <Text style={styles.backTextWhite}>Ignore</Text>
       </TouchableOpacity>
@@ -97,7 +138,7 @@ const styles = StyleSheet.create({
   },
   backTextWhite: {
     color: "#FFF",
-		fontFamily: "Poppins",
+    fontFamily: "Poppins",
   },
 
   backRightBtnLeft: {
@@ -112,7 +153,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     width: 75,
-		borderRadius: 16,
+    borderRadius: 16,
   },
 
   backRightBtnRight: {
@@ -127,10 +168,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingLeft: 15,
-		marginHorizontal: 4,
+    marginHorizontal: 4,
     marginVertical: 6,
     width: 340,
-		borderRadius: 16,
+    borderRadius: 16,
   },
 
   card: {
@@ -168,8 +209,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
 });
-
-
 
 const mapStateToProps = (store) => ({
   reportedDiscussion: store.userState.reportedDiscussion,
