@@ -20,24 +20,25 @@ function Cd(props) {
   const userId = firebase.auth().currentUser.uid;
   const [data, setData] = useState(0);
   const [xxx, setxxx] = useState(8);
-
+  const [isEmpty, setIsEmpty] = useState(false);
 
   useEffect(() => {
-    firebase.firestore()
-    .collection("Discussion")
-    .get()
-    .then((snapshot) => {
-        let posts = snapshot.docs.map(doc => {
-            const data = doc.data();
-            const id = doc.id;
-            return { id, ...data }
-        })
-        setPost(posts)
-    })
-      setData(2)
-      // setxxx(props.route.params.data)
+    firebase
+      .firestore()
+      .collection("Discussion")
+      .get()
+      .then((snapshot) => {
+        let posts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setPost(posts);
+      });
+
+    setData(2);
+    // setxxx(props.route.params.data)
   }, [data, props.route.params.data]);
-  
 
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>

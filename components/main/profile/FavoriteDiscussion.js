@@ -8,23 +8,23 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import firebase from "firebase";
-import { bindActionCreators } from 'redux' //call  function from action 
-import { fetchUserPosts } from "../../../redux/actions/index"; 
+import { bindActionCreators } from "redux"; //call  function from action
+import { fetchUserPosts } from "../../../redux/actions/index";
 
 function FavDiscussion(props) {
   const [userPosts, setUserPosts] = useState([]);
+  const [isEmpty, setIsEmpty] = useState(false);
   const userId = firebase.auth().currentUser.uid;
 
-
   useEffect(() => {
-      props.fetchUserPosts()
-      const { posts } = props;
-      setUserPosts(posts);
-      // console.log(posts)
-      // console.log(userId);
-    }, [props.route.params.uid]);
+    props.fetchUserPosts();
+    const { posts } = props;
+    setUserPosts(posts);
+    // console.log(posts)
+    // console.log(userId);
+  }, [props.route.params.uid]);
 
-
+  const anyAdult = userPosts.some((person) => person.favBy.includes(userId));
 
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
@@ -55,6 +55,7 @@ function FavDiscussion(props) {
           ) : null
         }
       />
+      {anyAdult === true ? null : <View style={{justifyContent:"center", alignItems:"center"}}><Text>No discussion has been added to favourite</Text></View>}
     </View>
   );
 }
