@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState,useEffect} from 'react'
 import {View, Text, StyleSheet, TouchableOpacity, Image, Dimensions} from 'react-native'
 import { Icon } from 'react-native-elements'
 import { connect } from 'react-redux'
@@ -11,6 +11,8 @@ import DropDownPicker from 'react-native-dropdown-picker';
 function Profile(props) {
     const userId = firebase.auth().currentUser.uid
     const { currentUser, posts } = props;
+
+    const [user, setUser] = useState(currentUser); 
     const [image, setImage] = useState(defaultImage);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
@@ -22,6 +24,24 @@ function Profile(props) {
     const onLogout = () => {
         firebase.auth().signOut();
     }
+
+    
+    useEffect(() => {
+      firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+        setUser(snapshot.data())
+        //console.log(snapshot.data())
+        } else {
+          console.log("does not exist");
+        }
+      });
+    });
+
 
 
     if (currentUser === null) {
@@ -39,7 +59,7 @@ function Profile(props) {
     return (
       <View style={styles.container}>
         <View style={{ alignItems: "center", marginBottom: 20 }}>
-          {!currentUser.image ? (
+          {!user.image ? (
             <Image
               style={{
                 width: 140,
@@ -58,14 +78,14 @@ function Profile(props) {
                 marginBottom: 10,
               }}
               source={{
-                uri: currentUser.image,
+                uri: user.image,
               }}
             />
           )}
         </View>
 
         <View>
-          <Text style={styles.us}>{currentUser.name}</Text>
+          <Text style={styles.us}>{user.name}</Text>
         </View>
         <View style={styles.bb}>
           <TouchableOpacity style={styles.title}>
