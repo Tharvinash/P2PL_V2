@@ -10,7 +10,7 @@ import {
   Image,
   Share,
   ScrollView,
-  Button,
+  ActivityIndicator,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
@@ -664,6 +664,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     fontWeight: "700",
     marginBottom: 20,
+
   },
 
   card: {
@@ -704,6 +705,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
     lineHeight: 20,
     fontWeight: "700",
+    marginBottom:5
   },
   image: {
     flex: 1,
@@ -728,7 +730,9 @@ const styles = StyleSheet.create({
 
   descT: {
     fontSize: 20,
+    lineHeight: 25,
     fontFamily: "Poppins",
+    marginTop: 10
   },
 
   comT: {

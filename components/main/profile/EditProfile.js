@@ -6,7 +6,7 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
-  ScrollView,
+  Alert,
 } from "react-native";
 import firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
@@ -54,8 +54,23 @@ function EditProfile(props) {
               image: snapshot,
             })
             .then(() => {
-              props.navigation.goBack();
-              console.log("save");
+              return Alert.alert(
+                "Are your sure?",
+                "Are you sure you want to delete this comment ?",
+                [
+                  // The "Yes" button
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      props.navigation.goBack();
+                      console.log("save");
+                    },
+                  },
+                  // The "No" button
+                  // Does nothing but dismiss the dialog when tapped
+                ]
+              );
+
             });
         });
       };
@@ -66,6 +81,18 @@ function EditProfile(props) {
 
       task.on("state_changed", taskProgress, taskError, taskCompleted);
     } else {
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(props.route.params.uid)
+        .update({
+          name: userId,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          props.navigation.goBack();
+          console.log("save");
+        });
     }
   };
 

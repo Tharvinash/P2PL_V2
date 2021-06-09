@@ -35,7 +35,7 @@ function Feed(props) {
       firebase
       .firestore()
       .collection("Discussion")
-      .orderBy("creation", "asc")
+      .orderBy("creation", "desc")
       .get()
       .then((snapshot) => {
         let posts = snapshot.docs.map((doc) => {
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 25,
     fontFamily: "Poppins",
-    lineHeight: 30,
+    lineHeight: 32,
   },
 });
 

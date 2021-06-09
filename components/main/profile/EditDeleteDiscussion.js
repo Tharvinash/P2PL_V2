@@ -75,7 +75,7 @@ function EditDeleteDiscussion(props) {
   return (
   <ScrollView>
     <View style={styles.container}>
-      <View style={{ flexDirection: "row", marginRight: 110 }}>
+      <View style={{ flexDirection: "row", marginRight: 50 }}>
         <Text style={styles.title}>{userPosts.title}</Text>
         <View style={styles.icon}>
           <Icon
@@ -98,9 +98,11 @@ function EditDeleteDiscussion(props) {
           />
         </View>
       </View>
-      <View style={{ flexDirection: "row", paddingBottom: 10 }}>
-        <Image style={styles.image} source={{ uri: userPosts.downloadURL }} />
-      </View>
+      {userPosts.downloadURL && (
+        <View style={{ flexDirection: "row", paddingBottom: 10 }}>
+          <Image style={styles.image} source={{ uri: userPosts.downloadURL }} />
+        </View>
+      )}
 
       <View style={styles.desc}>
         <Text style={styles.descT}>{userPosts.description}</Text>
@@ -293,11 +295,11 @@ const styles = StyleSheet.create({
     height: 400,
   },
   title: {
-    // marginTop:20,
     fontSize: 20,
     fontFamily: "Poppins",
-    //paddingRight:190
-    lineHeight: 25,
+    lineHeight: 20,
+    fontWeight: "700",
+    marginBottom:5
   },
   image: {
     flex: 1,
@@ -335,7 +337,9 @@ const styles = StyleSheet.create({
 
   descT: {
     fontSize: 20,
+    lineHeight: 25,
     fontFamily: "Poppins",
+    marginTop: 10
   },
 
   comT: {

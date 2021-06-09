@@ -13,23 +13,23 @@ function timeDifference(current, previous) {
     }
 
     else if (elapsed < msPerHour) {
-        return Math.round(elapsed / msPerMinute) + 'm';
+        return Math.round(elapsed / msPerMinute) + ' m';
     }
 
     else if (elapsed < msPerDay) {
-        return Math.round(elapsed / msPerHour) + 'h';
+        return Math.round(elapsed / msPerHour) + ' h';
     }
 
     else if (elapsed < msPerMonth) {
-        return Math.round(elapsed / msPerDay) + 'd';
+        return Math.round(elapsed / msPerDay) + ' d';
     }
 
-    else if (elapsed < msPerYear) {
-        return Math.round(elapsed / msPerMonth) + 'm';
+    else if (elapsed < msPerYear) { 
+        return Math.round(elapsed / msPerMonth) + ' mth';
     }
 
     else {
-        return Math.round(elapsed / msPerYear) + 'y';
+        return Math.round(elapsed / msPerYear) + ' y';
     }
 }
 

@@ -15,6 +15,8 @@ import firebase from "firebase";
 require("firebase/firestore");
 require("firebase/firebase-storage");
 import { connect } from "react-redux";
+import Modal from "react-native-modal";
+
 
 function Add(props) {
   const { currentUser } = props;
@@ -25,6 +27,7 @@ function Add(props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [faculty, setFaculty] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -60,6 +63,7 @@ function Add(props) {
   }
 
   const uploadImage = async () => {
+    setModalVisible(!isModalVisible);
     if (image != null) {
       //const uri = props.route.params.image;
       const childPath = `post/${
@@ -99,6 +103,7 @@ function Add(props) {
           faculty,
           description,
           postedBy: currentUser.name,
+          image: currentUser.image,
           favBy: [],
           creation: firebase.firestore.FieldValue.serverTimestamp(),
         })
@@ -124,6 +129,7 @@ function Add(props) {
         creation: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(function () {
+        setModalVisible(!isModalVisible);
         props.navigation.popToTop();
         console.log("Done");
       });
@@ -253,12 +259,7 @@ function Add(props) {
         />
       </View>
 
-      {isLoading ? (
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
-          <ActivityIndicator />
-          {isLoading && <ActivityIndicator size="large" color="#E3562A" />}
-        </View>
-      ) : (
+
         <View style={{ justifyContent: "center", alignItems: "center" }}>
           <TouchableOpacity
             style={styles.blogout}
@@ -267,7 +268,7 @@ function Add(props) {
             <Text style={styles.Ltext}>Upload</Text>
           </TouchableOpacity>
         </View>
-      )}
+
     </ScrollView>
   );
 }
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Poppins",
     fontWeight: "700",
-    fontSize: 30,
+    fontSize: 25,
     color: "#fff",
     alignContent: "space-around",
   },
