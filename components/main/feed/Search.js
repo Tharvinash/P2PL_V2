@@ -63,7 +63,7 @@ export default function Search(props) {
         />
         <TextInput
           underlineColorAndroid="transparent"
-          placeholder="Search Course"
+          placeholder="Search Discussion"
           placeholderTextColor="#000"
           autoCapitalize="none"
           onChangeText={(search) => fetchUsers(search)}
@@ -146,26 +146,29 @@ export default function Search(props) {
         horizontal={false}
         extraData={users}
         data={users}
-        keyExtractor={(users) => users.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={styles.cardContent}>
-              <TouchableOpacity
-                style={{ flex: 1 }}
-                onPress={() =>
-                  props.navigation.navigate("DiscussionTitle", {
-                    did: item.id,
-                  })
-                }
-              >
-                <Text numberOfLines={2} style={styles.title}>
-                  {item.title}
-                </Text>
-                <Text style={styles.faculty}>{item.faculty}</Text>
-              </TouchableOpacity>
+        key={users.id}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) =>
+          item === " " ? null : (
+            <View style={styles.card}>
+              <View style={styles.cardContent}>
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={() =>
+                    props.navigation.navigate("DiscussionTitle", {
+                      did: item.id,
+                    })
+                  }
+                >
+                  <Text numberOfLines={2} style={styles.title}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.faculty}>{item.faculty}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
+          )
+        }
       />
     </View>
   );
