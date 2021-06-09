@@ -270,6 +270,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    lineHeight: 25,
   },
 
   flat: {
