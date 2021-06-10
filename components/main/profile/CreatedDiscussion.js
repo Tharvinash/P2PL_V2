@@ -12,33 +12,31 @@ import {
 import { connect } from "react-redux";
 import firebase from "firebase";
 import { Icon } from "react-native-elements";
-import { RefreshControlBase } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 function Cd(props) {
   const [post, setPost] = useState(null);
   const { posts } = props;
   const userId = firebase.auth().currentUser.uid;
-  const [data, setData] = useState(0);
-  const [xxx, setxxx] = useState(8);
-  const [isEmpty, setIsEmpty] = useState(false);
 
-  useEffect(() => {
-    firebase
-      .firestore()
-      .collection("Discussion")
-      .get()
-      .then((snapshot) => {
-        let posts = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data };
+  useFocusEffect(
+    React.useCallback(() => {
+      firebase
+        .firestore()
+        .collection("Discussion")
+        .get()
+        .then((snapshot) => {
+          let posts = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setPost(posts);
         });
-        setPost(posts);
-      });
 
-    setData(2);
-    // setxxx(props.route.params.data)
-  }, [data, props.route.params.data]);
+
+    }, [])
+  );
 
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
