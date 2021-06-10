@@ -18,17 +18,20 @@ import { connect } from "react-redux";
 import firebase from "firebase";
 import * as Linking from "expo-linking";
 
-//import { timeDifference } from "../../utils";
+import { timeDifference } from "../../utils";
 import { RefreshControlBase } from "react-native";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
   const { currentUser, options } = props;
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isEditCommentModalVisible, setEditCommentModalVisible] =
+    useState(false);
+  const [commentId, setCommentId] = useState(null);
   const [isReportVisible, setReportVisible] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [newOption, setOption] = useState(options);
-
+  const [editComment, setEditComment] = useState("");
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
@@ -107,42 +110,6 @@ function ViewDiscussion(props) {
     console.log(24);
   };
 
-
-  const timeDifference = (current, previous) => {
-
-    var msPerMinute = 60 * 1000;
-    var msPerHour = msPerMinute * 60;
-    var msPerDay = msPerHour * 24;
-    var msPerMonth = msPerDay * 30;
-    var msPerYear = msPerDay * 365;
-
-    var elapsed = current - previous;
-
-    if (elapsed < msPerMinute) {
-        return 'Now';
-    }
-
-    else if (elapsed < msPerHour) {
-        return Math.round(elapsed / msPerMinute) + ' m';
-    }
-
-    else if (elapsed < msPerDay) {
-        return Math.round(elapsed / msPerHour) + ' h';
-    }
-
-    else if (elapsed < msPerMonth) {
-        return Math.round(elapsed / msPerDay) + ' d';
-    }
-
-    else if (elapsed < msPerYear) { 
-        return Math.round(elapsed / msPerMonth) + ' mth';
-    }
-
-    else {
-        return Math.round(elapsed / msPerYear) + ' y';
-    }
-}
-
   const sendReport = (rid) => {
     firebase
       .firestore()
@@ -159,6 +126,9 @@ function ViewDiscussion(props) {
         setReportVisible(!isReportVisible);
       });
   };
+  const toggleEditComment = () => {
+    setEditCommentModalVisible(!isEditCommentModalVisible);
+  };
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -169,22 +139,27 @@ function ViewDiscussion(props) {
   };
 
   const UploadComment = () => {
-    firebase
-      .firestore()
-      .collection("Comment")
-      .add({
-        userId,
-        postedBy,
-        discussionId,
-        comment: newComment,
-        creation: firebase.firestore.FieldValue.serverTimestamp(),
-        likeBy: [],
-        numOfLike: 0,
-      })
-      .then(function () {
-        setModalVisible(!isModalVisible);
-      });
-    setData(57);
+    if (!newComment.trim()) {
+      alert("Please Enter Comment");
+      return;
+    } else {
+      firebase
+        .firestore()
+        .collection("Comment")
+        .add({
+          userId,
+          postedBy,
+          discussionId,
+          comment: newComment,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+          likeBy: [],
+          numOfLike: 0,
+        })
+        .then(function () {
+          setModalVisible(!isModalVisible);
+        });
+      setData(57);
+    }
   };
 
   const AddFavDiscussion = () => {
@@ -349,6 +324,35 @@ function ViewDiscussion(props) {
     setData(3);
   };
 
+  const EditComment = (cid) => {
+    setCommentId(cid);
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cid)
+      .get()
+      .then((snapshot) => {
+        setEditComment(snapshot.data().comment);
+      });
+      setEditCommentModalVisible(!isEditCommentModalVisible);
+  };
+
+  const uploadUpdatedComment = () => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(commentId)
+      .update({
+        comment: editComment,
+        creation: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+      .then(() => {
+        console.log("save");
+      });
+    setEditCommentModalVisible(!isEditCommentModalVisible);
+    setData(88);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View
@@ -451,9 +455,15 @@ function ViewDiscussion(props) {
                     }}
                   >
                     <Text style={styles.userT}>{item.postedBy} </Text>
-                    <Text style={(styles.userC, { marginRight: 20 })}>
-                      {timeDifference(new Date(), item.creation.toDate())}
-                    </Text>
+                    {item.creation === null ? (
+                      <Text style={(styles.userC, { marginRight: 20 })}>
+                        Now
+                      </Text>
+                    ) : (
+                      <Text style={(styles.userC, { marginRight: 20 })}>
+                        {timeDifference(new Date(), item.creation.toDate())}
+                      </Text>
+                    )}
                   </View>
                   <View
                     style={{
@@ -511,11 +521,7 @@ function ViewDiscussion(props) {
                             type="ionicon"
                             size={20}
                             color="#000"
-                            onPress={() =>
-                              props.navigation.navigate("EditComment", {
-                                cid: item.id,
-                              })
-                            }
+                            onPress={() => EditComment(item.id)}
                           />
                         </View>
                       ) : null}
@@ -566,11 +572,7 @@ function ViewDiscussion(props) {
                             type="ionicon"
                             size={20}
                             color="#000"
-                            onPress={() =>
-                              props.navigation.navigate("EditComment", {
-                                cid: item.id,
-                              })
-                            }
+                            onPress={() => EditComment(item.id)}
                           />
                         </View>
                       ) : null}
@@ -631,6 +633,53 @@ function ViewDiscussion(props) {
           </View>
         </Modal>
 
+        <Modal isVisible={isEditCommentModalVisible}>
+          <View style={{ justifyContent: "center" }}>
+            <View style={{ marginLeft: 8 }}>
+              <TextInput
+                style={styles.input}
+                value={editComment}
+                placeholderTextColor="#000"
+                multiline={true}
+                onChangeText={(editComment) => setEditComment(editComment)}
+              />
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.blogout}
+                  onPress={() => uploadUpdatedComment()}
+                >
+                  <Text style={styles.Ltext}>Update Comment</Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.blogout}
+                  onPress={toggleEditComment}
+                >
+                  <Text style={styles.Ltext}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
         <Modal isVisible={isReportVisible}>
           <View style={{ justifyContent: "center", alignItems: "center" }}>
             <Text style={styles.titley}>Why are you reporting this post</Text>
@@ -663,7 +712,6 @@ function ViewDiscussion(props) {
   );
 }
 
-////(credits < 30) ? "freshman" : (credits >= 30 && credits < 60) ?"sophomore" : (credits >= 60 && credits < 90) ? "junior" : "senior"
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -700,7 +748,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     fontWeight: "700",
     marginBottom: 20,
-
   },
 
   card: {
@@ -741,7 +788,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
     lineHeight: 20,
     fontWeight: "700",
-    marginBottom:5
+    marginBottom: 5,
   },
   image: {
     flex: 1,
@@ -768,7 +815,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 25,
     fontFamily: "Poppins",
-    marginTop: 10
+    marginTop: 10,
   },
 
   comT: {
