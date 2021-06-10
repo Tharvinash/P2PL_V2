@@ -334,22 +334,28 @@ function ViewDiscussion(props) {
       .then((snapshot) => {
         setEditComment(snapshot.data().comment);
       });
-      setEditCommentModalVisible(!isEditCommentModalVisible);
+    setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
   const uploadUpdatedComment = () => {
-    firebase
-      .firestore()
-      .collection("Comment")
-      .doc(commentId)
-      .update({
-        comment: editComment,
-        creation: firebase.firestore.FieldValue.serverTimestamp(),
-      })
-      .then(() => {
-        console.log("save");
-      });
-    setEditCommentModalVisible(!isEditCommentModalVisible);
+    if (!editComment.trim()) {
+      alert("Please Enter Comment");
+      return;
+    } else {
+      firebase
+        .firestore()
+        .collection("Comment")
+        .doc(commentId)
+        .update({
+          comment: editComment,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          console.log("save");
+        });
+      setEditCommentModalVisible(!isEditCommentModalVisible);
+    }
+
     setData(88);
   };
 
