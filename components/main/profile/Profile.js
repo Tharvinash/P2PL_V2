@@ -126,7 +126,7 @@ function Profile(props) {
       <View style={styles.bb}>
         <TouchableOpacity style={styles.title}>
           <Text style={styles.Ltext} resizeMode="cover">
-            Title
+            Beginner
           </Text>
           <Icon
             style={styles.arrow}

@@ -62,6 +62,10 @@ function Add(props) {
     return <Text>No access to camera</Text>;
   }
 
+  // const toggleModal = () => {
+  //   setModalVisible(!isModalVisible);
+  // };
+
   const uploadImage = async () => {
     setModalVisible(!isModalVisible);
     if (image != null) {
@@ -84,7 +88,7 @@ function Add(props) {
         task.snapshot.ref.getDownloadURL().then((snapshot) => {
           savePostData(snapshot, title, description);
           console.log("downloadUri" + snapshot);
-          setIsLoading(false);
+          setModalVisible(!isModalVisible);
         });
       };
 
@@ -108,10 +112,12 @@ function Add(props) {
           creation: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(function () {
+          setModalVisible(!isModalVisible);
           props.navigation.popToTop();
           console.log("Done");
         });
     }
+    
   };
 
   const savePostData = (downloadURL, title, description) => {
@@ -269,6 +275,12 @@ function Add(props) {
           </TouchableOpacity>
         </View>
 
+        <Modal isVisible={isModalVisible}>
+          <View style={{ justifyContent: "center",flex:1 }}>
+          
+          <ActivityIndicator size="large" color="#E3562A" />
+          </View>
+        </Modal>
     </ScrollView>
   );
 }

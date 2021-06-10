@@ -221,7 +221,7 @@ function Feed(props) {
                             borderRadius: 35 / 2,
                             marginBottom: 10,
                           }}
-                          source={require("../../../assets/default.jpg")}
+                          source={require("../../../assets/newProfile.png")}
                         />
                       )}
                       <View
