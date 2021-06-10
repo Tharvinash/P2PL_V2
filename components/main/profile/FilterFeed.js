@@ -9,18 +9,21 @@ import {
   Text,
   StyleSheet,
   Switch,
-  TouchableOpacity,
+  ActivityIndicator,
   ScrollView,
 } from "react-native";
 import firebase from "firebase";
 import { connect } from "react-redux";
 import { Icon } from "react-native-elements";
 require("firebase/firestore");
+import { useFocusEffect } from "@react-navigation/native";
+import Modal from "react-native-modal";
 
 function FilterFeed(props) {
   const [data, setData] = useState(0);
   const { currentUser } = props;
   const [cu, setCu] = useState(currentUser);
+  const [isModalVisible, setModalVisible] = useState(false);
   const [filter, setFilter] = useState([]);
   const toggleSwitchFs = () => setFs((previousState) => !previousState);
   const toggleSwitchFca = () => setFca((previousState) => !previousState);
@@ -60,28 +63,49 @@ function FilterFeed(props) {
   const [fobe, setFobe] = useState(cu.fobe);
   const [fcsit, setFcsit] = useState(cu.fcsit);
   const [aois, setAois] = useState(cu.aois);
+
   const [aoms, setAoms] = useState(cu.aoms);
 
-  useEffect(() => {
-		setData(1)
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          // console.log(snapshot.data())
-          setCu(snapshot.data());
-        } else {
-          console.log("does not exist");
-        }
-      });
-  }, [data]);
+  // useEffect(() => {
+  // 	setData(1)
+  //   firebase
+  //     .firestore()
+  //     .collection("users")
+  //     .doc(firebase.auth().currentUser.uid)
+  //     .get()
+  //     .then((snapshot) => {
+  //       if (snapshot.exists) {
+
+  //         setCu(snapshot.data());
+  //         console.log(snapshot.data())
+  //       } else {
+  //         console.log("does not exist");
+  //       }
+  //     });
+  // }, [data]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setCu(snapshot.data());
+            //console.log(snapshot.data());
+          } else {
+            console.log("does not exist");
+          }
+        });
+    }, [])
+  );
 
   const ff = [];
 
   const Save = async () => {
+    setModalVisible(!isModalVisible);
     if (fs === true) {
       ff.push("FACULTY OF SCIENCE");
     }
@@ -155,11 +179,10 @@ function FilterFeed(props) {
         aoms,
       })
       .then(() => {
-        setData(8);
-        console.log("done");
+        props.navigation.navigate("Feed")
       });
+      setModalVisible(!isModalVisible);
   };
-
 
   return (
     <View style={styles.container}>
@@ -167,7 +190,7 @@ function FilterFeed(props) {
         <View style={styles.container}>
           <View style={{ alignItems: "center", flexDirection: "row" }}>
             <Text style={styles.title}>
-              You may filter your feed according to your need 
+              You may filter your feed according to your need
             </Text>
             <View style={{ marginLeft: -60 }}>
               <Icon
@@ -362,6 +385,12 @@ function FilterFeed(props) {
           </View>
         </View>
       </ScrollView>
+      <Modal isVisible={isModalVisible}>
+          <View style={{ justifyContent: "center",flex:1 }}>
+          
+          <ActivityIndicator size="large" color="#E3562A" />
+          </View>
+        </Modal>
     </View>
   );
 }
