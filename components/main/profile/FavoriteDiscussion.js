@@ -10,19 +10,40 @@ import { connect } from "react-redux";
 import firebase from "firebase";
 import { bindActionCreators } from "redux"; //call  function from action
 import { fetchUserPosts } from "../../../redux/actions/index";
+import { useFocusEffect } from "@react-navigation/native";
 
 function FavDiscussion(props) {
   const [userPosts, setUserPosts] = useState([]);
-  const [isEmpty, setIsEmpty] = useState(false);
   const userId = firebase.auth().currentUser.uid;
 
-  useEffect(() => {
-    props.fetchUserPosts();
-    const { posts } = props;
-    setUserPosts(posts);
-    // console.log(posts)
-    // console.log(userId);
-  }, [props.route.params.uid]);
+  // useEffect(() => {
+  //   props.fetchUserPosts();
+  //   const { posts } = props;
+  //   setUserPosts(posts);
+  //   // console.log(posts)
+  //   // console.log(userId);
+  // }, [props.route.params.uid]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      props.fetchUserPosts();
+      const { posts } = props;
+      setUserPosts(posts);
+
+      firebase
+        .firestore()
+        .collection("Discussion")
+        .get()
+        .then((snapshot) => {
+          let posts = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setUserPosts(posts);
+        });
+    }, [])
+  );
 
   const anyAdult = userPosts.some((person) => person.favBy.includes(userId));
 
@@ -55,7 +76,11 @@ function FavDiscussion(props) {
           ) : null
         }
       />
-      {anyAdult === true ? null : <View style={{justifyContent:"center", alignItems:"center"}}><Text>No discussion has been added to favourite</Text></View>}
+      {anyAdult === true ? null : (
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <Text>No discussion has been added to favourite</Text>
+        </View>
+      )}
     </View>
   );
 }
