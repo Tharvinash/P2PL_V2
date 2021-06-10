@@ -62,11 +62,19 @@ function Add(props) {
     return <Text>No access to camera</Text>;
   }
 
-  // const toggleModal = () => {
-  //   setModalVisible(!isModalVisible);
-  // };
 
   const uploadImage = async () => {
+
+    if (!title.trim()) {
+      alert('Please Enter Title');
+      return;
+    }
+    
+    if (!faculty.trim()) {
+      alert('Please Enter Faculty');
+      return;
+    }
+
     setModalVisible(!isModalVisible);
     if (image != null) {
       //const uri = props.route.params.image;
