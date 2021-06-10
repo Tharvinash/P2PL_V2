@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -33,11 +34,9 @@ function Profile(props) {
     firebase.auth().signOut();
   };
 
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-  
-    firebase
+  useFocusEffect(
+    React.useCallback(() => {
+      firebase
       .firestore()
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -50,9 +49,30 @@ function Profile(props) {
           console.log("does not exist");
         }
       });
-    setRefreshing(false);
+    }, [])
+  );
 
-  }, [refreshing]);
+
+
+  // const onRefresh = useCallback(() => {
+  //   setRefreshing(true);
+  
+  //   firebase
+  //     .firestore()
+  //     .collection("users")
+  //     .doc(firebase.auth().currentUser.uid)
+  //     .get()
+  //     .then((snapshot) => {
+  //       if (snapshot.exists) {
+  //         setUser(snapshot.data());
+  //         //console.log(snapshot.data())
+  //       } else {
+  //         console.log("does not exist");
+  //       }
+  //     });
+  //   setRefreshing(false);
+
+  // }, [refreshing]);
 
   if (currentUser === null) {
     return <View />;
@@ -69,9 +89,9 @@ function Profile(props) {
 
   return (
     <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
+      // refreshControl={
+      //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      // }
       contentContainerStyle={styles.container}
     >
       <View style={{ alignItems: "center", marginBottom: 20 }}>
