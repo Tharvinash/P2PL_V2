@@ -128,6 +128,8 @@ function Cd(props) {
       </TouchableOpacity>
     </View>
   );
+
+  
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
       <SwipeListView
