@@ -4,17 +4,26 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  FlatList,
+  Image,
   TouchableOpacity,
-  Alert,
+  ActivityIndicator,
 } from "react-native";
+import { connect } from "react-redux";
 import firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
+import Modal from "react-native-modal";
 require("firebase/firestore");
 function EditProfile(props) {
+  const { currentUser, comments, posts } = props;
+  const [nameToBeEditted, setNameToBeEditted] = useState(currentUser.name)
+  const [comment, setComment] = useState(comments);
+  const [cntbu, setCntbu] = useState([]);
+  const [discussion, setDiscussion] = useState(posts)
+  const [dntbc, setDntbc] = useState([])
   const [userId, setUserId] = useState("");
   const [image, setImage] = useState(null);
   const [imageChanged, setImageChanged] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
 
   useEffect(() => {
@@ -26,9 +35,24 @@ function EditProfile(props) {
       .then((snapshot) => {
         setUserId(snapshot.data().name);
       });
+//comment
+      const newArray = comment.filter(
+        (element) => element.postedBy === nameToBeEditted
+      );
+      const secArray = newArray.map((element) => element.id);
+      setCntbu(secArray);
+//discussion
+      const newArray2 = discussion.filter(
+        (e) => e.postedBy === nameToBeEditted
+      );
+      console.log(newArray2)
+      const secArray2 = newArray2.map((element) => element.id);
+      setDntbc(secArray2);
+
   }, []);
 
   const Save = async () => {
+    setModalVisible(!isModalVisible);
     if (imageChanged) {
       const uri = image;
       const childPath = `profile/${firebase.auth().currentUser.uid}`;
@@ -54,23 +78,7 @@ function EditProfile(props) {
               image: snapshot,
             })
             .then(() => {
-              return Alert.alert(
-                "Are your sure?",
-                "Are you sure you want to delete this comment ?",
-                [
-                  // The "Yes" button
-                  {
-                    text: "Yes",
-                    onPress: () => {
-                      props.navigation.goBack();
-                      console.log("save");
-                    },
-                  },
-                  // The "No" button
-                  // Does nothing but dismiss the dialog when tapped
-                ]
-              );
-
+                yyy(userId,snapshot)
             });
         });
       };
@@ -90,11 +98,72 @@ function EditProfile(props) {
           creation: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
-          props.navigation.goBack();
-          console.log("save");
+          xxx(userId)
         });
     }
   };
+
+  const xxx = (newName) =>{
+    for ( var i = 0; i < cntbu.length; i++) {
+      firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cntbu[i])
+      .update({
+        postedBy: newName,
+      })
+      .then(() => {
+       
+      });
+    }
+
+    for ( var i = 0; i < dntbc.length; i++) {
+      firebase
+      .firestore()
+      .collection("Discussion")
+      .doc(dntbc[i])
+      .update({
+        postedBy: newName,
+      })
+      .then(() => {
+        
+      });
+      console.log(24)
+    }
+    setModalVisible(!isModalVisible);
+    props.navigation.goBack();
+  }
+
+  const yyy = (newName, image) =>{
+    for ( var i = 0; i < cntbu.length; i++) {
+      firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cntbu[i])
+      .update({
+        postedBy: newName,
+        image: image
+      })
+      .then(() => {
+
+      });
+    }
+    for ( var i = 0; i < dntbc.length; i++) {
+      firebase
+      .firestore()
+      .collection("Discussion")
+      .doc(dntbc[i])
+      .update({
+        postedBy: newName,
+        image: image
+      })
+      .then(() => {
+
+      });
+    }
+    setModalVisible(!isModalVisible);
+    props.navigation.goBack();
+  }
 
   // const Save = () => {
   //       firebase.firestore()
@@ -102,12 +171,14 @@ function EditProfile(props) {
   //         .doc(props.route.params.uid)
   //         .update({
   //             name:userId,
-  //             creation: firebase.firestore.FieldValue.serverTimestamp()
+  //             creation: firebase.firestore.FieldValue.serverTimestamp  ()
   //         }).then(()=> {
   //             props.navigation.goBack()
   //             console.log("save")
   //         })
   // }
+
+
 
   const pickImage = async () => {
     if (true) {
@@ -143,11 +214,23 @@ function EditProfile(props) {
           </TouchableOpacity>
         </View>
       </View>
+      <View style={{ alignItems: "center" }}>
+        {image && (
+          <Image source={{ uri: image }} style={{ height: 200, width: 200 }} />
+        )}
+      </View>
       <View style={{ justifyContent: "center", alignItems: "center" }}>
+
         <TouchableOpacity style={styles.logout} onPress={() => Save()}>
           <Text style={styles.Ltext}>Save Changes</Text>
         </TouchableOpacity>
       </View>
+      <Modal isVisible={isModalVisible}>
+          <View style={{ justifyContent: "center",flex:1 }}>
+          
+          <ActivityIndicator size="large" color="#E3562A" />
+          </View>
+        </Modal>
     </View>
   );
 }
@@ -193,4 +276,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditProfile;
+const mapStateToProps = (store) => ({
+  currentUser: store.userState.currentUser,
+  comments: store.userState.comment,
+  posts: store.userState.posts,
+});
+
+
+export default connect(mapStateToProps, null)(EditProfile);
+
