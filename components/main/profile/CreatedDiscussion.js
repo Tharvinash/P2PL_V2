@@ -15,6 +15,7 @@ import { SwipeListView } from "react-native-swipe-list-view";
 
 function Cd(props) {
   const [post, setPost] = useState(null);
+  console.log(post);
   const [data, setData] = useState(0);
   const { posts } = props;
   const userId = firebase.auth().currentUser.uid;
@@ -54,33 +55,22 @@ function Cd(props) {
   }, [data]);
 
   const renderItem = (data) => (
-    <View style={{ justifyContent: "center", alignItems: "center" }}>
-      <FlatList
-        horizontal={false}
-        data={post}
-        keyExtractor={posts.id}
-        renderItem={({ item }) =>
-          item.userId == userId ? (
-            <View style={styles.card}>
-              <View style={styles.cardContent}>
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() =>
-                    props.navigation.navigate("Created Discussion", {
-                      did: item.id,
-                    })
-                  }
-                >
-                  <Text numberOfLines={2} style={styles.title}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.faculty}>{item.faculty}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : null
-        }
-      />
+    <View style={styles.card}>
+      <View style={styles.cardContent}>
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          onPress={() =>
+            props.navigation.navigate("Created Discussion", {
+              did: data.item.id,
+            })
+          }
+        >
+          <Text numberOfLines={2} style={styles.title}>
+            {data.item.title}
+          </Text>
+          <Text style={styles.faculty}>{data.item.faculty}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -112,7 +102,7 @@ function Cd(props) {
     );
   };
 
-  const renderHiddenItem = (data, rowMap) => (
+  const renderHiddenItem = (data) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnLeft]}
@@ -122,14 +112,13 @@ function Cd(props) {
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
-        onPress={() => deleteRow(data.item.id, rowMap)}
+        onPress={() => deleteRow(data.item.id)}
       >
         <Text style={styles.backTextWhite}>Delete</Text>
       </TouchableOpacity>
     </View>
   );
 
-  
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
       <SwipeListView
