@@ -10,6 +10,7 @@ import {
   Image,
   Share,
   ScrollView,
+  Dimensions,
   ActivityIndicator,
 } from "react-native";
 import { Icon } from "react-native-elements";
@@ -17,6 +18,7 @@ import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import firebase from "firebase";
 import * as Linking from "expo-linking";
+import Images from "react-native-scalable-image";
 
 import { timeDifference } from "../../utils";
 import { RefreshControlBase } from "react-native";
@@ -394,8 +396,12 @@ function ViewDiscussion(props) {
       </View>
 
       {userPosts.downloadURL && (
-        <View style={{ flexDirection: "row", paddingBottom: 10 }}>
-          <Image style={styles.image} source={{ uri: userPosts.downloadURL }} />
+        <View style={{ flexDirection: "row", paddingBottom: 10, justifyContent:"center"}}>
+          {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
+          <Images
+            width={Dimensions.get("window").width} // height will be calculated automatically
+            source={{ uri: userPosts.downloadURL }}
+          />
         </View>
       )}
 
@@ -722,7 +728,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 20,
-    marginRight: 5,
     // marginTop: 20,
     marginBottom: 5,
     // marginLeft: 20,
@@ -801,8 +806,8 @@ const styles = StyleSheet.create({
     //aspectRatio: 3 / 1,
     alignItems: "center",
     justifyContent: "center",
-    width: 300,
-    height: 300,
+    width: "100%",
+    height: "100%",
     resizeMode: "contain",
   },
 
