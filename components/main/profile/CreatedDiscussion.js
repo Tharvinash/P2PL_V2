@@ -14,10 +14,11 @@ import { useFocusEffect } from "@react-navigation/native";
 import { SwipeListView } from "react-native-swipe-list-view";
 
 function Cd(props) {
-  const [post, setPost] = useState(null);
-  console.log(post);
+ 
+
   const [data, setData] = useState(0);
   const { posts } = props;
+  const [post, setPost] = useState(posts);
   const userId = firebase.auth().currentUser.uid;
 
   useFocusEffect(

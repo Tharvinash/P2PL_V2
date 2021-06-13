@@ -4,12 +4,15 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  Image,
+  ActivityIndicator,
   TouchableOpacity,
+  Dimensions,
   ScrollView,
 } from "react-native";
 import firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
+import Images from "react-native-scalable-image";
+import Modal from "react-native-modal";
 require("firebase/firestore");
 function EditDiscussion(props) {
   const [userPosts, setUserPosts] = useState([]);
@@ -17,6 +20,7 @@ function EditDiscussion(props) {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [imageChanged, setImageChanged] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     firebase
@@ -32,6 +36,7 @@ function EditDiscussion(props) {
   }, []);
 
   const Save = async () => {
+    setModalVisible(!isModalVisible);
     if (imageChanged) {
       const uri = image;
       const childPath = `profile/${firebase.auth().currentUser.uid}`;
@@ -81,6 +86,7 @@ function EditDiscussion(props) {
           console.log("save");
         });
     }
+    setModalVisible(!isModalVisible);
   };
 
   const pickImage = async () => {
@@ -88,7 +94,7 @@ function EditDiscussion(props) {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [1, 1],
+        // aspect: [1, 1],
         quality: 1,
       });
 
@@ -100,8 +106,8 @@ function EditDiscussion(props) {
   };
 
   return (
-    <View style={styles.container}>
-       {/* {image && <Image source={{ uri: image }} style={{ flex: 1 }} />} */}
+    <ScrollView style={styles.container}>
+      {/* {image && <Image source={{ uri: image }} style={{ flex: 1 }} />} */}
       <View style={styles.form}>
         <View style={styles.formControl}>
           <Text style={styles.label}>Title</Text>
@@ -122,19 +128,26 @@ function EditDiscussion(props) {
         <View style={styles.formControl}>
           <Text style={styles.label}>Edit Discussion Image</Text>
           <TouchableOpacity style={styles.logout} onPress={() => pickImage()}>
-            
             <Text style={styles.Ltext}>Upload New Image</Text>
           </TouchableOpacity>
         </View>
-       
       </View>
-      <View style={{alignItems:"center"}}>
-      {image && <Image source={{ uri: image }} style={{height:200, width: 200}} />}
+      <View style={{ alignItems: "center" }}>
+        {image && (
+          <Images
+            width={Dimensions.get("window").width} // height will be calculated automatically
+            source={{ uri: image }}
+          />
+        )}
       </View>
-  
-      
 
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: 10,
+        }}
+      >
         <TouchableOpacity
           style={styles.logout}
           onPress={() => Save(title, description)}
@@ -142,14 +155,16 @@ function EditDiscussion(props) {
           <Text style={styles.Ltext}>Save Changes</Text>
         </TouchableOpacity>
       </View>
-
-     
-    </View>
+      <Modal isVisible={isModalVisible}>
+        <View style={{ justifyContent: "center", flex: 1 }}>
+          <ActivityIndicator size="large" color="#E3562A" />
+        </View>
+      </Modal>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
   },

@@ -9,13 +9,15 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  TextInput
+  TextInput,
+  Dimensions
 } from "react-native";
 import { connect } from "react-redux";
 import { Icon } from "react-native-elements";
 import firebase from "firebase";
 import { timeDifference } from "../../utils";
 import Modal from "react-native-modal";
+import Images from "react-native-scalable-image";
 
 require("firebase/firestore");
 import { useFocusEffect } from "@react-navigation/native";
@@ -36,7 +38,7 @@ function EditDeleteDiscussion(props) {
   useFocusEffect(
     React.useCallback(() => {
       const { currentUser, posts, comments } = props;
-      setPostedBy(currentUser.name)
+      setPostedBy(currentUser.name);
       setComment(comments);
       setUser(currentUser);
 
@@ -228,9 +230,9 @@ function EditDeleteDiscussion(props) {
           </View>
         </View>
         {userPosts.downloadURL && (
-          <View style={{ flexDirection: "row", paddingBottom: 10 }}>
-            <Image
-              style={styles.image}
+          <View style={{ flexDirection: "row", paddingBottom: 10, justifyContent:"center" }}>
+            <Images
+              width={Dimensions.get("window").width} // height will be calculated automatically
               source={{ uri: userPosts.downloadURL }}
             />
           </View>
@@ -547,8 +549,8 @@ const styles = StyleSheet.create({
 
   desc: {
     fontSize: 14,
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
   },
 
   descT: {

@@ -9,6 +9,7 @@ import {
   Image,
   ScrollView,
   Picker,
+  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import firebase from "firebase";
@@ -16,7 +17,7 @@ require("firebase/firestore");
 require("firebase/firebase-storage");
 import { connect } from "react-redux";
 import Modal from "react-native-modal";
-
+import Images from "react-native-scalable-image";
 
 function Add(props) {
   const { currentUser } = props;
@@ -44,7 +45,7 @@ function Add(props) {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-     // aspect: [1, 1],
+      // aspect: [1, 1],
       quality: 1,
     });
 
@@ -62,16 +63,14 @@ function Add(props) {
     return <Text>No access to camera</Text>;
   }
 
-
   const uploadImage = async () => {
-
     if (!title.trim()) {
-      alert('Please Enter Title');
+      alert("Please Enter Title");
       return;
     }
-    
+
     if (!faculty.trim()) {
-      alert('Please Enter Faculty');
+      alert("Please Enter Faculty");
       return;
     }
 
@@ -125,7 +124,6 @@ function Add(props) {
           console.log("Done");
         });
     }
-    
   };
 
   const savePostData = (downloadURL, title, description) => {
@@ -251,7 +249,10 @@ function Add(props) {
 
       <View style={{ alignItems: "center" }}>
         {image && (
-          <Image source={{ uri: image }} style={{ height: 200, width: 200 }} />
+          <Images
+            width={Dimensions.get("window").width} // height will be calculated automatically
+            source={{ uri: image }}
+          />
         )}
       </View>
 
@@ -273,22 +274,17 @@ function Add(props) {
         />
       </View>
 
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <TouchableOpacity style={styles.blogout} onPress={() => uploadImage()}>
+          <Text style={styles.Ltext}>Upload</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
-          <TouchableOpacity
-            style={styles.blogout}
-            onPress={() => uploadImage()}
-          >
-            <Text style={styles.Ltext}>Upload</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Modal isVisible={isModalVisible}>
-          <View style={{ justifyContent: "center",flex:1 }}>
-          
+      <Modal isVisible={isModalVisible}>
+        <View style={{ justifyContent: "center", flex: 1 }}>
           <ActivityIndicator size="large" color="#E3562A" />
-          </View>
-        </Modal>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }

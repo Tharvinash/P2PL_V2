@@ -44,6 +44,7 @@ export class Register extends Component {
                         fcsit: true,
                         aois: true,
                         aoms: true,
+                        image:'https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/default%2FnewProfile.png?alt=media&token=b2e22482-506a-4e78-ae2e-e38c83ee7c27',
                         filteredFeed: [
                             "FACULTY OF SCIENCE", "FACULTY OF CREATIVE ARTS", "FACULTY OF PHARMACY", "FACULTY OF LAW",
                             "FACULTY OF EDUCATION", "FACULTY OF DENTISTRY", "FACULTY OF ENGINEERING", "FACULTY OF MEDICINE",
