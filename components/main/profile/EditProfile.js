@@ -35,15 +35,29 @@ function EditProfile(props) {
       .then((snapshot) => {
         setUserId(snapshot.data().name);
       });
-    //comment
-    const newArray = comment.filter(
-      (element) => element.postedBy === nameToBeEditted
-    );
-    const secArray = newArray.map((element) => element.id);
-    setCntbu(secArray);
+
+      firebase
+      .firestore()
+      .collection("Comment")
+      .orderBy("creation", "asc")
+      .get()
+      .then((snapshot) => {
+        let comment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        const newArray = comment.filter(
+          (element) => element.postedBy === nameToBeEditted
+        );
+        const secArray = newArray.map((element) => element.id);
+        setCntbu(secArray);
+      });
+ 
+
     //discussion
     const newArray2 = discussion.filter((e) => e.postedBy === nameToBeEditted);
-    console.log(newArray2);
+    //console.log(newArray2);
     const secArray2 = newArray2.map((element) => element.id);
     setDntbc(secArray2);
   }, []);
@@ -121,7 +135,7 @@ function EditProfile(props) {
           postedBy: newName,
         })
         .then(() => {});
-      console.log(24);
+      //console.log(24);
     }
     setModalVisible(!isModalVisible);
     props.navigation.goBack();

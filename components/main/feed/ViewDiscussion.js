@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -103,6 +104,24 @@ function ViewDiscussion(props) {
 
     setData(11);
   }, [props.currentUser, props.route.params.did, data]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .orderBy("creation", "asc")
+      .get()
+      .then((snapshot) => {
+        let comment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setComment(comment);
+      });
+    }, [])
+  );
 
   if (user === null) {
     return <View />;
