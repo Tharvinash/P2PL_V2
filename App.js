@@ -207,7 +207,7 @@ export class App extends Component {
               navigation={this.props.navigation}
             />
             <Stack.Screen
-              name="DiscussionTitle"
+              name="Discussion"
               component={DiscussionTitle}
               navigation={this.props.navigation}
             />

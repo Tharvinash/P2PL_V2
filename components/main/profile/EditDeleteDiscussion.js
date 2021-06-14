@@ -95,7 +95,7 @@ function EditDeleteDiscussion(props) {
   const Delete = () => {
     return Alert.alert(
       "Are your sure?",
-      "Are you sure you want to delete this comment ?",
+      "Are you sure you want to delete this discussion ?",
       [
         // The "Yes" button
         {

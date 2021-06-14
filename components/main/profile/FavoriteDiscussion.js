@@ -62,7 +62,7 @@ function FavDiscussion(props) {
                 <TouchableOpacity
                   style={{ flex: 1 }}
                   onPress={() =>
-                    props.navigation.navigate("DiscussionTitle", {
+                    props.navigation.navigate("Discussion", {
                       did: item.id,
                     })
                   }
