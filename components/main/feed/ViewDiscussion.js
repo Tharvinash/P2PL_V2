@@ -145,6 +145,13 @@ function ViewDiscussion(props) {
       })
       .then(function () {
         setReportVisible(!isReportVisible);
+        Alert.alert(
+          "Done",
+          "Your report has been received and will be reviewed",
+          [
+            { text: "OK", onPress: () => console.log("OK Pressed") }
+          ]
+        );
       });
   };
   const toggleEditComment = () => {
