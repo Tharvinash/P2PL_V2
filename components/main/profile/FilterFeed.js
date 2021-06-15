@@ -105,7 +105,8 @@ function FilterFeed(props) {
   const ff = [];
 
   const Save = async () => {
-    setModalVisible(!isModalVisible);
+     
+    //setModalVisible(!isModalVisible);
     if (fs === true) {
       ff.push("FACULTY OF SCIENCE");
     }
@@ -146,15 +147,16 @@ function FilterFeed(props) {
       ff.push("FACULTY OF BUILT ENVIRONMENT");
     }
     if (fcsit === true) {
-      ff.push("FACULTY OF CREATIVE ARTS");
+      ff.push("FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY");
+      console.log("fcsit")
     }
     if (aois === true) {
-      ff.push("FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY");
+      ff.push("ACADEMY OF ISLAMIC STUDIES");
     }
     if (aoms === true) {
-      ff.push("ACADEMY OF ISLAMIC STUDIES", "ACADEMY OF MALAY STUDIES");
+      ff.push("ACADEMY OF MALAY STUDIES");
     }
-
+console.log(ff)
     firebase
       .firestore()
       .collection("users")
@@ -181,7 +183,7 @@ function FilterFeed(props) {
       .then(() => {
         props.navigation.navigate("Feed")
       });
-      setModalVisible(!isModalVisible);
+     setModalVisible(!isModalVisible);
   };
 
   return (

@@ -10,14 +10,14 @@ import {
   Image,
   Share,
   ScrollView,
-  Button,
+  Dimensions,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import firebase from "firebase";
 import * as Linking from "expo-linking";
-
+import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
 require("firebase/firestore");
 
@@ -346,9 +346,15 @@ function ViewDiscussion(props) {
           )}
         </View>
       </View>
-      <View style={{ flexDirection: "row", paddingBottom: 10 }}>
-        <Image style={styles.image} source={{ uri: userPosts.downloadURL }} />
-      </View>
+      {userPosts.downloadURL && (
+        <View style={{ flexDirection: "row", paddingBottom: 10, justifyContent:"center"}}>
+          {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
+          <Images
+            width={Dimensions.get("window").width} // height will be calculated automatically
+            source={{ uri: userPosts.downloadURL }}
+          />
+        </View>
+      )}
 
       <View style={styles.desc}>
         <Text style={styles.descT}>{userPosts.description}</Text>
@@ -610,7 +616,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 20,
-    marginRight: 5,
     // marginTop: 20,
     marginBottom: 5,
     // marginLeft: 20,

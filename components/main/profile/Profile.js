@@ -212,7 +212,7 @@ function Profile(props) {
         style={styles.button}
         onPress={() => props.navigation.navigate("Activity Tracking")}
       >
-        <Text style={styles.text}>Activity Tracking</Text>
+        <Text style={styles.text}>Discussion Room</Text>
         <Icon
           style={styles.arrow}
           name="chevron-forward-outline"

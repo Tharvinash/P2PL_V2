@@ -17,20 +17,25 @@ function FavDiscussion(props) {
   const [userPosts, setUserPosts] = useState([]);
   const userId = firebase.auth().currentUser.uid;
 
-  // useEffect(() => {
-  //   props.fetchUserPosts();
-  //   const { posts } = props;
-  //   setUserPosts(posts);
-  //   // console.log(posts)
-  //   // console.log(userId);
-  // }, [props.route.params.uid]);
+  useEffect(() => {
+    props.fetchUserPosts();
+    const { posts } = props;
+    firebase
+    .firestore()
+    .collection("Discussion")
+    .get()
+    .then((snapshot) => {
+      let posts = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        const id = doc.id;
+        return { id, ...data };
+      });
+      setUserPosts(posts);
+    });
+  }, [props.route.params.uid]);
 
   useFocusEffect(
     React.useCallback(() => {
-      props.fetchUserPosts();
-      const { posts } = props;
-      setUserPosts(posts);
-
       firebase
         .firestore()
         .collection("Discussion")
