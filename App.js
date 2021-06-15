@@ -135,7 +135,7 @@ export class App extends Component {
       );
     }
     //Lecture1
-    if (name === "Lecture1") {
+    if (name === "Lecture2") {
       return (
         <Provider store={store}>
           <NavigationContainer>
@@ -164,6 +164,11 @@ export class App extends Component {
               <Stack.Screen
                 name="Change Password"
                 component={EditPassword}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Filter Feed"
+                component={FilterFeed}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>

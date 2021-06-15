@@ -19,16 +19,21 @@ import firebase from "firebase";
 import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
+import { version } from "react-dom";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
   const { currentUser } = props;
+  const [commentId, setCommentId] = useState(null);
+  const [isEditCommentModalVisible, setEditCommentModalVisible] =
+  useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
   const [data, setData] = useState(null);
+  const [editComment, setEditComment] = useState("");version
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   // const discussionId = props.route.params.did;
   const userId = firebase.auth().currentUser.uid;
@@ -58,6 +63,10 @@ function ViewDiscussion(props) {
 
   const xxx = () => {
     console.log(24);
+  };
+
+  const toggleEditComment = () => {
+    setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
   useEffect(() => {
@@ -122,6 +131,28 @@ function ViewDiscussion(props) {
         setModalVisible(!isModalVisible);
       });
     setData(57);
+  };
+
+  const uploadUpdatedComment = () => {
+    if (!editComment.trim()) {
+      alert("Please Enter Comment");
+      return;
+    } else {
+      firebase
+        .firestore()
+        .collection("Comment")
+        .doc(commentId)
+        .update({
+          comment: editComment,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          console.log("save");
+        });
+      setEditCommentModalVisible(!isEditCommentModalVisible);
+    }
+
+    setData(88);
   };
 
   const AddFavDiscussion = () => {
@@ -230,6 +261,19 @@ function ViewDiscussion(props) {
         console.log("done");
       });
     setData(5);
+  };
+
+  const EditComment = (cid) => {
+    setCommentId(cid);
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cid)
+      .get()
+      .then((snapshot) => {
+        setEditComment(snapshot.data().comment);
+      });
+    setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
 
@@ -427,9 +471,15 @@ function ViewDiscussion(props) {
                     }}
                   >
                     <Text style={styles.userT}>{item.postedBy} </Text>
-                    <Text style={(styles.userC, { marginRight: 20 })}>
-                      {timeDifference(new Date(), item.creation.toDate())}
-                    </Text>
+                    {item.creation === null ? (
+                      <Text style={(styles.userC, { marginRight: 20 })}>
+                        Now
+                      </Text>
+                    ) : (
+                      <Text style={(styles.userC, { marginRight: 20 })}>
+                        {timeDifference(new Date(), item.creation.toDate())}
+                      </Text>
+                    )}
                   </View>
                   <View
                     style={{
@@ -487,11 +537,7 @@ function ViewDiscussion(props) {
                             type="ionicon"
                             size={20}
                             color="#000"
-                            onPress={() =>
-                              props.navigation.navigate("EditComment", {
-                                cid: item.id,
-                              })
-                            }
+                            onPress={() => EditComment(item.id)}
                           />
                         </View>
                       ) : null}
@@ -542,11 +588,7 @@ function ViewDiscussion(props) {
                             type="ionicon"
                             size={20}
                             color="#000"
-                            onPress={() =>
-                              props.navigation.navigate("EditComment", {
-                                cid: item.id,
-                              })
-                            }
+                            onPress={() => EditComment(item.id)}
                           />
                         </View>
                       ) : null}
@@ -562,6 +604,53 @@ function ViewDiscussion(props) {
         <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
           <Text style={styles.Ltext}>Add Comment</Text>
         </TouchableOpacity>
+
+        <Modal isVisible={isEditCommentModalVisible}>
+          <View style={{ justifyContent: "center" }}>
+            <View style={{ marginLeft: 8 }}>
+              <TextInput
+                style={styles.input}
+                value={editComment}
+                placeholderTextColor="#000"
+                multiline={true}
+                onChangeText={(editComment) => setEditComment(editComment)}
+              />
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.blogout}
+                  onPress={() => uploadUpdatedComment()}
+                >
+                  <Text style={styles.Ltext}>Update Comment</Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.blogout}
+                  onPress={toggleEditComment}
+                >
+                  <Text style={styles.Ltext}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         <Modal isVisible={isModalVisible}>
           <View style={{ justifyContent: "center" }}>

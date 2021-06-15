@@ -139,7 +139,19 @@ function Profile(props) {
             color="#3C3A36"
           />
         </TouchableOpacity>
-
+        <TouchableOpacity
+        style={styles.button}
+        onPress={() => props.navigation.navigate("Filter Feed")}
+      >
+        <Text style={styles.text}>Filter Feed</Text>
+        <Icon
+          style={styles.arrow}
+          name="chevron-forward-outline"
+          type="ionicon"
+          size={20}
+          color="#3C3A36"
+        />
+      </TouchableOpacity>
         <TouchableOpacity style={styles.logout} onPress={() => onLogout()}>
           <Text style={styles.Ltext}>Log Out</Text>
           <Icon
@@ -150,6 +162,7 @@ function Profile(props) {
             color="#3C3A36"
           />
         </TouchableOpacity>
+        
       </View>
     );
 }

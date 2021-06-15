@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
 import { connect } from "react-redux";
 import firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
@@ -15,7 +16,7 @@ import Modal from "react-native-modal";
 require("firebase/firestore");
 function EditProfile(props) {
   const { currentUser, comments, posts } = props;
-  const [nameToBeEditted, setNameToBeEditted] = useState(currentUser.name);
+  const [nameToBeEditted, setNameToBeEditted] = useState(firebase.auth().currentUser.uid);
   const [comment, setComment] = useState(comments);
   const [cntbu, setCntbu] = useState([]);
   const [discussion, setDiscussion] = useState(posts);
@@ -36,7 +37,17 @@ function EditProfile(props) {
         setUserId(snapshot.data().name);
       });
 
-      firebase
+    //discussion
+    const newArray2 = discussion.filter((e) => e.postedBy === nameToBeEditted);
+    //console.log(newArray2);
+    const secArray2 = newArray2.map((element) => element.id);
+    setDntbc(secArray2);
+  }, []);
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+    firebase
       .firestore()
       .collection("Comment")
       .orderBy("creation", "asc")
@@ -48,19 +59,14 @@ function EditProfile(props) {
           return { id, ...data };
         });
         const newArray = comment.filter(
-          (element) => element.postedBy === nameToBeEditted
+          (element) => element.userId === nameToBeEditted
         );
         const secArray = newArray.map((element) => element.id);
         setCntbu(secArray);
+       
       });
- 
-
-    //discussion
-    const newArray2 = discussion.filter((e) => e.postedBy === nameToBeEditted);
-    //console.log(newArray2);
-    const secArray2 = newArray2.map((element) => element.id);
-    setDntbc(secArray2);
-  }, []);
+    }, [])
+  );
 
   const Save = async () => {
     setModalVisible(!isModalVisible);
@@ -110,11 +116,13 @@ function EditProfile(props) {
         })
         .then(() => {
           xxx(userId);
+          console.log("xxx")
         });
     }
   };
 
   const xxx = (newName) => {
+    console.log(88)
     for (var i = 0; i < cntbu.length; i++) {
       firebase
         .firestore()
@@ -123,7 +131,7 @@ function EditProfile(props) {
         .update({
           postedBy: newName,
         })
-        .then(() => {});
+        .then(() => {console.log("updated")});
     }
 
     for (var i = 0; i < dntbc.length; i++) {
