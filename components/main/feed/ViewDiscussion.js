@@ -778,10 +778,7 @@ const styles = StyleSheet.create({
     // marginLeft: 20,
     // marginLeft:20
   },
-  container3: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   titlex: {
     color: "#fff",
     fontSize: 20,
@@ -835,10 +832,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
   },
 
-  logo: {
-    width: 300,
-    height: 400,
-  },
+
   title: {
     fontSize: 20,
     fontFamily: "Poppins",
@@ -846,15 +840,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 5,
   },
-  image: {
-    flex: 1,
-    //aspectRatio: 3 / 1,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
-  },
+
 
   commentCon: {
     borderColor: "#E3562A",
@@ -882,7 +868,7 @@ const styles = StyleSheet.create({
 
   userT: {
     fontFamily: "Poppins",
-    fontWeight: "700",
+    fontWeight: "600",
     fontSize: 15,
   },
 
@@ -892,10 +878,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
-  userT: {
-    fontFamily: "Poppins",
-    fontSize: 15,
-  },
 
   blogout: {
     width: 140,
