@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -39,6 +39,7 @@ function ViewDiscussion(props) {
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
   const [data, setData] = useState(null);
+  const [cu, setCu] = useState(currentUser);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   // const discussionId = props.route.params.did;
   const userId = firebase.auth().currentUser.uid;
@@ -107,19 +108,32 @@ function ViewDiscussion(props) {
 
   useFocusEffect(
     React.useCallback(() => {
-    firebase
-      .firestore()
-      .collection("Comment")
-      .orderBy("creation", "asc")
-      .get()
-      .then((snapshot) => {
-        let comment = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data };
+      firebase
+        .firestore()
+        .collection("Comment")
+        .orderBy("creation", "asc")
+        .get()
+        .then((snapshot) => {
+          let comment = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setComment(comment);
         });
-        setComment(comment);
-      });
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setCu(snapshot.data());
+          } else {
+            console.log("does not exist");
+          }
+        });
     }, [])
   );
 
@@ -148,9 +162,7 @@ function ViewDiscussion(props) {
         Alert.alert(
           "Done",
           "Your report has been received and will be reviewed",
-          [
-            { text: "OK", onPress: () => console.log("OK Pressed") }
-          ]
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
         );
       });
   };
@@ -176,10 +188,11 @@ function ViewDiscussion(props) {
         .collection("Comment")
         .add({
           userId,
-          postedBy,
+          postedBy: cu.name,
           discussionId,
           comment: newComment,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
+          image: cu.image,
           likeBy: [],
           numOfLike: 0,
         })
@@ -422,7 +435,13 @@ function ViewDiscussion(props) {
       </View>
 
       {userPosts.downloadURL && (
-        <View style={{ flexDirection: "row", paddingBottom: 10, justifyContent:"center"}}>
+        <View
+          style={{
+            flexDirection: "row",
+            paddingBottom: 10,
+            justifyContent: "center",
+          }}
+        >
           {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
           <Images
             width={Dimensions.get("window").width} // height will be calculated automatically

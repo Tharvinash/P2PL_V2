@@ -16,6 +16,7 @@ require("firebase/firestore");
 export default function Search(props) {
   const [users, setUsers] = useState(" ");
   const [faculty, setFaculty] = useState("");
+  const userId = firebase.auth().currentUser.uid;
 
   const fetchUsers = (search) => {
     firebase
@@ -152,19 +153,36 @@ export default function Search(props) {
           item === " " ? null : (
             <View style={styles.card}>
               <View style={styles.cardContent}>
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() =>
-                    props.navigation.navigate("Discussion", {
-                      did: item.id,
-                    })
-                  }
-                >
-                  <Text numberOfLines={2} style={styles.title}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.faculty}>{item.faculty}</Text>
-                </TouchableOpacity>
+                {userId === "aszrJayRTbZNtcX5DPzXU5HTD6a2" ||
+                "uvlRbumPXGb0cie0E75eUClfYHR2" ? (
+                  <TouchableOpacity
+                    style={{ flex: 1 }}
+                    onPress={() =>
+                      props.navigation.navigate("LectureDiscussionView", {
+                        did: item.id,
+                      })
+                    }
+                  >
+                    <Text numberOfLines={2} style={styles.title}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.faculty}>{item.faculty}</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={{ flex: 1 }}
+                    onPress={() =>
+                      props.navigation.navigate("Discussion", {
+                        did: item.id,
+                      })
+                    }
+                  >
+                    <Text numberOfLines={2} style={styles.title}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.faculty}>{item.faculty}</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           )

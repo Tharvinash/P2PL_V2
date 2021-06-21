@@ -22,18 +22,19 @@ import { timeDifference } from "../../../utils";
 import { version } from "react-dom";
 require("firebase/firestore");
 
-function ViewDiscussion(props) {
+function LectureDiscussionView(props) {
   const { currentUser } = props;
   const [commentId, setCommentId] = useState(null);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
-  useState(false);
+    useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
   const [data, setData] = useState(null);
-  const [editComment, setEditComment] = useState("");version
+  const [editComment, setEditComment] = useState("");
+  const [cu, setCu] = useState(currentUser);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   // const discussionId = props.route.params.did;
   const userId = firebase.auth().currentUser.uid;
@@ -43,12 +44,6 @@ function ViewDiscussion(props) {
     props.navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", paddingRight: 15 }}>
-          <Icon
-            name="alert-circle-outline"
-            type="ionicon"
-            size={30}
-            color="#000"
-          />
           <Icon
             name="share-social-outline"
             type="ionicon"
@@ -102,6 +97,19 @@ function ViewDiscussion(props) {
         setComment(comment);
       });
 
+      firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          setCu(snapshot.data());
+        } else {
+          console.log("does not exist");
+        }
+      });
+
     setData(11);
   }, [props.currentUser, props.route.params.did, data]);
 
@@ -114,23 +122,28 @@ function ViewDiscussion(props) {
   };
 
   const UploadComment = () => {
-    firebase
-      .firestore()
-      .collection("Comment")
-      .add({
-        userId,
-        postedBy,
-        discussionId,
-        comment: newComment,
-        creation: firebase.firestore.FieldValue.serverTimestamp(),
-        likeBy: [],
-        numOfLike: 0,
-        verify: false,
-      })
-      .then(function () {
-        setModalVisible(!isModalVisible);
-      });
-    setData(57);
+    if (!newComment.trim()) {
+      alert("Please Enter Comment");
+      return;
+    } else {
+      firebase
+        .firestore()
+        .collection("Comment")
+        .add({
+          userId,
+          postedBy: cu.name,
+          discussionId,
+          comment: newComment,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+          image: cu.image,
+          likeBy: [],
+          numOfLike: 0,
+        })
+        .then(function () {
+          setModalVisible(!isModalVisible);
+        });
+      setData(57);
+    }
   };
 
   const uploadUpdatedComment = () => {
@@ -276,8 +289,7 @@ function ViewDiscussion(props) {
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
-
-	const removeVerifyComment = (cid) => {
+  const removeVerifyComment = (cid) => {
     firebase
       .firestore()
       .collection("Comment")
@@ -361,37 +373,17 @@ function ViewDiscussion(props) {
 
   return (
     <ScrollView style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignContent: "space-between",
-          paddingRight: 35,
-        }}
-      >
+
         <Text style={styles.title}>{userPosts.title}</Text>
 
-        <View>
-          {user.FavDiscussion.includes(discussionId) ? (
-            <Icon
-              name="bookmark"
-              type="ionicon"
-              size={35}
-              Color="#000"
-              onPress={() => RemoveFavDiscussion()}
-            />
-          ) : (
-            <Icon
-              name="bookmark-outline"
-              type="ionicon"
-              size={35}
-              Color="#000"
-              onPress={() => AddFavDiscussion()}
-            />
-          )}
-        </View>
-      </View>
       {userPosts.downloadURL && (
-        <View style={{ flexDirection: "row", paddingBottom: 10, justifyContent:"center"}}>
+        <View
+          style={{
+            flexDirection: "row",
+            paddingBottom: 10,
+            justifyContent: "center",
+          }}
+        >
           {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
           <Images
             width={Dimensions.get("window").width} // height will be calculated automatically
@@ -733,7 +725,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontFamily: "Poppins",
-    lineHeight: 25,
+    lineHeight: 20,
+    fontWeight: "700",
+    marginBottom: 5,
   },
   image: {
     flex: 1,
@@ -809,4 +803,4 @@ const mapStateToProps = (store) => ({
   comments: store.userState.comment,
 });
 
-export default connect(mapStateToProps, null)(ViewDiscussion);
+export default connect(mapStateToProps, null)(LectureDiscussionView);

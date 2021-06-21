@@ -110,7 +110,7 @@ export class App extends Component {
     this.setState({ loading: false });
   }
   render() {
-    const { loggedIn, loaded, name } = this.state;
+    const { loggedIn, loaded, email } = this.state;
     if (!loaded) {
       return (
         <View style={{ flex: 1, justifyContent: "center" }}>
@@ -135,7 +135,7 @@ export class App extends Component {
       );
     }
     //Lecture1
-    if (name === "Lecture1") {
+    if (email === "lecture1@um.edu.my" || "lecture2@um.edu.my") {
       return (
         <Provider store={store}>
           <NavigationContainer>
@@ -169,6 +169,11 @@ export class App extends Component {
               <Stack.Screen
                 name="Filter Feed"
                 component={FilterFeed}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Search Results"
+                component={Search}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>

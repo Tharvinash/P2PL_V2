@@ -14,7 +14,7 @@ import { timeDifference } from "../../../utils";
 import firebase from "firebase";
 require("firebase/firestore");
 
-function Feed(props) {
+function LectureFeed(props) {
   const { posts, currentUser } = props;
   
   if (currentUser === null || currentUser.filteredFeed === null) {
@@ -197,7 +197,7 @@ function Feed(props) {
                   <TouchableOpacity
                     style={{ flex: 1 }}
                     onPress={() =>
-                      props.navigation.navigate("DiscussionTitle", {
+                      props.navigation.navigate("LectureDiscussionView", {
                         did: item.id,
                       })
                     }
@@ -372,4 +372,4 @@ const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
 });
 
-export default connect(mapStateToProps, null)(Feed);
+export default connect(mapStateToProps, null)(LectureFeed);
