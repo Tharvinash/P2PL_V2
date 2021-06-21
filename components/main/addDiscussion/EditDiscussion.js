@@ -12,15 +12,18 @@ import {
 import firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
 import Images from "react-native-scalable-image";
+
 import Modal from "react-native-modal";
-require("firebase/firestore");
 function EditDiscussion(props) {
+
+
   const [userPosts, setUserPosts] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [imageChanged, setImageChanged] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [di, setDi] = useState(null)
 
   useEffect(() => {
     firebase
@@ -32,6 +35,7 @@ function EditDiscussion(props) {
         //   console.log(snapshot.data().description)
         setDescription(snapshot.data().description);
         setTitle(snapshot.data().title);
+        setDi(snapshot.data().downloadURL);
       });
   }, []);
 
@@ -105,6 +109,22 @@ function EditDiscussion(props) {
     }
   };
 
+  const removeImage = () =>{
+    setModalVisible(!isModalVisible);
+    firebase
+    .firestore()
+    .collection("Discussion")
+    .doc(props.route.params.did)
+    .update({
+      downloadURL: null,
+    })
+    .then(() => {
+      props.navigation.goBack();
+      setModalVisible(!isModalVisible);
+    });
+  }
+
+
   return (
     <ScrollView style={styles.container}>
       {/* {image && <Image source={{ uri: image }} style={{ flex: 1 }} />} */}
@@ -127,8 +147,16 @@ function EditDiscussion(props) {
         </View>
         <View style={styles.formControl}>
           <Text style={styles.label}>Edit Discussion Image</Text>
+          {di && (
+            <TouchableOpacity
+              style={styles.logout}
+              onPress={() => removeImage()}
+            >
+              <Text style={styles.Ltext}>Remove Image</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity style={styles.logout} onPress={() => pickImage()}>
-            <Text style={styles.Ltext}>Upload New Image</Text>
+            <Text style={styles.Ltext}>Upload Image</Text>
           </TouchableOpacity>
         </View>
       </View>
