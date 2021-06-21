@@ -147,8 +147,7 @@ export default function Search(props) {
         horizontal={false}
         extraData={users}
         data={users}
-        key={users.id}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         renderItem={({ item }) =>
           item === " " ? null : (
             <View style={styles.card}>
