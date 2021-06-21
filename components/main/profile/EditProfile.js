@@ -41,16 +41,31 @@ function EditProfile(props) {
       .then((snapshot) => {
         setUserId(snapshot.data().name);
       });
-
-    //discussion
-    const newArray2 = discussion.filter((e) => e.postedBy === nameToBeEditted);
-    //console.log(newArray2);
-    const secArray2 = newArray2.map((element) => element.id);
-    setDntbc(secArray2);
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
+      firebase
+        .firestore()
+        .collection("Discussion")
+        .get()
+        .then((snapshot) => {
+          let discussion = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          //discussion
+         
+          const newArray2 = discussion.filter(
+            (e) => e.userId === nameToBeEditted
+          );
+          
+          const secArray2 = newArray2.map((element) => element.id);
+          console.log(secArray2);
+          setDntbc(secArray2);
+        });
+
       firebase
         .firestore()
         .collection("Comment")
@@ -229,8 +244,8 @@ function EditProfile(props) {
         image: defaultImage,
       })
       .then(() => {
-        setModalVisible(!isModalVisible);
-        props.navigation.goBack();
+        //setModalVisible(!isModalVisible);
+        yyy(cu.name, defaultImage )
       });
   };
 
@@ -247,7 +262,7 @@ function EditProfile(props) {
         </View>
         <View style={styles.formControl}>
           <Text style={styles.label}>Profile Picture</Text>
-          <View style={{ flexDirection: "row"}}>
+          <View style={{ flexDirection: "row" }}>
             {cu.image != defaultImage ? (
               <TouchableOpacity
                 style={styles.logout}
@@ -310,7 +325,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal:10
+    marginHorizontal: 10,
   },
 
   Ltext: {
