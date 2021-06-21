@@ -54,7 +54,7 @@ function ViewDiscussion(props) {
             type="ionicon"
             size={30}
             color="#000"
-            onPress={() => toggleReport()}
+            onPress={() => {toggleReport()}}
           />
           <TouchableOpacity>
             <Icon
@@ -62,13 +62,13 @@ function ViewDiscussion(props) {
               type="ionicon"
               size={30}
               color="#000"
-              onPress={() => onShare()}
+              onPress={() => {onShare()}}
             />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, []);
+  }, [data]);
   // props.navigation.setParams({ toggleReport: toggleReport })
   useEffect(() => {
     const { currentUser, comments } = props;
