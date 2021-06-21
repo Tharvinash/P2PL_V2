@@ -154,7 +154,7 @@ export default function Search(props) {
             <View style={styles.card}>
               <View style={styles.cardContent}>
                 {userId === "aszrJayRTbZNtcX5DPzXU5HTD6a2" ||
-                "uvlRbumPXGb0cie0E75eUClfYHR2" ? (
+                userId === "uvlRbumPXGb0cie0E75eUClfYHR2" ? (
                   <TouchableOpacity
                     style={{ flex: 1 }}
                     onPress={() =>

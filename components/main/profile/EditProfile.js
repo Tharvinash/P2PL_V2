@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import { connect } from "react-redux";
 import firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
@@ -16,7 +16,9 @@ import Modal from "react-native-modal";
 require("firebase/firestore");
 function EditProfile(props) {
   const { currentUser, comments, posts } = props;
-  const [nameToBeEditted, setNameToBeEditted] = useState(firebase.auth().currentUser.uid);
+  const [nameToBeEditted, setNameToBeEditted] = useState(
+    firebase.auth().currentUser.uid
+  );
   const [comment, setComment] = useState(comments);
   const [cntbu, setCntbu] = useState([]);
   const [discussion, setDiscussion] = useState(posts);
@@ -25,7 +27,10 @@ function EditProfile(props) {
   const [image, setImage] = useState(null);
   const [imageChanged, setImageChanged] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [cu, setCu] = useState(currentUser);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  const defaultImage =
+    "https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/default%2FnewProfile.png?alt=media&token=b2e22482-506a-4e78-ae2e-e38c83ee7c27";
 
   useEffect(() => {
     firebase
@@ -44,27 +49,34 @@ function EditProfile(props) {
     setDntbc(secArray2);
   }, []);
 
-
   useFocusEffect(
     React.useCallback(() => {
-    firebase
-      .firestore()
-      .collection("Comment")
-      .orderBy("creation", "asc")
-      .get()
-      .then((snapshot) => {
-        let comment = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data };
+      firebase
+        .firestore()
+        .collection("Comment")
+        .orderBy("creation", "asc")
+        .get()
+        .then((snapshot) => {
+          let comment = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          const newArray = comment.filter(
+            (element) => element.userId === nameToBeEditted
+          );
+          const secArray = newArray.map((element) => element.id);
+          setCntbu(secArray);
         });
-        const newArray = comment.filter(
-          (element) => element.userId === nameToBeEditted
-        );
-        const secArray = newArray.map((element) => element.id);
-        setCntbu(secArray);
-       
-      });
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(props.route.params.uid)
+        .get()
+        .then((snapshot) => {
+          setCu(snapshot.data());
+        });
     }, [])
   );
 
@@ -116,13 +128,13 @@ function EditProfile(props) {
         })
         .then(() => {
           xxx(userId);
-          console.log("xxx")
+          console.log("xxx");
         });
     }
   };
 
   const xxx = (newName) => {
-    console.log(88)
+    console.log(88);
     for (var i = 0; i < cntbu.length; i++) {
       firebase
         .firestore()
@@ -131,7 +143,9 @@ function EditProfile(props) {
         .update({
           postedBy: newName,
         })
-        .then(() => {console.log("updated")});
+        .then(() => {
+          console.log("updated");
+        });
     }
 
     for (var i = 0; i < dntbc.length; i++) {
@@ -205,6 +219,21 @@ function EditProfile(props) {
     }
   };
 
+  const removePicture = () => {
+    setModalVisible(!isModalVisible);
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(nameToBeEditted)
+      .update({
+        image: defaultImage,
+      })
+      .then(() => {
+        setModalVisible(!isModalVisible);
+        props.navigation.goBack();
+      });
+  };
+
   return (
     <View>
       <View style={styles.form}>
@@ -218,9 +247,19 @@ function EditProfile(props) {
         </View>
         <View style={styles.formControl}>
           <Text style={styles.label}>Profile Picture</Text>
-          <TouchableOpacity style={styles.logout} onPress={() => pickImage()}>
-            <Text style={styles.Ltext}>Upload Profile Picture</Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: "row"}}>
+            {cu.image != defaultImage ? (
+              <TouchableOpacity
+                style={styles.logout}
+                onPress={() => removePicture()}
+              >
+                <Text style={styles.Ltext}>Remove Existing Image</Text>
+              </TouchableOpacity>
+            ) : null}
+            <TouchableOpacity style={styles.logout} onPress={() => pickImage()}>
+              <Text style={styles.Ltext}>New Image</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <View style={{ alignItems: "center" }}>
@@ -265,12 +304,13 @@ const styles = StyleSheet.create({
   logout: {
     width: 160,
     height: 40,
+    marginTop: 5,
     backgroundColor: "#E3562A",
     borderColor: "#E3562A",
     borderRadius: 16,
-    marginTop: 20,
     justifyContent: "center",
     alignItems: "center",
+    marginHorizontal:10
   },
 
   Ltext: {
