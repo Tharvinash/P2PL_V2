@@ -8,7 +8,7 @@ import {
   FlatList,
   TextInput,
   Alert,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { connect } from "react-redux";
 import Modal from "react-native-modal";
@@ -26,6 +26,8 @@ function Reply(props) {
   const [mainComment, setMainComment] = useState([]);
   const [data, setData] = useState(0);
   const [editComment, setEditComment] = useState("");
+  const [editReplyComment, setEditReplyComment] = useState("");
+  const [editReplyCommentId, setEditReplyCommentId] = useState("");
   const [authorOfRepliedSubComment, setAuthorOfRepliedSubComment] =
     useState("");
   const [idOfRepliedSubComment, setIdOfRepliedSubComment] = useState("");
@@ -33,15 +35,19 @@ function Reply(props) {
   const [newReply, setNewReply] = useState("");
   const [replyComment, setReplyComment] = useState([]);
   const [likeBy, setLikeBy] = useState(props.route.params.xxx);
-  const [isEditCommentModalVisible, setEditCommentModalVisible] =
-    useState(false);
-  const [isReplyCommentModalVisible, setReplyCommentModalVisible] =
-    useState(false);
   const [mainCommentAuthorName, setMainCommentAuthorName] = useState(
     props.route.params.mainCommentAuthorName
   );
+
+  const [isEditCommentModalVisible, setEditCommentModalVisible] =
+    useState(false);
+  const [isEditReplyCommentModalVisible, setEditReplyCommentModalVisible] =
+    useState(false);
+  const [isReplyCommentModalVisible, setReplyCommentModalVisible] =
+    useState(false);
   const [isReplySubCommentModalVisible, setReplySubCommentModalVisible] =
     useState(false);
+
   const userId = firebase.auth().currentUser.uid;
   const time = props.route.params.time;
 
@@ -181,6 +187,22 @@ function Reply(props) {
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
+  const EditReplyComment = (rcid) => {
+    setEditReplyCommentId(rcid)
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .collection("Reply")
+      .doc(rcid)
+      .get()
+      .then((snapshot) => {
+        setEditReplyComment(snapshot.data().comment)
+      });
+      setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible)
+      console.log(rcid)
+  };
+
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
@@ -209,7 +231,11 @@ function Reply(props) {
   };
 
   const toggleReplyComment = () => {
-    setReplyCommentModalVisible(!isReplyCommentModalVisible);
+   setReplyCommentModalVisible(!isReplyCommentModalVisible);
+  };
+
+  const toggleReplyEditComment = () => {
+    setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible);
   };
 
   const toggleSubReplyComment = (id, posted) => {
@@ -366,8 +392,35 @@ function Reply(props) {
     setData(3);
   };
 
+  const UploadEditSubComment = () => {
+    if (!editReplyComment.trim()) {
+      alert("Please Enter Comment");
+      return;
+    } else {
+      firebase
+        .firestore()
+        .collection("Comment")
+        .doc(mainCommentId)
+        .collection("Reply")
+        .doc(editReplyCommentId)
+        .update({
+          comment: editReplyComment,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          console.log("save");
+        });
+
+        setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible);
+    }
+
+    setData(44);
+  };
+
   return (
-    <ScrollView contentContainerStyle={{alignItems:"center", justifyContent:"center"}}>
+    <ScrollView
+      contentContainerStyle={{ alignItems: "center", justifyContent: "center" }}
+    >
       <View style={styles.container}>
         <View>
           <View style={{ flexDirection: "row" }}>
@@ -573,7 +626,11 @@ function Reply(props) {
                           Now
                         </Text>
                       ) : (
-                        <Text style={(styles.userC, { marginRight: 20 })}>
+                        <Text
+                          style={
+                            (styles.userC, { marginRight: 20, paddingRight: 8 })
+                          }
+                        >
                           {timeDifference(new Date(), item.creation.toDate())}
                         </Text>
                       )}
@@ -582,6 +639,7 @@ function Reply(props) {
                       style={{
                         flexDirection: "row",
                         justifyContent: "space-between",
+                        paddingRight: 8,
                       }}
                     >
                       <Text style={styles.userC}>{item.comment}</Text>
@@ -770,7 +828,7 @@ function Reply(props) {
         </Modal>
 
         {/* Reply to Reply Comment Modal */}
-        {/* replyOfSubComment, setReplyOfSubComment */}
+
         <Modal isVisible={isReplySubCommentModalVisible}>
           <View style={{ justifyContent: "center" }}>
             <View style={{ marginLeft: 8 }}>
@@ -819,6 +877,58 @@ function Reply(props) {
             </View>
           </View>
         </Modal>
+
+        {/* Edit Reply Comment */}
+
+        <Modal isVisible={isEditReplyCommentModalVisible}>
+          <View style={{ justifyContent: "center" }}>
+            <View style={{ marginLeft: 8 }}>
+              <TextInput
+                style={styles.input}
+                value={editReplyComment}
+                placeholderTextColor="#000"
+                multiline={true}
+                onChangeText={(editReplyComment) =>
+                  setEditReplyComment(editReplyComment)
+                }
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.blogout}
+                  onPress={() => UploadEditSubComment()}
+                >
+                  <Text style={styles.Ltext}>Update Reply</Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  paddingHorizontal: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.blogout}
+                  onPress={toggleReplyEditComment}
+                >
+                  <Text style={styles.Ltext}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+
       </View>
     </ScrollView>
   );

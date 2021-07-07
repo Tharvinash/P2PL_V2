@@ -8,6 +8,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUser, fetchUserPosts, fetchUserComment, fetchOption, fetchReportedDiscussion} from '../redux/actions/index'
 import { Icon } from "react-native-elements";
+import firebase from "firebase";
+require("firebase/firestore");
 //, fetchUserPosts, fetchUserFollowing, clearData
 import FeedScreen from './main/feed/Feed'
 import ProfileScreen from './main/profile/Profile'
@@ -63,7 +65,19 @@ function InventoryStackScreen() {
   function ProfileStackScreen() {
     return (
       <HomeStack.Navigator initialRouteName="Profile">
-        <HomeStack.Screen name="Profile" component={ProfileScreen}  options={{ headerTitle: "Profile" }}/>
+        <HomeStack.Screen name="Profile" component={ProfileScreen}  options={{ headerTitle: "Profile", headerRight: () => (
+    <View style={{ flexDirection: "row", paddingRight: 15 }}>
+      <TouchableOpacity>
+        <Icon
+          name="exit-outline"
+          type="ionicon"
+          size={30}
+          color="#000"
+          onPress={() => firebase.auth().signOut()}
+        />
+      </TouchableOpacity>
+    </View>
+  ) }}/>
       </HomeStack.Navigator>
     );
   }

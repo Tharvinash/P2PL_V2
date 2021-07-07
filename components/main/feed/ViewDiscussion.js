@@ -589,7 +589,7 @@ function ViewDiscussion(props) {
                       style={{
                         paddingLeft: 10,
                       }}
-                      name="arrow-redo-outline"
+                      name="chatbubble-ellipses-outline"
                       type="ionicon"
                       size={20}
                       color="#000"

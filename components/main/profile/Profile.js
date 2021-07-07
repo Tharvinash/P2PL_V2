@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -37,26 +37,24 @@ function Profile(props) {
   useFocusEffect(
     React.useCallback(() => {
       firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setUser(snapshot.data());
-          //console.log(snapshot.data())
-        } else {
-          console.log("does not exist");
-        }
-      });
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setUser(snapshot.data());
+            //console.log(snapshot.data())
+          } else {
+            console.log("does not exist");
+          }
+        });
     }, [])
   );
 
-
-
   // const onRefresh = useCallback(() => {
   //   setRefreshing(true);
-  
+
   //   firebase
   //     .firestore()
   //     .collection("users")
@@ -88,36 +86,19 @@ function Profile(props) {
   };
 
   return (
-    <ScrollView
-      // refreshControl={
-      //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      // }
-      contentContainerStyle={styles.container}
-    >
-      <View style={{ alignItems: "center", marginBottom: 20 }}>
-        {!user.image ? (
-          <Image
-            style={{
-              width: 140,
-              height: 140,
-              borderRadius: 140 / 2,
-              marginBottom: 10,
-            }}
-            source={require("../../../assets/newProfile.png")}
-          />
-        ) : (
-          <Image
-            style={{
-              width: 140,
-              height: 140,
-              borderRadius: 140 / 2,
-              marginBottom: 10,
-            }}
-            source={{
-              uri: user.image,
-            }}
-          />
-        )}
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={{ alignItems: "center", marginBottom: 20, marginTop: 10 }}>
+        <Image
+          style={{
+            width: 140,
+            height: 140,
+            borderRadius: 140 / 2,
+            marginBottom: 10,
+          }}
+          source={{
+            uri: user.image,
+          }}
+        />
       </View>
 
       <View>
@@ -221,17 +202,6 @@ function Profile(props) {
           color="#3C3A36"
         />
       </TouchableOpacity>
-
-      <TouchableOpacity style={styles.logout} onPress={() => onLogout()}>
-        <Text style={styles.Ltext}>Log Out</Text>
-        <Icon
-          style={styles.arrow}
-          name="chevron-forward-outline"
-          type="ionicon"
-          size={20}
-          color="#3C3A36"
-        />
-      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -273,7 +243,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderColor: "#E3562A",
     borderRadius: 16,
-    marginTop: 20,
+    marginTop: 5,
   },
 
   Ltext: {
