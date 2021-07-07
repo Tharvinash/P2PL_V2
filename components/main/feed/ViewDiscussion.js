@@ -20,7 +20,7 @@ import { connect } from "react-redux";
 import firebase from "firebase";
 import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
-
+import moment from "moment";
 import { timeDifference } from "../../utils";
 import { RefreshControlBase } from "react-native";
 require("firebase/firestore");
@@ -37,11 +37,10 @@ function ViewDiscussion(props) {
   const [editComment, setEditComment] = useState("");
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
-  const [comment, setComment] = useState(null);
+  const [comment, setComment] = useState("");
   const [data, setData] = useState(null);
   const [cu, setCu] = useState(currentUser);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
-  // const discussionId = props.route.params.did;
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
 
@@ -49,20 +48,27 @@ function ViewDiscussion(props) {
     props.navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", paddingRight: 15 }}>
-          <Icon
-            name="alert-circle-outline"
-            type="ionicon"
-            size={30}
-            color="#000"
-            onPress={() => {toggleReport()}}
-          />
+          <TouchableOpacity>
+            <Icon
+              name="alert-circle-outline"
+              type="ionicon"
+              size={30}
+              color="#000"
+              onPress={() => {
+                toggleReport();
+              }}
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity>
             <Icon
               name="share-social-outline"
               type="ionicon"
               size={30}
               color="#000"
-              onPress={() => {onShare()}}
+              onPress={() => {
+                onShare();
+              }}
             />
           </TouchableOpacity>
         </View>
@@ -195,6 +201,7 @@ function ViewDiscussion(props) {
           image: cu.image,
           likeBy: [],
           numOfLike: 0,
+          numberOfReply: 0
         })
         .then(function () {
           setModalVisible(!isModalVisible);
@@ -298,9 +305,6 @@ function ViewDiscussion(props) {
   };
 
   const Delete = (cid) => {
-    // firebase.firestore().collection("Comment").doc(cid).delete();
-    // console.log("delete");
-    // props.navigation.goBack();
 
     return Alert.alert(
       "Are your sure?",
@@ -465,29 +469,18 @@ function ViewDiscussion(props) {
             <View>
               <View style={{ flexDirection: "row" }}>
                 <View>
-                  {!item.image ? (
-                    <Image
-                      style={{
-                        marginRight: 15,
-                        width: 35,
-                        height: 35,
-                        borderRadius: 35 / 2,
-                      }}
-                      source={require("../../../assets/newProfile.png")}
-                    />
-                  ) : (
-                    <Image
-                      style={{
-                        marginRight: 15,
-                        width: 35,
-                        height: 35,
-                        borderRadius: 35 / 2,
-                      }}
-                      source={{
-                        uri: item.image,
-                      }}
-                    />
-                  )}
+                  <Image
+                    style={{
+                      marginRight: 15,
+                      width: 35,
+                      height: 35,
+                      borderRadius: 35 / 2,
+                    }}
+                    source={{
+                      uri: item.image,
+                    }}
+                  />
+
                   <View
                     style={{
                       marginRight: 10,
@@ -531,20 +524,19 @@ function ViewDiscussion(props) {
                     <Text style={styles.userC}>{item.comment}</Text>
                   </View>
 
-                  {item.likeBy.includes(userId) ? (
-                    <View style={{ flexDirection: "row" }}>
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          marginRight: 3,
-                          fontFamily: "Poppins",
-                        }}
-                      >
-                        {item.numOfLike}
-                      </Text>
+                  <View style={{ flexDirection: "row" }}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginRight: 3,
+                        fontFamily: "Poppins",
+                      }}
+                    >
+                      {item.numOfLike}
+                    </Text>
+                    {item.likeBy.includes(userId) ? (
                       <Icon
                         style={{
-                          flexDirection: "row-reverse",
                           paddingLeft: 10,
                         }}
                         name="heart"
@@ -555,48 +547,9 @@ function ViewDiscussion(props) {
                           removeLike(item.id, item.numOfLike, item.likeBy)
                         }
                       />
-
-                      {item.userId === userId ? (
-                        <View style={{ flexDirection: "row" }}>
-                          <Icon
-                            style={{
-                              flexDirection: "row-reverse",
-                              paddingLeft: 10,
-                            }}
-                            name="trash-outline"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() => Delete(item.id)}
-                          />
-                          <Icon
-                            style={{
-                              flexDirection: "row-reverse",
-                              paddingLeft: 10,
-                            }}
-                            name="create-outline"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() => EditComment(item.id)}
-                          />
-                        </View>
-                      ) : null}
-                    </View>
-                  ) : (
-                    <View style={{ flexDirection: "row" }}>
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          marginRight: 3,
-                          fontFamily: "Poppins",
-                        }}
-                      >
-                        {item.numOfLike}
-                      </Text>
+                    ) : (
                       <Icon
                         style={{
-                          flexDirection: "row-reverse",
                           paddingLeft: 10,
                         }}
                         name="heart-outline"
@@ -607,34 +560,51 @@ function ViewDiscussion(props) {
                           addLike(item.id, item.numOfLike, item.likeBy)
                         }
                       />
-                      {item.userId === userId ? (
-                        <View style={{ flexDirection: "row" }}>
-                          <Icon
-                            style={{
-                              flexDirection: "row-reverse",
-                              paddingLeft: 10,
-                            }}
-                            name="trash-outline"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() => Delete(item.id)}
-                          />
-                          <Icon
-                            style={{
-                              flexDirection: "row-reverse",
-                              paddingLeft: 10,
-                            }}
-                            name="create-outline"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() => EditComment(item.id)}
-                          />
-                        </View>
-                      ) : null}
-                    </View>
-                  )}
+                    )}
+                    {item.userId === userId ? (
+                      <View style={{ flexDirection: "row" }}>
+                        <Icon
+                          style={{
+                            paddingLeft: 10,
+                          }}
+                          name="trash-outline"
+                          type="ionicon"
+                          size={20}
+                          color="#000"
+                          onPress={() => Delete(item.id)}
+                        />
+                        <Icon
+                          style={{
+                            paddingLeft: 10,
+                          }}
+                          name="create-outline"
+                          type="ionicon"
+                          size={20}
+                          color="#000"
+                          onPress={() => EditComment(item.id)}
+                        />
+                      </View>
+                    ) : null}
+                    <Icon
+                      style={{
+                        paddingLeft: 10,
+                      }}
+                      name="arrow-redo-outline"
+                      type="ionicon"
+                      size={20}
+                      color="#000"
+                      onPress={() => props.navigation.navigate("Reply Discussion", { cid: item.id, time: timeDifference(new Date(), item.creation.toDate()), xxx : item.likeBy.includes(userId), mainCommentAuthorName: item.postedBy  })}
+                    />
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginRight: 3,
+                        fontFamily: "Poppins",
+                      }}
+                    >
+                      ({item.numberOfReply})
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
@@ -832,7 +802,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
   },
 
-
   title: {
     fontSize: 20,
     fontFamily: "Poppins",
@@ -840,7 +809,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 5,
   },
-
 
   commentCon: {
     borderColor: "#E3562A",
@@ -877,7 +845,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontSize: 15,
   },
-
 
   blogout: {
     width: 140,

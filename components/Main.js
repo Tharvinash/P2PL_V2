@@ -1,18 +1,18 @@
 import React, { Component } from 'react'
-import { View, Text } from 'react-native'
-
+import { View, Text, TouchableOpacity } from 'react-native'
+import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 // import firebase from 'firebase'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchUser, fetchUserPosts, fetchUserComment, fetchOption, fetchReportedDiscussion} from '../redux/actions/index'
-
+import { Icon } from "react-native-elements";
 //, fetchUserPosts, fetchUserFollowing, clearData
 import FeedScreen from './main/feed/Feed'
 import ProfileScreen from './main/profile/Profile'
 import InventoryScreen from './main/inventory/Inventory'
-
+import { useNavigation } from '@react-navigation/native';
 // import SearchScreen from './main/Search'
 
 const Tab = createMaterialBottomTabNavigator();
@@ -20,6 +20,53 @@ const Tab = createMaterialBottomTabNavigator();
 const EmptyScreen = () => {
     return (null)
 }
+
+const HomeStack = createStackNavigator();
+
+function HomeStackScreen() {
+  const navigation = useNavigation();
+  return (
+    <HomeStack.Navigator initialRouteName="Feed">
+      <HomeStack.Screen name="Feed" component={FeedScreen}  options={{ headerTitle: "P2PL", headerRight: () => (
+    <View style={{ flexDirection: "row", paddingRight: 15 }}>
+      <TouchableOpacity>
+        <Icon
+          name="ios-search"
+          type="ionicon"
+          size={30}
+          color="#000"
+          onPress={() => navigation.navigate("Search Results")}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity>
+        <Icon
+          name="notifications-outline"
+          type="ionicon"
+          size={30}
+          color="#000"
+        />
+      </TouchableOpacity>
+    </View>
+  ), headerStyle:{backgroundColor:"#fff"}}}/>
+    </HomeStack.Navigator>
+  );
+}
+
+function InventoryStackScreen() {
+    return (
+      <HomeStack.Navigator initialRouteName="Inventory">
+        <HomeStack.Screen name="Inventory" component={InventoryScreen}  options={{ headerTitle: "Inventory" }}/>
+      </HomeStack.Navigator>
+    );
+  }
+  function ProfileStackScreen() {
+    return (
+      <HomeStack.Navigator initialRouteName="Profile">
+        <HomeStack.Screen name="Profile" component={ProfileScreen}  options={{ headerTitle: "Profile" }}/>
+      </HomeStack.Navigator>
+    );
+  }
 
 export class Main extends Component {
 
@@ -32,10 +79,6 @@ export class Main extends Component {
         this.props.fetchReportedDiscussion()
     }
     render() {
-
-        // const { currentUser } = this.props;
-        // console.log(currentUser)
-        //current user data
         return (
             <Tab.Navigator
                 initialRouteName="Feed"
@@ -45,7 +88,7 @@ export class Main extends Component {
                 barStyle={{ backgroundColor: '#694fad',  borderTopLeftRadius: 50,
                             borderTopRightRadius: 50, }}
             >
-                  <Tab.Screen name="Inventory" component={InventoryScreen}
+                  <Tab.Screen name="Inventory" component={InventoryStackScreen} 
                     options={{
                         
                         tabBarIcon: ({ color, size }) => (
@@ -54,7 +97,7 @@ export class Main extends Component {
                     }} />
                 
                 
-                <Tab.Screen name="Feed" component={FeedScreen}
+                <Tab.Screen name="Feed" component={HomeStackScreen}
                     options={{
                         tabBarIcon: ({ color, size }) => (
                          <MaterialCommunityIcons name="home" color={color} size={26} />
@@ -74,7 +117,7 @@ export class Main extends Component {
                     ),
                     }} /> 
                
-                 <Tab.Screen name="Profile" component={ProfileScreen}
+                 <Tab.Screen name="Profile" component={ProfileStackScreen}
                     options={{
                         tabBarIcon: ({ color, size }) => (
                          <MaterialCommunityIcons name="account-circle" color={color} size={26} />

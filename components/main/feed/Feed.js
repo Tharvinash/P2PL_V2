@@ -65,30 +65,9 @@ function Feed(props) {
 
 
   if(post.length == 0){
-    return(<View style={styles.container}>
-      <View style={styles.appLayout}>
-        <Text style={styles.app}>P2P Learning Platform</Text>
-      </View>
-      <View style={styles.search}>
-        <Icon
-          name="ios-search"
-          type="ionicon"
-          color="#fff"
-          size={30}
-          onPress={() => props.navigation.navigate("Search Results")}
-        />
-      </View>
-
-      <View style={styles.bell}>
-        <Icon
-          name="notifications-outline"
-          type="ionicon"
-          color="#fff"
-          size={30}
-        />
-      </View>
-
-      <View style={{ paddingTop: 80 }}>
+    return(
+    <View style={styles.container}>
+      <View style={{marginTop: 8}} >
         <FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -161,29 +140,7 @@ function Feed(props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.appLayout}>
-        <Text style={styles.app}>P2P Learning Platform</Text>
-      </View>
-      <View style={styles.search}>
-        <Icon
-          name="ios-search"
-          type="ionicon"
-          color="#fff"
-          size={30}
-          onPress={() => props.navigation.navigate("Search Results")}
-        />
-      </View>
-
-      <View style={styles.bell}>
-        <Icon
-          name="notifications-outline"
-          type="ionicon"
-          color="#fff"
-          size={30}
-        />
-      </View>
-
-      <View style={{ paddingTop: 80 }}>
+      <View style={{margin: 8}}>
         <FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
