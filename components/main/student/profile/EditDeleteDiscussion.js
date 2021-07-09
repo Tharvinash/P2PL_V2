@@ -15,7 +15,7 @@ import {
 import { connect } from "react-redux";
 import { Icon } from "react-native-elements";
 import firebase from "firebase";
-import { timeDifference } from "../../utils";
+import { timeDifference } from "../../../utils";
 import Modal from "react-native-modal";
 import Images from "react-native-scalable-image";
 
@@ -29,6 +29,7 @@ function EditDeleteDiscussion(props) {
   const [user, setUser] = useState(null);
   const [postedBy, setPostedBy] = useState(null);
   const [data, setData] = useState(null);
+  const [image, setImage] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
 
   const discussionId = props.route.params.did;
@@ -194,6 +195,7 @@ function EditDeleteDiscussion(props) {
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         likeBy: [],
         numOfLike: 0,
+        image: user.image
       })
       .then(function () {
         setModalVisible(!isModalVisible);
@@ -253,17 +255,7 @@ function EditDeleteDiscussion(props) {
               <View>
                 <View style={{ flexDirection: "row" }}>
                   <View>
-                    {!item.image ? (
-                      <Image
-                        style={{
-                          marginRight: 15,
-                          width: 35,
-                          height: 35,
-                          borderRadius: 35 / 2,
-                        }}
-                        source={require("../../../assets/newProfile.png")}
-                      />
-                    ) : (
+                    
                       <Image
                         style={{
                           marginRight: 15,
@@ -275,7 +267,7 @@ function EditDeleteDiscussion(props) {
                           uri: item.image,
                         }}
                       />
-                    )}
+
                     <View
                       style={{
                         marginRight: 10,
@@ -300,9 +292,15 @@ function EditDeleteDiscussion(props) {
                       }}
                     >
                       <Text style={styles.userT}>{item.postedBy} </Text>
+                       {item.creation === null ? (
+                      <Text style={(styles.userC, { marginRight: 20 })}>
+                        Now
+                      </Text>
+                    ) : (
                       <Text style={(styles.userC, { marginRight: 20 })}>
                         {timeDifference(new Date(), item.creation.toDate())}
                       </Text>
+                    )}
                     </View>
                     <View
                       style={{

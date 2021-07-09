@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
-import { timeDifference } from "../../utils";
+import { timeDifference } from "../../../utils";
 import firebase from "firebase";
 require("firebase/firestore");
 
@@ -87,7 +87,7 @@ function Feed(props) {
                     }
                   >
                     <View style={{ flexDirection: "row" }}>
-                      {item.image ? (
+                      
                         <Image
                           style={{
                             width: 35,
@@ -97,17 +97,7 @@ function Feed(props) {
                           }}
                           source={{ uri: item.image }}
                         />
-                      ) : (
-                        <Image
-                          style={{
-                            width: 35,
-                            height: 35,
-                            borderRadius: 35 / 2,
-                            marginBottom: 10,
-                          }}
-                          source={require("../../../assets/newProfile.png")}
-                        />
-                      )}
+                      
                       <View
                         style={{
                           marginLeft: 10,
@@ -160,7 +150,7 @@ function Feed(props) {
                     }
                   >
                     <View style={{ flexDirection: "row" }}>
-                      {item.image ? (
+                      
                         <Image
                           style={{
                             width: 35,
@@ -170,17 +160,7 @@ function Feed(props) {
                           }}
                           source={{ uri: item.image }}
                         />
-                      ) : (
-                        <Image
-                          style={{
-                            width: 35,
-                            height: 35,
-                            borderRadius: 35 / 2,
-                            marginBottom: 10,
-                          }}
-                          source={require("../../../assets/newProfile.png")}
-                        />
-                      )}
+                     
                       <View
                         style={{
                           marginLeft: 10,

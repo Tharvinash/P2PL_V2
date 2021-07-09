@@ -14,7 +14,6 @@ import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 import firebase from "firebase";
 require("firebase/firestore");
-import defaultImage from "../../../assets/default.jpg";
 import DropDownPicker from "react-native-dropdown-picker";
 
 function Profile(props) {
@@ -22,7 +21,6 @@ function Profile(props) {
   const { currentUser, posts } = props;
   const [refreshing, setRefreshing] = useState(false);
   const [user, setUser] = useState(currentUser);
-  const [image, setImage] = useState(defaultImage);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([

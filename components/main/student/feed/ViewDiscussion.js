@@ -21,7 +21,7 @@ import firebase from "firebase";
 import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
 import moment from "moment";
-import { timeDifference } from "../../utils";
+import { timeDifference } from "../../../utils";
 import { RefreshControlBase } from "react-native";
 require("firebase/firestore");
 

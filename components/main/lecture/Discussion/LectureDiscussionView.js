@@ -23,10 +23,12 @@ import { version } from "react-dom";
 require("firebase/firestore");
 
 function LectureDiscussionView(props) {
-  const { currentUser } = props;
+  const { currentUser, options } = props;
   const [commentId, setCommentId] = useState(null);
+  const [newOption, setOption] = useState(options);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
+  const [isReportVisible, setReportVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [userPosts, setUserPosts] = useState([]);
@@ -44,6 +46,17 @@ function LectureDiscussionView(props) {
     props.navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", paddingRight: 15 }}>
+          <TouchableOpacity>
+            <Icon
+              name="alert-circle-outline"
+              type="ionicon"
+              size={30}
+              color="#000"
+              onPress={() => {
+                toggleReport();
+              }}
+            />
+          </TouchableOpacity>
           <Icon
             name="share-social-outline"
             type="ionicon"
@@ -56,12 +69,38 @@ function LectureDiscussionView(props) {
     });
   }, []);
 
+  const sendReport = (rid) => {
+    firebase
+      .firestore()
+      .collection("ReportedDiscussion")
+      .add({
+        reportedBy: userId,
+        Reason: rid,
+        reportedDiscussion: discussionId,
+        discussionTitle: userPosts.title,
+        timeReported: firebase.firestore.FieldValue.serverTimestamp(),
+        discussionPostedBy: userPosts.userId,
+      })
+      .then(function () {
+        setReportVisible(!isReportVisible);
+        Alert.alert(
+          "Done",
+          "Your report has been received and will be reviewed",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        );
+      });
+  };
+
   const xxx = () => {
     console.log(24);
   };
 
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
+  };
+
+  const toggleReport = () => {
+    setReportVisible(!isReportVisible);
   };
 
   useEffect(() => {
@@ -97,7 +136,7 @@ function LectureDiscussionView(props) {
         setComment(comment);
       });
 
-      firebase
+    firebase
       .firestore()
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -373,8 +412,7 @@ function LectureDiscussionView(props) {
 
   return (
     <ScrollView style={styles.container}>
-
-        <Text style={styles.title}>{userPosts.title}</Text>
+      <Text style={styles.title}>{userPosts.title}</Text>
 
       {userPosts.downloadURL && (
         <View
@@ -644,6 +682,34 @@ function LectureDiscussionView(props) {
           </View>
         </Modal>
 
+        <Modal isVisible={isReportVisible}>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Text style={styles.titley}>Why are you reporting this post</Text>
+            <FlatList
+              horizontal={false}
+              extraData={newOption}
+              data={newOption}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={() => sendReport(item.Option)}
+                >
+                  <View style={styles.card}>
+                    <View style={styles.cardContent}>
+                      <Text style={styles.titlex}>{item.Option}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <TouchableOpacity style={styles.blogout} onPress={toggleReport}>
+              <Text style={styles.Ltext}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
         <Modal isVisible={isModalVisible}>
           <View style={{ justifyContent: "center" }}>
             <View style={{ marginLeft: 8 }}>
@@ -705,6 +771,46 @@ const styles = StyleSheet.create({
   container3: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  titlex: {
+    color: "#fff",
+    fontSize: 20,
+    fontFamily: "Poppins",
+    paddingVertical: 0,
+    //  marginVertical: -5,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+
+  titley: {
+    color: "#fff",
+    fontSize: 25,
+    fontFamily: "Poppins",
+    paddingVertical: 0,
+    //  marginVertical: -5,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    fontWeight: "700",
+    marginBottom: 20,
+  },
+  card: {
+    borderRadius: 16,
+    elevation: 5,
+    backgroundColor: "#140F38",
+    shadowOffset: { width: 1, height: 1 },
+    shadowColor: "#333",
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    marginHorizontal: 4,
+    marginVertical: 6,
+    width: 340,
+  },
+
+  cardContent: {
+    marginVertical: 10,
+    marginHorizontal: 18,
   },
 
   input: {
@@ -801,6 +907,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
   comments: store.userState.comment,
+  options: store.userState.option,
 });
 
 export default connect(mapStateToProps, null)(LectureDiscussionView);

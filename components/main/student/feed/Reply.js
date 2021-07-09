@@ -16,7 +16,7 @@ import firebase from "firebase";
 require("firebase/firestore");
 import { Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/native";
-import { timeDifference } from "../../utils";
+import { timeDifference } from "../../../utils";
 
 function Reply(props) {
   const { currentUser } = props;

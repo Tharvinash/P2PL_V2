@@ -11,11 +11,12 @@ import {
   fetchUserPosts,
   fetchUserComment,
   fetchReportedDiscussion
-} from "../../../redux/actions/index";
+} from "../redux/actions/index";
 
-import LectureFeed from "../admin/lectureMain/LectureFeed";
-import LectureProfile from "../admin/lectureMain/LectureProfile";
-import Room from "../admin/lectureMain/Room";
+//lecture main 
+import LectureFeed from "./main/lecture/lectureMain/LectureFeed";
+import LectureProfile from "./main/lecture/lectureMain/LectureProfile";
+import Room from "./main/lecture/lectureMain/Room";
 
 
 const Tab = createMaterialBottomTabNavigator();

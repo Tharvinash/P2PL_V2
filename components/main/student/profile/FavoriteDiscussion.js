@@ -9,7 +9,7 @@ import {
 import { connect } from "react-redux";
 import firebase from "firebase";
 import { bindActionCreators } from "redux"; //call  function from action
-import { fetchUserPosts } from "../../../redux/actions/index";
+import { fetchUserPosts } from "../../../../redux/actions/index";
 import { useFocusEffect } from "@react-navigation/native";
 import { SwipeListView } from "react-native-swipe-list-view";
 

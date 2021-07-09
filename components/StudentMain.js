@@ -11,9 +11,9 @@ import { Icon } from "react-native-elements";
 import firebase from "firebase";
 require("firebase/firestore");
 //, fetchUserPosts, fetchUserFollowing, clearData
-import FeedScreen from './main/feed/Feed'
-import ProfileScreen from './main/profile/Profile'
-import InventoryScreen from './main/inventory/Inventory'
+import FeedScreen from './main/student/feed/Feed'
+import ProfileScreen from './main/student/profile/Profile'
+import InventoryScreen from './main/student/inventory/Inventory'
 import { useNavigation } from '@react-navigation/native';
 // import SearchScreen from './main/Search'
 

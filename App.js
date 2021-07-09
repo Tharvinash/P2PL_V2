@@ -4,6 +4,7 @@ import { View, Text, Button } from "react-native";
 import { Icon } from "react-native-elements";
 import * as Font from "expo-font";
 import * as Linking from "expo-linking";
+import AppLoading from "expo-app-loading";
 //import AppLoading from 'expo-app-loading';
 //-----------------REDUX---------------//
 import { Provider } from "react-redux";
@@ -35,37 +36,39 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
 
-//profile
-import CreatedDiscussion from "./components/main/profile/CreatedDiscussion";
-import ActivityTracking from "./components/main/profile/ActivityTracking";
-import FilterFeed from "./components/main/profile/FilterFeed";
-import FavoriteDiscussion from "./components/main/profile/FavoriteDiscussion";
-import EditProfile from "./components/main/profile/EditProfile";
-import EditDeleteDiscussion from "./components/main/profile/EditDeleteDiscussion";
-import EditPassword from "./components/main/profile/EditPassword";
+//Student Profile
+import CreatedDiscussion from "./components/main/student/profile/CreatedDiscussion";
+import ActivityTracking from "./components/main/student/profile/ActivityTracking";
+import FilterFeed from "./components/main/student/profile/FilterFeed";
+import FavoriteDiscussion from "./components/main/student/profile/FavoriteDiscussion";
+import EditProfile from "./components/main/student/profile/EditProfile";
+import EditDeleteDiscussion from "./components/main/student/profile/EditDeleteDiscussion";
+import EditPassword from "./components/main/student/profile/EditPassword";
 
+//Auth
 import LandingScreen from "./components/auth/Landing";
 import RegisterScreen from "./components/auth/Register";
 import LoginScreen from "./components/auth/Login";
-import MainScreen from "./components/Main";
-import AddScreen from "./components/main/addDiscussion/Add";
-import ReportDiscussion from "./components/main/feed/ReportDiscussion";
-// import SaveScreen from './components/main/Save'
-// import CommentScreen from './components/main/Comment'
 
-import EditDiscussion from "./components/main/addDiscussion/EditDiscussion";
-import EditComment from "./components/main/addDiscussion/EditComment";
+//Main Screen
+import MainScreen from "./components/StudentMain";
+
+//Add Discussion    
+import AddScreen from "./components/main/student/addDiscussion/Add";
+import EditDiscussion from "./components/main/student/addDiscussion/EditDiscussion";
+import EditComment from "./components/main/student/addDiscussion/EditComment";
 
 //Lecture
-import LectureMainScreen from "./components/main/admin/Main2";
-import ReportedDiscussion from "./components/main/admin/profile/ReportedDiscussion";
-import LectureDiscussionView from "./components/main/admin/Discussion/LectureDiscussionView";
+import LectureMainScreen from "./components/LectureMain";
+import ReportedDiscussion from "./components/main/lecture/profile/ReportedDiscussion";
+import LectureDiscussionView from "./components/main/lecture/Discussion/LectureDiscussionView";
 
-import DiscussionTitle from "./components/main/feed/ViewDiscussion";
-import PostComment from "./components/main/addDiscussion/PostComment";
-import Search from "./components/main/feed/Search";
-import Reply from "./components/main/feed/Reply";
-import AppLoading from "expo-app-loading";
+//feed
+import DiscussionTitle from "./components/main/student/feed/ViewDiscussion";
+import PostComment from "./components/main/student/addDiscussion/PostComment";
+import Search from "./components/main/student/feed/Search";
+import Reply from "./components/main/student/feed/Reply";
+
 
 export class App extends Component {
   constructor(props) {
@@ -186,9 +189,9 @@ export class App extends Component {
     return (
       <Provider store={store}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Main">
+          <Stack.Navigator initialRouteName="StudentMain">
             <Stack.Screen
-              name="Main"
+              name="StudentMain"
               component={MainScreen}
               options={{ headerShown: false }}
               navigation={this.props.navigation}
@@ -256,11 +259,6 @@ export class App extends Component {
             <Stack.Screen
               name="Change Password"
               component={EditPassword}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Report Discussion"
-              component={ReportDiscussion}
               navigation={this.props.navigation}
             />
             <Stack.Screen
