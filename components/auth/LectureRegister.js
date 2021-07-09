@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Picker,
 } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 import firebase from "firebase";
 import "firebase/firestore";
 
@@ -20,19 +21,19 @@ export class Register extends Component {
       password: "",
       name: "",
       faculty: null,
-			year: ''
+      year: "",
     };
 
     this.onSignUp = this.onSignUp.bind(this);
   }
 
-	updateYear = (year) => {
-	this.setState({ year: year })
- }
+  updateYear = (year) => {
+    this.setState({ year: year });
+  };
 
- updateFaculty = (faculty) => {
-	this.setState({ faculty: faculty })
- }
+  updateFaculty = (faculty) => {
+    this.setState({ faculty: faculty });
+  };
 
   onSignUp() {
     const { email, password, name, faculty, year } = this.state;
@@ -48,9 +49,9 @@ export class Register extends Component {
             name,
             email,
             FavDiscussion: [],
-						faculty,
-						status:0,
-						year,
+            faculty,
+            status: 1,
+            year,
             fca: true,
             fp: true,
             fs: true,
@@ -115,7 +116,7 @@ export class Register extends Component {
         <TextInput
           style={styles.input}
           underlineColorAndroid="transparent"
-          placeholder="Siswamail"
+          placeholder="E-mail"
           placeholderTextColor="#000"
           autoCapitalize="none"
           onChangeText={(email) => this.setState({ email })}
@@ -136,7 +137,7 @@ export class Register extends Component {
             selectedValue={this.state.faculty}
             style={{ height: 50, width: 300, color: "#000", marginTop: -10 }}
             itemStyle={{ fontFamily: "Poppins" }}
-						onValueChange={this.updateFaculty}
+            onValueChange={this.updateFaculty}
           >
             <Picker.Item
               label="FACULTY OF EDUCATION"
@@ -199,20 +200,6 @@ export class Register extends Component {
               label="ACADEMY OF MALAY STUDIES"
               value="ACADEMY OF MALAY STUDIES"
             />
-          </Picker>
-        </View>
-
-        <View style={styles.input}>
-          <Picker
-            selectedValue={this.state.year}
-            style={{ height: 50, width: 300, color: "#000", marginTop: -10 }}
-						onValueChange={this.updateYear}
-          >
-            <Picker.Item label="Year 1" value="1" />
-            <Picker.Item label="Year 2" value="2" />
-            <Picker.Item label="Year 3" value="3" />
-            <Picker.Item label="Year 4" value="4" />
-            <Picker.Item label="Year 5" value="5" />
           </Picker>
         </View>
 
@@ -281,7 +268,7 @@ const styles = StyleSheet.create({
     width: 275,
     borderRadius: 12,
     padding: 10,
-		fontSize:15
+    fontSize: 15,
   },
 });
 

@@ -49,6 +49,7 @@ import EditPassword from "./components/main/student/profile/EditPassword";
 import LandingScreen from "./components/auth/Landing";
 import RegisterScreen from "./components/auth/Register";
 import LoginScreen from "./components/auth/Login";
+import LectureRegister from "./components/auth/LectureRegister"
 
 //Main Screen
 import MainScreen from "./components/StudentMain";
@@ -98,7 +99,7 @@ export class App extends Component {
           .then((snapshot) => {
             if (snapshot.exists) {
               this.setState({
-                email: snapshot.data().email,
+                status: snapshot.data().status,
               });
             } else {
               console.log("does not exist");
@@ -114,7 +115,7 @@ export class App extends Component {
     this.setState({ loading: false });
   }
   render() {
-    const { loggedIn, loaded, email } = this.state;
+    const { loggedIn, loaded, status } = this.state;
     if (!loaded) {
       return (
         <View style={{ flex: 1, justifyContent: "center" }}>
@@ -134,12 +135,13 @@ export class App extends Component {
             />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="LectureRegister" component={LectureRegister} />
           </Stack.Navigator>
         </NavigationContainer>
       );
     }
     //Lecture1
-    if (email === "lecture1@um.edu.my" || email === "lecture2@um.edu.my") {
+    if (status === 1) {
       return (
         <Provider store={store}>
           <NavigationContainer>
