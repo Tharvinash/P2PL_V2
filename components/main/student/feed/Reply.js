@@ -188,7 +188,7 @@ function Reply(props) {
   };
 
   const EditReplyComment = (rcid) => {
-    setEditReplyCommentId(rcid)
+    setEditReplyCommentId(rcid);
     firebase
       .firestore()
       .collection("Comment")
@@ -197,10 +197,10 @@ function Reply(props) {
       .doc(rcid)
       .get()
       .then((snapshot) => {
-        setEditReplyComment(snapshot.data().comment)
+        setEditReplyComment(snapshot.data().comment);
       });
-      setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible)
-      console.log(rcid)
+    setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible);
+    console.log(rcid);
   };
 
   const toggleEditComment = () => {
@@ -231,7 +231,7 @@ function Reply(props) {
   };
 
   const toggleReplyComment = () => {
-   setReplyCommentModalVisible(!isReplyCommentModalVisible);
+    setReplyCommentModalVisible(!isReplyCommentModalVisible);
   };
 
   const toggleReplyEditComment = () => {
@@ -411,10 +411,71 @@ function Reply(props) {
           console.log("save");
         });
 
-        setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible);
+      setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible);
     }
 
     setData(44);
+  };
+
+  const removeVerifyComment = () => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .update({
+        verify: false,
+      })
+      .then(() => {
+        console.log("done");
+      });
+    setData(6);
+  };
+
+  const verifyComment = () => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .update({
+        verify: true,
+      })
+      .then(() => {
+        console.log("done");
+      });
+    setData(5);
+  };
+
+  const removeVerifyReplyComment = (rcid) => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .collection("Reply")
+      .doc(rcid)
+      .update({
+        verify: false,
+      })
+      .then(() => {
+        console.log("done");
+      });
+
+    setData(73);
+  };
+
+  const verifyReplyComment = (rcid) => {
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .collection("Reply")
+      .doc(rcid)
+      .update({
+        verify: true,
+      })
+      .then(() => {
+        console.log("done");
+      });
+    setData(70);
   };
 
   return (
@@ -443,13 +504,39 @@ function Reply(props) {
                   paddingTop: 10,
                 }}
               >
-                {mainComment.verify ? (
-                  <Icon
-                    name="checkmark-circle"
-                    type="ionicon"
-                    size={25}
-                    color="#140F38"
-                  />
+                {loginCurrentUser.status == 1 ? (
+                  <View>
+                    {mainComment.verify ? (
+                      <Icon
+                        name="checkmark-circle"
+                        type="ionicon"
+                        size={25}
+                        color="#140F38"
+                        onPress={() => removeVerifyComment()}
+                      />
+                    ) : (
+                      <Icon
+                        name="checkmark-circle-outline"
+                        type="ionicon"
+                        size={25}
+                        color="#140F38"
+                        onPress={() => verifyComment()}
+                      />
+                    )}
+                  </View>
+                ) : null}
+
+                {loginCurrentUser.status == 0 ? (
+                  <View>
+                    {mainComment.verify ? (
+                      <Icon
+                        name="checkmark-circle"
+                        type="ionicon"
+                        size={20}
+                        color="#140F38"
+                      />
+                    ) : null}
+                  </View>
                 ) : null}
               </View>
             </View>
@@ -562,9 +649,9 @@ function Reply(props) {
                     <Image
                       style={{
                         marginRight: 15,
-                        width: 35,
-                        height: 35,
-                        borderRadius: 35 / 2,
+                        width: 28,
+                        height: 28,
+                        borderRadius: 28 / 2,
                       }}
                       source={{
                         uri: item.image,
@@ -577,13 +664,39 @@ function Reply(props) {
                         paddingTop: 10,
                       }}
                     >
-                      {item.verify ? (
-                        <Icon
-                          name="checkmark-circle"
-                          type="ionicon"
-                          size={25}
-                          color="#140F38"
-                        />
+                      {loginCurrentUser.status == 1 ? (
+                        <View>
+                          {item.verify ? (
+                            <Icon
+                              name="checkmark-circle"
+                              type="ionicon"
+                              size={20}
+                              color="#140F38"
+                              onPress={() => removeVerifyReplyComment(item.id)}
+                            />
+                          ) : (
+                            <Icon
+                              name="checkmark-circle-outline"
+                              type="ionicon"
+                              size={20}
+                              color="#140F38"
+                              onPress={() => verifyReplyComment(item.id)}
+                            />
+                          )}
+                        </View>
+                      ) : null}
+
+                      {loginCurrentUser.status == 0 ? (
+                        <View>
+                          {item.verify ? (
+                            <Icon
+                              name="checkmark-circle"
+                              type="ionicon"
+                              size={20}
+                              color="#140F38"
+                            />
+                          ) : null}
+                        </View>
                       ) : null}
                     </View>
                   </View>
@@ -927,8 +1040,6 @@ function Reply(props) {
             </View>
           </View>
         </Modal>
-
-
       </View>
     </ScrollView>
   );

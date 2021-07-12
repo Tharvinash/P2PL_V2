@@ -154,6 +154,7 @@ export class App extends Component {
 
               <Stack.Screen
                 name="LectureDiscussionView"
+                options={{ headerTitle: "Discussion"}}
                 component={LectureDiscussionView}
                 navigation={this.props.navigation}
               />

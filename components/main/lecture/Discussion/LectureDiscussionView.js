@@ -12,6 +12,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
@@ -105,10 +106,8 @@ function LectureDiscussionView(props) {
 
   useEffect(() => {
     const { currentUser, comments } = props;
-    if (currentUser.FavDiscussion !== null) {
-      setUser(currentUser);
-    }
     setUser(currentUser);
+
     if (props.route.params.did) {
       setDiscussionId(props.route.params.did);
     }
@@ -151,6 +150,26 @@ function LectureDiscussionView(props) {
 
     setData(11);
   }, [props.currentUser, props.route.params.did, data]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+
+        firebase
+        .firestore()
+        .collection("Comment")
+        .orderBy("creation", "asc")
+        .get()
+        .then((snapshot) => {
+          let comment = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setComment(comment);
+        });
+
+    }, [])
+  );
 
   if (user === null) {
     return <View />;
