@@ -140,19 +140,7 @@ function Profile(props) {
           }}
         />
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => props.navigation.navigate("ReportedDiscussion")}
-      >
-        <Text style={styles.text}>Reported Discussion</Text>
-        <Icon
-          style={styles.arrow}
-          name="chevron-forward-outline"
-          type="ionicon"
-          size={20}
-          color="#3C3A36"
-        />
-      </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.button}
         onPress={() => props.navigation.navigate("Create Discussion Room")}

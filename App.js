@@ -61,7 +61,6 @@ import EditComment from "./components/main/student/addDiscussion/EditComment";
 
 //Lecture
 import LectureMainScreen from "./components/LectureMain";
-import ReportedDiscussion from "./components/main/lecture/profile/ReportedDiscussion";
 import LectureDiscussionView from "./components/main/lecture/Discussion/LectureDiscussionView";
 
 //feed
@@ -69,6 +68,9 @@ import DiscussionTitle from "./components/main/student/feed/ViewDiscussion";
 import PostComment from "./components/main/student/addDiscussion/PostComment";
 import Search from "./components/main/student/feed/Search";
 import Reply from "./components/main/student/feed/Reply";
+
+//Admin
+import AdminMainScreen from "./components/AdminMain"
 
 export class App extends Component {
   constructor(props) {
@@ -151,16 +153,10 @@ export class App extends Component {
                 options={{ headerShown: false }}
                 navigation={this.props.navigation}
               />
-
               <Stack.Screen
                 name="LectureDiscussionView"
                 options={{ headerTitle: "Discussion"}}
                 component={LectureDiscussionView}
-                navigation={this.props.navigation}
-              />
-              <Stack.Screen
-                name="ReportedDiscussion"
-                component={ReportedDiscussion}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
@@ -193,6 +189,25 @@ export class App extends Component {
         </Provider>
       );
     }
+
+    if (status === 2) {
+      return (
+        <Provider store={store}>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Main3">
+              <Stack.Screen
+                name="Main3"
+                component={AdminMainScreen}
+                options={{ headerShown: false }}
+                navigation={this.props.navigation}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </Provider>
+      );
+    }
+
+
     return (
       <Provider store={store}>
         <NavigationContainer>
