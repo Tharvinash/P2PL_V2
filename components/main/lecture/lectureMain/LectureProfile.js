@@ -94,17 +94,7 @@ function Profile(props) {
       contentContainerStyle={styles.container}
     >
       <View style={{ alignItems: "center", marginBottom: 20 }}>
-        {!user.image ? (
-          <Image
-            style={{
-              width: 140,
-              height: 140,
-              borderRadius: 140 / 2,
-              marginBottom: 10,
-            }}
-            source={require("../../../../assets/newProfile.png")}
-          />
-        ) : (
+       
           <Image
             style={{
               width: 140,
@@ -116,7 +106,7 @@ function Profile(props) {
               uri: user.image,
             }}
           />
-        )}
+
       </View>
 
       <View>
@@ -195,16 +185,6 @@ function Profile(props) {
         onPress={() => props.navigation.navigate("Filter Feed")}
       >
         <Text style={styles.text}>Filter Feed</Text>
-        <Icon
-          style={styles.arrow}
-          name="chevron-forward-outline"
-          type="ionicon"
-          size={20}
-          color="#3C3A36"
-        />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.logout} onPress={() => onLogout()}>
-        <Text style={styles.Ltext}>Log Out</Text>
         <Icon
           style={styles.arrow}
           name="chevron-forward-outline"

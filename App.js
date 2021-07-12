@@ -49,12 +49,12 @@ import EditPassword from "./components/main/student/profile/EditPassword";
 import LandingScreen from "./components/auth/Landing";
 import RegisterScreen from "./components/auth/Register";
 import LoginScreen from "./components/auth/Login";
-import LectureRegister from "./components/auth/LectureRegister"
+import LectureRegister from "./components/auth/LectureRegister";
 
 //Main Screen
 import MainScreen from "./components/StudentMain";
 
-//Add Discussion    
+//Add Discussion
 import AddScreen from "./components/main/student/addDiscussion/Add";
 import EditDiscussion from "./components/main/student/addDiscussion/EditDiscussion";
 import EditComment from "./components/main/student/addDiscussion/EditComment";
@@ -69,7 +69,6 @@ import DiscussionTitle from "./components/main/student/feed/ViewDiscussion";
 import PostComment from "./components/main/student/addDiscussion/PostComment";
 import Search from "./components/main/student/feed/Search";
 import Reply from "./components/main/student/feed/Reply";
-
 
 export class App extends Component {
   constructor(props) {
@@ -181,6 +180,11 @@ export class App extends Component {
               <Stack.Screen
                 name="Search Results"
                 component={Search}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Reply Discussion"
+                component={Reply}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>

@@ -16,23 +16,20 @@ require("firebase/firestore");
 
 function LectureFeed(props) {
   const { posts, currentUser } = props;
-  
+
   if (currentUser === null || currentUser.filteredFeed === null) {
     return <View />;
   }
-  
+
   const [post, setPost] = useState(posts);
   const [refreshing, setRefreshing] = useState(false);
 
   const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
 
-
-
-
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-  
-      firebase
+
+    firebase
       .firestore()
       .collection("Discussion")
       .orderBy("creation", "desc")
@@ -47,7 +44,7 @@ function LectureFeed(props) {
         setRefreshing(false);
       });
 
-      firebase
+    firebase
       .firestore()
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -58,132 +55,87 @@ function LectureFeed(props) {
         } else {
           console.log("does not exist");
         }
-      })
+      });
     setRefreshing(false);
-
   }, [refreshing]);
 
-
-  if(post.length == 0){
-    return(<View style={styles.container}>
-      <View style={styles.appLayout}>
-        <Text style={styles.app}>P2P Learning Platform</Text>
-      </View>
-      <View style={styles.search}>
-        <Icon
-          name="ios-search"
-          type="ionicon"
-          color="#fff"
-          size={30}
-          onPress={() => props.navigation.navigate("Search Results")}
-        />
-      </View>
-
-      <View style={styles.bell}>
-        <Icon
-          name="notifications-outline"
-          type="ionicon"
-          color="#fff"
-          size={30}
-        />
-      </View>
-
-      <View style={{ paddingTop: 80 }}>
-        <FlatList
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          horizontal={false}
-          data={posts}
-          renderItem={({ item }) =>
-            FilterFeed.indexOf(item.faculty) !== -1 ? (
-              <View style={styles.card}>
-                <View style={styles.cardContent}>
-                  <TouchableOpacity
-                    style={{ flex: 1 }}
-                    onPress={() =>
-                      props.navigation.navigate("LectureDiscussionView", {
-                        did: item.id,
-                      })
-                    }
-                  >
-                    <View style={{ flexDirection: "row" }}>
-                      {item.image ? (
-                        <Image
+  if (post.length == 0) {
+    return (
+      <View style={styles.container}>
+        <View style={{ paddingTop: 10 }}>
+          <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            horizontal={false}
+            data={posts}
+            renderItem={({ item }) =>
+              FilterFeed.indexOf(item.faculty) !== -1 ? (
+                <View style={styles.card}>
+                  <View style={styles.cardContent}>
+                    <TouchableOpacity
+                      style={{ flex: 1 }}
+                      onPress={() =>
+                        props.navigation.navigate("LectureDiscussionView", {
+                          did: item.id,
+                        })
+                      }
+                    >
+                      <View style={{ flexDirection: "row" }}>
+                        {item.image ? (
+                          <Image
+                            style={{
+                              width: 35,
+                              height: 35,
+                              borderRadius: 35 / 2,
+                              marginBottom: 10,
+                            }}
+                            source={{ uri: item.image }}
+                          />
+                        ) : (
+                          <Image
+                            style={{
+                              width: 35,
+                              height: 35,
+                              borderRadius: 35 / 2,
+                              marginBottom: 10,
+                            }}
+                            source={require("../../../../assets/newProfile.png")}
+                          />
+                        )}
+                        <View
                           style={{
-                            width: 35,
-                            height: 35,
-                            borderRadius: 35 / 2,
-                            marginBottom: 10,
+                            marginLeft: 10,
+                            marginTop: 8,
+                            flexDirection: "row",
                           }}
-                          source={{ uri: item.image }}
-                        />
-                      ) : (
-                        <Image
-                          style={{
-                            width: 35,
-                            height: 35,
-                            borderRadius: 35 / 2,
-                            marginBottom: 10,
-                          }}
-                          source={require("../../../../assets/newProfile.png")}
-                        />
-                      )}
-                      <View
-                        style={{
-                          marginLeft: 10,
-                          marginTop: 8,
-                          flexDirection: "row",
-                        }}
-                      >
-                        <Text style={styles.userName}>{item.postedBy}</Text>
+                        >
+                          <Text style={styles.userName}>{item.postedBy}</Text>
+                        </View>
                       </View>
-                    </View>
 
-                    <Text numberOfLines={2} style={styles.title}>
-                      {item.title}
-                    </Text>
-                    <Text style={styles.faculty}>{item.faculty}</Text>
-                    <Text style={styles.postedTime}>
-                      Posted:{" "}
-                      {timeDifference(new Date(), item.creation.toDate())}
-                    </Text>
-                  </TouchableOpacity>
+                      <Text numberOfLines={2} style={styles.title}>
+                        {item.title}
+                      </Text>
+                      <Text style={styles.faculty}>{item.faculty}</Text>
+                      <Text style={styles.postedTime}>
+                        Posted:{" "}
+                        {timeDifference(new Date(), item.creation.toDate())}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ) : null
-          }
-        />
+              ) : null
+            }
+          />
+        </View>
       </View>
-    </View>)
+    );
   }
-
 
   return (
     <View style={styles.container}>
-      <View style={styles.appLayout}>
-        <Text style={styles.app}>P2P Learning Platform</Text>
-      </View>
-      <View style={styles.search}>
-        <Icon
-          name="ios-search"
-          type="ionicon"
-          color="#fff"
-          size={30}
-          onPress={() => props.navigation.navigate("Search Results")}
-        />
-      </View>
-
-      <View style={styles.bell}>
-        <Icon
-          name="notifications-outline"
-          type="ionicon"
-          color="#fff"
-          size={30}
-        />
-      </View>
-
-      <View style={{ paddingTop: 80 }}>
+      <View style={{ paddingTop: 10 }}>
         <FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
