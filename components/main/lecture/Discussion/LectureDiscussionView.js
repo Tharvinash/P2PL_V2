@@ -47,6 +47,7 @@ function LectureDiscussionView(props) {
     props.navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", paddingRight: 15 }}>
+          
           <TouchableOpacity>
             <Icon
               name="alert-circle-outline"

@@ -70,7 +70,9 @@ import Search from "./components/main/student/feed/Search";
 import Reply from "./components/main/student/feed/Reply";
 
 //Admin
-import AdminMainScreen from "./components/AdminMain"
+import AdminMainScreen from "./components/AdminMain";
+import ViewDiscussion from "./components/main/admin/ReportDiscussion/ViewDiscussion";
+import ViewReply from "./components/main/admin/ReportDiscussion/ViewReply";
 
 export class App extends Component {
   constructor(props) {
@@ -155,7 +157,7 @@ export class App extends Component {
               />
               <Stack.Screen
                 name="LectureDiscussionView"
-                options={{ headerTitle: "Discussion"}}
+                options={{ headerTitle: "Discussion" }}
                 component={LectureDiscussionView}
                 navigation={this.props.navigation}
               />
@@ -201,13 +203,25 @@ export class App extends Component {
                 options={{ headerShown: false }}
                 navigation={this.props.navigation}
               />
+              <Stack.Screen
+                name="ViewDiscussion"
+                options={{ headerTitle: "Discussion" }}
+                component={ViewDiscussion}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="ViewReply"
+                options={{ headerTitle: "Replies" }}
+                component={ViewReply}
+                navigation={this.props.navigation}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </Provider>
       );
     }
 
-    if (status === 0){
+    if (status === 0) {
       return (
         <Provider store={store}>
           <NavigationContainer>
@@ -250,7 +264,7 @@ export class App extends Component {
               />
               <Stack.Screen
                 name="Created Discussion"
-                options={{ headerTitle: "Discussion"}}
+                options={{ headerTitle: "Discussion" }}
                 component={EditDeleteDiscussion}
                 navigation={this.props.navigation}
               />
@@ -261,7 +275,7 @@ export class App extends Component {
               />
               <Stack.Screen
                 name="EditProfile"
-                options={{ headerTitle: "Edit Profile Info"}}
+                options={{ headerTitle: "Edit Profile Info" }}
                 component={EditProfile}
                 navigation={this.props.navigation}
               />
@@ -296,11 +310,7 @@ export class App extends Component {
       );
     }
 
-    return(
-      <AppLoading/>
-    )
-
-    
+    return <AppLoading />;
   }
 }
 

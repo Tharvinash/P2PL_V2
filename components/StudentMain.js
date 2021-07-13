@@ -84,7 +84,7 @@ function InventoryStackScreen() {
 
   function LogOut(){
     return Alert.alert(
-      "Log Out?",
+      "Log Out",
       "Are you sure you want to log out ?",
       [
         // The "Yes" button

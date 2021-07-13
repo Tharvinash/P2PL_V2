@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Alert, TouchableOpacity } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -71,12 +71,34 @@ function ProfileStackScreen() {
         type="ionicon"
         size={30}
         color="#000"
-        onPress={() => firebase.auth().signOut()}
+        onPress={() => LogOut()}
       />
     </TouchableOpacity>
   </View>
 ) }}/>
     </HomeStack.Navigator>
+  );
+}
+
+
+function LogOut(){
+  return Alert.alert(
+    "Log Out",
+    "Are you sure you want to log out ?",
+    [
+      // The "Yes" button
+      {
+        text: "Yes",
+        onPress: () => {
+          firebase.auth().signOut()
+        },
+      },
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: "No",
+      },
+    ]
   );
 }
 

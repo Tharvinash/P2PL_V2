@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -38,13 +39,33 @@ function ReportedDiscussion(props) {
     setX(1);
   }, [x]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      firebase
+        .firestore()
+        .collection("ReportedDiscussion")
+        .get()
+        .then((snapshot) => {
+          let reportedDiscussion = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setData(reportedDiscussion);
+        });
+
+      setX(8);
+    }, [])
+  );
+
   const renderItem = (data) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <TouchableOpacity
           onPress={() =>
-            props.navigation.navigate("LectureDiscussionView", {
+            props.navigation.navigate("ViewDiscussion", {
               did: data.item.reportedDiscussion,
+              rid: data.item.id,
             })
           }
         >
@@ -58,15 +79,11 @@ function ReportedDiscussion(props) {
   );
 
   const closeRow = (rowKey) => {
-    firebase.
-    firestore().
-    collection("ReportedDiscussion").
-    doc(rowKey).
-    delete();
+    firebase.firestore().collection("ReportedDiscussion").doc(rowKey).delete();
     setX(2);
   };
 
-  const deleteRow = (x,y) => {
+  const deleteRow = (x, y) => {
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to remove this Discussion ?",
@@ -76,14 +93,13 @@ function ReportedDiscussion(props) {
           text: "Yes",
           onPress: () => {
             firebase.firestore().collection("Discussion").doc(y).delete();
-            firebase.
-            firestore().
-            collection("ReportedDiscussion").
-            doc(x).
-            delete();
+            firebase
+              .firestore()
+              .collection("ReportedDiscussion")
+              .doc(x)
+              .delete();
             setX(3);
           },
-          
         },
         // The "No" button
         // Does nothing but dismiss the dialog when tapped
@@ -92,7 +108,6 @@ function ReportedDiscussion(props) {
         },
       ]
     );
-
   };
 
   const renderHiddenItem = (data) => (
