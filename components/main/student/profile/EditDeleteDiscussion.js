@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 
 import {
   View,
@@ -10,7 +15,7 @@ import {
   ScrollView,
   Image,
   TextInput,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import { connect } from "react-redux";
 import { Icon } from "react-native-elements";
@@ -69,6 +74,35 @@ function EditDeleteDiscussion(props) {
     }, [data])
   );
 
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+          <TouchableOpacity>
+            <Icon
+              name="create-outline"
+              type="ionicon"
+              size={30}
+              color="#000"
+              onPress={() => {
+                EditDiscussion();
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon
+              name="trash-outline"
+              type="ionicon"
+              size={30}
+              color="#000"
+              onPress={() => Delete()}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [data]);
+
   // useEffect(() => {
   //   const { currentUser, posts, comments } = props;
   //   setComment(comments);
@@ -91,6 +125,12 @@ function EditDeleteDiscussion(props) {
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  const EditDiscussion = () => {
+    props.navigation.navigate("Edit Discussion", {
+      did: discussionId,
+    })
   };
 
   const Delete = () => {
@@ -195,7 +235,7 @@ function EditDeleteDiscussion(props) {
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         likeBy: [],
         numOfLike: 0,
-        image: user.image
+        image: user.image,
       })
       .then(function () {
         setModalVisible(!isModalVisible);
@@ -206,33 +246,17 @@ function EditDeleteDiscussion(props) {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <View style={{ flexDirection: "row", marginRight: 50 }}>
+        <View style={{ flexDirection: "row"}}>
           <Text style={styles.title}>{userPosts.title}</Text>
-          <View style={styles.icon}>
-            <Icon
-              styles={{ paddingHorizontal: 20 }}
-              name="create-outline"
-              type="ionicon"
-              size={28}
-              color="#000"
-              onPress={() =>
-                props.navigation.navigate("Edit Discussion", {
-                  did: discussionId,
-                })
-              }
-            />
-            <Icon
-              styles={{ paddingHorizontal: 20 }}
-              name="trash-outline"
-              type="ionicon"
-              size={28}
-              color="#000"
-              onPress={() => Delete()}
-            />
-          </View>
         </View>
         {userPosts.downloadURL && (
-          <View style={{ flexDirection: "row", paddingBottom: 10, justifyContent:"center" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              paddingBottom: 10,
+              justifyContent: "center",
+            }}
+          >
             <Images
               width={Dimensions.get("window").width} // height will be calculated automatically
               source={{ uri: userPosts.downloadURL }}
@@ -255,18 +279,17 @@ function EditDeleteDiscussion(props) {
               <View>
                 <View style={{ flexDirection: "row" }}>
                   <View>
-                    
-                      <Image
-                        style={{
-                          marginRight: 15,
-                          width: 35,
-                          height: 35,
-                          borderRadius: 35 / 2,
-                        }}
-                        source={{
-                          uri: item.image,
-                        }}
-                      />
+                    <Image
+                      style={{
+                        marginRight: 15,
+                        width: 35,
+                        height: 35,
+                        borderRadius: 35 / 2,
+                      }}
+                      source={{
+                        uri: item.image,
+                      }}
+                    />
 
                     <View
                       style={{
@@ -292,15 +315,15 @@ function EditDeleteDiscussion(props) {
                       }}
                     >
                       <Text style={styles.userT}>{item.postedBy} </Text>
-                       {item.creation === null ? (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        Now
-                      </Text>
-                    ) : (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
-                    )}
+                      {item.creation === null ? (
+                        <Text style={(styles.userC, { marginRight: 20 })}>
+                          Now
+                        </Text>
+                      ) : (
+                        <Text style={(styles.userC, { marginRight: 20 })}>
+                          {timeDifference(new Date(), item.creation.toDate())}
+                        </Text>
+                      )}
                     </View>
                     <View
                       style={{

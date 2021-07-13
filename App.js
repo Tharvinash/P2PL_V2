@@ -207,91 +207,100 @@ export class App extends Component {
       );
     }
 
+    if (status === 0){
+      return (
+        <Provider store={store}>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="StudentMain">
+              <Stack.Screen
+                name="StudentMain"
+                component={MainScreen}
+                options={{ headerShown: false }}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Add Discussion"
+                component={AddScreen}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Created Discussions"
+                component={CreatedDiscussion}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Activity Tracking"
+                component={ActivityTracking}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Filter Feed"
+                component={FilterFeed}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Favorite Discussion"
+                component={FavoriteDiscussion}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Discussion"
+                component={DiscussionTitle}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Created Discussion"
+                options={{ headerTitle: "Discussion"}}
+                component={EditDeleteDiscussion}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Edit Discussion"
+                component={EditDiscussion}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="EditProfile"
+                options={{ headerTitle: "Edit Profile Info"}}
+                component={EditProfile}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="EditComment"
+                component={EditComment}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Post Comment"
+                component={PostComment}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Search Results"
+                component={Search}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Change Password"
+                component={EditPassword}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Reply Discussion"
+                component={Reply}
+                navigation={this.props.navigation}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </Provider>
+      );
+    }
 
-    return (
-      <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="StudentMain">
-            <Stack.Screen
-              name="StudentMain"
-              component={MainScreen}
-              options={{ headerShown: false }}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Add Discussion"
-              component={AddScreen}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Created Discussions"
-              component={CreatedDiscussion}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Activity Tracking"
-              component={ActivityTracking}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Filter Feed"
-              component={FilterFeed}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Favorite Discussion"
-              component={FavoriteDiscussion}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Discussion"
-              component={DiscussionTitle}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Created Discussion"
-              component={EditDeleteDiscussion}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Edit Discussion"
-              component={EditDiscussion}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="EditProfile"
-              component={EditProfile}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="EditComment"
-              component={EditComment}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Post Comment"
-              component={PostComment}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Search Results"
-              component={Search}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Change Password"
-              component={EditPassword}
-              navigation={this.props.navigation}
-            />
-            <Stack.Screen
-              name="Reply Discussion"
-              component={Reply}
-              navigation={this.props.navigation}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </Provider>
-    );
+    return(
+      <AppLoading/>
+    )
+
+    
   }
 }
 
