@@ -69,6 +69,11 @@ import PostComment from "./components/main/student/addDiscussion/PostComment";
 import Search from "./components/main/student/feed/Search";
 import Reply from "./components/main/student/feed/Reply";
 
+//MentorMentee
+import Choose from "./components/main/student/mentorMentee/Choose";
+import RequestForMentor from "./components/main/student/mentorMentee/RequestForMentor";
+import RequestToBeMentor from "./components/main/student/mentorMentee/RequestToBeMentor";
+
 //Admin
 import AdminMainScreen from "./components/AdminMain";
 import ViewDiscussion from "./components/main/admin/ReportDiscussion/ViewDiscussion";
@@ -302,6 +307,21 @@ export class App extends Component {
               <Stack.Screen
                 name="Reply Discussion"
                 component={Reply}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Choose"
+                component={Choose}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="RequestForMentor"
+                component={RequestForMentor}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="RequestToBeMentor"
+                component={RequestToBeMentor}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>
