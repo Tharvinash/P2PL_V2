@@ -317,11 +317,13 @@ export class App extends Component {
               <Stack.Screen
                 name="RequestForMentor"
                 component={RequestForMentor}
+                options={{ headerTitle: "Request For Mentor"}}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
                 name="RequestToBeMentor"
                 component={RequestToBeMentor}
+                options={{ headerTitle: "Request To Be Mentor"}}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>

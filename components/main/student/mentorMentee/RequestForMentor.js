@@ -9,48 +9,69 @@ import {
   ScrollView,
   CheckBox,
 } from "react-native";
+import { connect } from "react-redux";
 import firebase from "firebase";
-import * as ImagePicker from "expo-image-picker";
 require("firebase/firestore");
-function EditPassword(props) {
-
+function requestformentor(props) {
+  const { currentUser } = props;
   const [problem1, setProblem1] = useState(false);
 	const [problem2, setProblem2] = useState(false);
 	const [problem3, setProblem3] = useState(false);
 	const [problem4, setProblem4] = useState(false);
 	const [problem5, setProblem5] = useState(false);
 	const [finalValue, setFinalValue] = useState([]);
+  const [user, setUser] = useState(currentUser);
+  const [desc, setDesc] = useState("");
 
-	const xxx = () =>{
-		if(problem1 ===  true){
-			finalValue.push("Problem 1")
-		}		if(problem2 ===  true){
-			finalValue.push("Problem 2")
-		}		if(problem3 ===  true){
-			finalValue.push("Problem 3")
-		}		if(problem4 ===  true){
-			finalValue.push("Problem 4")
-		}		if(problem5 ===  true){
-			finalValue.push("Problem 5")
-		}
-		console.log(finalValue)
-	}
+  const UploadReq = () => {
+    
+    if (problem1 === true) {
+      finalValue.push("Problem 1");
+    }
+    if (problem2 === true) {
+      finalValue.push("Problem 2");
+    }
+    if (problem3 === true) {
+      finalValue.push("Problem 3");
+    }
+    if (problem4 === true) {
+      finalValue.push("Problem 4");
+    }
+    if (problem5 === true) {
+      finalValue.push("Problem 5");
+    }
+
+    firebase
+      .firestore()
+      .collection("RequestForMentor")
+      .add({
+        name: user.name,
+        faculty: user.faculty,
+        year: user.year,
+        creation: firebase.firestore.FieldValue.serverTimestamp(),
+        description: desc,
+        problems: finalValue
+      })
+      .then(function () {
+        console.log("Done");
+      });
+  };
 
   return (
-    <View>
+    <ScrollView>
       <View style={styles.form}>
         <View style={styles.formControl}>
-          <Text style={styles.label}>Name: </Text>
+          <Text style={styles.label}>Name: {user.name} </Text>
         </View>
       </View>
       <View style={styles.form}>
         <View style={styles.formControl}>
-          <Text style={styles.label}>Faculty: </Text>
+          <Text style={styles.label}>Faculty: {user.faculty}</Text>
         </View>
       </View>
       <View style={styles.form}>
         <View style={styles.formControl}>
-          <Text style={styles.label}>Year: </Text>
+          <Text style={styles.label}>Year: {user.year} </Text>
         </View>
       </View>
       <View style={styles.form}>
@@ -60,7 +81,6 @@ function EditPassword(props) {
             <CheckBox
               value={problem1}
               onValueChange={setProblem1}
-              //onChange={() => xxx()}
             />
             <Text style={styles.label2}>Problem 1</Text>
           </View>
@@ -68,7 +88,6 @@ function EditPassword(props) {
             <CheckBox
               value={problem2}
               onValueChange={setProblem2}
-             // onChange={() => xxx()}
             />
             <Text style={styles.label2}>Problem 2</Text>
           </View>
@@ -76,7 +95,6 @@ function EditPassword(props) {
             <CheckBox
               value={problem3}
               onValueChange={setProblem3}
-             // onChange={() => xxx()}
             />
             <Text style={styles.label2}>Problem 3</Text>
           </View>
@@ -84,7 +102,6 @@ function EditPassword(props) {
             <CheckBox
               value={problem4}
               onValueChange={setProblem4}
-              //onChange={() => xxx()}
             />
             <Text style={styles.label2}>Problem 4</Text>
           </View>
@@ -92,7 +109,6 @@ function EditPassword(props) {
             <CheckBox
               value={problem5}
               onValueChange={setProblem5}
-              //onChange={() => xxx()}
             />
             <Text style={styles.label2}>Problem 5</Text>
           </View>
@@ -107,15 +123,17 @@ function EditPassword(props) {
             autoCapitalize="sentences"
             style={styles.input}
             multiline={true}
+            value={desc}
+            onChangeText={(desc) => setDesc(desc)}
           />
         </View>
       </View>
 			<View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.logout} onPress={() => onChangePasswordPress()}>
+        <TouchableOpacity style={styles.logout} onPress={() => UploadReq()}>
           <Text style={styles.Ltext}>Send Request </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -171,4 +189,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditPassword;
+
+const mapStateToProps = (store) => ({
+  currentUser: store.userState.currentUser,
+});
+
+export default connect(mapStateToProps, null)(requestformentor);

@@ -27,25 +27,6 @@ function requesttobementor(props) {
   const [desc, setDesc] = useState("");
   const [qualification, setQualification] = useState("");
 
-  const xxx = () => {
-    if (problem1 === true) {
-      finalValue.push("Problem 1");
-    }
-    if (problem2 === true) {
-      finalValue.push("Problem 2");
-    }
-    if (problem3 === true) {
-      finalValue.push("Problem 3");
-    }
-    if (problem4 === true) {
-      finalValue.push("Problem 4");
-    }
-    if (problem5 === true) {
-      finalValue.push("Problem 5");
-    }
-    console.log(finalValue);
-  };
-
   const pickDocument = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
 
