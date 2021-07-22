@@ -13,8 +13,8 @@ import { Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/native";
 import { SwipeListView } from "react-native-swipe-list-view";
 
+
 function Room(props) {
- 
 
   const [data, setData] = useState(0);
   const { discussionroom } = props;
@@ -32,6 +32,7 @@ function Room(props) {
             const id = doc.id;
             return { id, ...data };
           });
+					setPost(posts)
         });
     }, [])
   );
@@ -47,6 +48,8 @@ function Room(props) {
           const id = doc.id;
           return { id, ...data };
         });
+				setPost(posts)
+				renderItem(posts)
       });
   }, [data]);
 
@@ -85,8 +88,9 @@ function Room(props) {
         {
           text: "Yes",
           onPress: () => {
-            firebase.firestore().collection("Discussion").doc(x).delete();
-            setData(1);
+           firebase.firestore().collection("DiscussionRoom").doc(x).delete();
+           renderItem()
+					//console.log(y)
           },
         },
         // The "No" button

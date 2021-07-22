@@ -77,6 +77,7 @@ import RequestToBeMentor from "./components/main/student/mentorMentee/RequestToB
 //LectureMentorMentee
 import CreateRoom from "./components/main/lecture/MentorMentee/CreateRoom";
 import ViewRoom from "./components/main/lecture/MentorMentee/ViewRoom";
+import RoomReplyComment from "./components/main/lecture/MentorMentee/RoomReplyComment";
 
 //Admin
 import AdminMainScreen from "./components/AdminMain";
@@ -204,6 +205,12 @@ export class App extends Component {
                 name="View Room"
                 component={ViewRoom}
                 navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="RoomReplyComment"
+                component={RoomReplyComment}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Reply" }}
               />
             </Stack.Navigator>
           </NavigationContainer>

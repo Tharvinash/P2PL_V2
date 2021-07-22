@@ -26,14 +26,13 @@ import { RefreshControlBase } from "react-native";
 require("firebase/firestore");
 
 function ViewRoom(props) {
-  const { currentUser, options } = props;
+  const { currentUser } = props;
   const [isModalVisible, setModalVisible] = useState(false);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
   const [commentId, setCommentId] = useState(null);
   const [isReportVisible, setReportVisible] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [newOption, setOption] = useState(options);
   const [editComment, setEditComment] = useState("");
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
@@ -44,40 +43,40 @@ function ViewRoom(props) {
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
 
-  useLayoutEffect(() => {
-    props.navigation.setOptions({
-      headerRight: () => (
-        <View style={{ flexDirection: "row", paddingRight: 15 }}>
-          <TouchableOpacity>
-            <Icon
-              name="alert-circle-outline"
-              type="ionicon"
-              size={30}
-              color="#000"
-              onPress={() => {
-                toggleReport();
-              }}
-            />
-          </TouchableOpacity>
+  //   useLayoutEffect(() => {
+  //     props.navigation.setOptions({
+  //       headerRight: () => (
+  //         <View style={{ flexDirection: "row", paddingRight: 15 }}>
+  //           <TouchableOpacity>
+  //             <Icon
+  //               name="alert-circle-outline"
+  //               type="ionicon"
+  //               size={30}
+  //               color="#000"
+  //               onPress={() => {
+  //                 toggleReport();
+  //               }}
+  //             />
+  //           </TouchableOpacity>
 
-          <TouchableOpacity>
-            <Icon
-              name="share-social-outline"
-              type="ionicon"
-              size={30}
-              color="#000"
-              onPress={() => {
-                onShare();
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-      ),
-    });
-  }, [data]);
+  //           <TouchableOpacity>
+  //             <Icon
+  //               name="share-social-outline"
+  //               type="ionicon"
+  //               size={30}
+  //               color="#000"
+  //               onPress={() => {
+  //                 onShare();
+  //               }}
+  //             />
+  //           </TouchableOpacity>
+  //         </View>
+  //       ),
+  //     });
+  //   }, [data]);
   // props.navigation.setParams({ toggleReport: toggleReport })
   useEffect(() => {
-    const { currentUser, comments } = props;
+    const { currentUser} = props;
     if (currentUser.FavDiscussion !== null) {
       setUser(currentUser);
     }
@@ -97,7 +96,7 @@ function ViewRoom(props) {
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection("DiscussionRoomComment")
       .orderBy("creation", "asc")
       .get()
       .then((snapshot) => {
@@ -116,7 +115,7 @@ function ViewRoom(props) {
     React.useCallback(() => {
       firebase
         .firestore()
-        .collection("Comment")
+        .collection("DiscussionRoomComment")
         .orderBy("creation", "asc")
         .get()
         .then((snapshot) => {
@@ -147,31 +146,7 @@ function ViewRoom(props) {
     return <View />;
   }
 
-  const xxx = () => {
-    console.log(24);
-  };
 
-  const sendReport = (rid) => {
-    firebase
-      .firestore()
-      .collection("ReportedDiscussion")
-      .add({
-        reportedBy: userId,
-        Reason: rid,
-        reportedDiscussion: discussionId,
-        discussionTitle: userPosts.title,
-        timeReported: firebase.firestore.FieldValue.serverTimestamp(),
-        discussionPostedBy: userPosts.userId,
-      })
-      .then(function () {
-        setReportVisible(!isReportVisible);
-        Alert.alert(
-          "Done",
-          "Your report has been received and will be reviewed",
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-        );
-      });
-  };
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
@@ -180,9 +155,7 @@ function ViewRoom(props) {
     setModalVisible(!isModalVisible);
   };
 
-  const toggleReport = () => {
-    setReportVisible(!isReportVisible);
-  };
+
 
   const UploadComment = () => {
     if (!newComment.trim()) {
@@ -191,17 +164,17 @@ function ViewRoom(props) {
     } else {
       firebase
         .firestore()
-        .collection("Comment")
+        .collection("DiscussionRoomComment")
         .add({
           userId,
           postedBy: cu.name,
-          discussionId,
+          discussionRoomId: discussionId,
           comment: newComment,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           image: cu.image,
           likeBy: [],
           numOfLike: 0,
-          numberOfReply: 0
+          numberOfReply: 0,
         })
         .then(function () {
           setModalVisible(!isModalVisible);
@@ -210,102 +183,7 @@ function ViewRoom(props) {
     }
   };
 
-  const AddFavDiscussion = () => {
-    const FD = user.FavDiscussion;
-
-    if (FD.includes(discussionId)) {
-      console.log("already added to fav");
-    } else {
-      FD.push(discussionId);
-    }
-
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .update({
-        FavDiscussion: FD,
-      })
-      .then(() => {
-        console.log("done");
-      });
-
-    const FB = [];
-    FB.push(userId);
-    firebase
-      .firestore()
-      .collection("Discussion")
-      .doc(discussionId)
-      .update({
-        favBy: FB,
-      })
-      .then(() => {
-        console.log("done");
-      });
-    setData(1);
-  };
-
-  const RemoveFavDiscussion = () => {
-    const FD = user.FavDiscussion;
-
-    const index = FD.indexOf(discussionId);
-    if (index > -1) {
-      FD.splice(index, 1);
-    }
-
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .update({
-        FavDiscussion: FD,
-      })
-      .then(() => {
-        console.log("done");
-      });
-
-    const FB = userPosts.favBy;
-
-    const indexx = FB.indexOf(userId);
-    if (indexx > -1) {
-      FB.splice(indexx, 1);
-    }
-
-    firebase
-      .firestore()
-      .collection("Discussion")
-      .doc(discussionId)
-      .update({
-        favBy: FB,
-      })
-      .then(() => {
-        console.log("done");
-      });
-    setData(0);
-  };
-
-  const onShare = async () => {
-    try {
-      const result = await Share.share({
-        message: userPosts.description,
-        title: userPosts.title,
-      });
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
   const Delete = (cid) => {
-
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
@@ -314,7 +192,7 @@ function ViewRoom(props) {
         {
           text: "Yes",
           onPress: () => {
-            firebase.firestore().collection("Comment").doc(cid).delete();
+            firebase.firestore().collection("DiscussionRoomComment").doc(cid).delete();
             setData(4);
           },
         },
@@ -336,7 +214,7 @@ function ViewRoom(props) {
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection("DiscussionRoomComment")
       .doc(cid)
       .update({
         numOfLike: x,
@@ -357,7 +235,7 @@ function ViewRoom(props) {
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection("DiscussionRoomComment")
       .doc(cid)
       .update({
         numOfLike: x,
@@ -373,7 +251,7 @@ function ViewRoom(props) {
     setCommentId(cid);
     firebase
       .firestore()
-      .collection("Comment")
+      .collection("DiscussionRoomComment")
       .doc(cid)
       .get()
       .then((snapshot) => {
@@ -389,7 +267,7 @@ function ViewRoom(props) {
     } else {
       firebase
         .firestore()
-        .collection("Comment")
+        .collection("DiscussionRoomComment")
         .doc(commentId)
         .update({
           comment: editComment,
@@ -415,26 +293,6 @@ function ViewRoom(props) {
       >
         <View>
           <Text style={styles.title}>{userPosts.title}</Text>
-        </View>
-
-        <View>
-          {user.FavDiscussion.includes(discussionId) ? (
-            <Icon
-              name="bookmark"
-              type="ionicon"
-              size={35}
-              Color="#000"
-              onPress={() => RemoveFavDiscussion()}
-            />
-          ) : (
-            <Icon
-              name="bookmark-outline"
-              type="ionicon"
-              size={35}
-              Color="#000"
-              onPress={() => AddFavDiscussion()}
-            />
-          )}
         </View>
       </View>
 
@@ -465,7 +323,7 @@ function ViewRoom(props) {
         extraData={comment}
         data={comment}
         renderItem={({ item }) =>
-          item.discussionId === discussionId ? (
+          item.discussionRoomId === discussionId ? (
             <View>
               <View style={{ flexDirection: "row" }}>
                 <View>
@@ -593,7 +451,17 @@ function ViewRoom(props) {
                       type="ionicon"
                       size={20}
                       color="#000"
-                      onPress={() => props.navigation.navigate("Reply Discussion", { cid: item.id, time: timeDifference(new Date(), item.creation.toDate()), xxx : item.likeBy.includes(userId), mainCommentAuthorName: item.postedBy  })}
+                      onPress={() =>
+                        props.navigation.navigate("RoomReplyComment", {
+                          cid: item.id,
+                          time: timeDifference(
+                            new Date(),
+                            item.creation.toDate()
+                          ),
+                          xxx: item.likeBy.includes(userId),
+                          mainCommentAuthorName: item.postedBy,
+                        })
+                      }
                     />
                     <Text
                       style={{
@@ -704,34 +572,6 @@ function ViewRoom(props) {
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
-        </Modal>
-
-        <Modal isVisible={isReportVisible}>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text style={styles.titley}>Why are you reporting this post</Text>
-            <FlatList
-              horizontal={false}
-              extraData={newOption}
-              data={newOption}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() => sendReport(item.Option)}
-                >
-                  <View style={styles.card}>
-                    <View style={styles.cardContent}>
-                      <Text style={styles.titlex}>{item.Option}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <TouchableOpacity style={styles.blogout} onPress={toggleReport}>
-              <Text style={styles.Ltext}>Cancel</Text>
-            </TouchableOpacity>
           </View>
         </Modal>
       </View>
@@ -869,7 +709,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
   comments: store.userState.comment,
-  options: store.userState.option,
 });
 
 export default connect(mapStateToProps, null)(ViewRoom);
