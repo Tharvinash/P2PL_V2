@@ -52,6 +52,7 @@ function Cd(props) {
         });
         const newArray = posts.filter((element) => element.userId === userId);
         setPost(newArray);
+        setData(999)
       });
   }, [data]);
 

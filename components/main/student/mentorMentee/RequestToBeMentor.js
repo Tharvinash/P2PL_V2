@@ -26,6 +26,7 @@ function requesttobementor(props) {
   const [Doc, setDoc] = useState(null);
   const [desc, setDesc] = useState("");
   const [qualification, setQualification] = useState("");
+  const userId = firebase.auth().currentUser.uid;
 
   const pickDocument = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
@@ -90,7 +91,8 @@ function requesttobementor(props) {
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         description: desc,
         qualification,
-        problems: finalValue
+        problems: finalValue,
+        userId
       })
       .then(function () {
         console.log("Done");

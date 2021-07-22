@@ -50,7 +50,8 @@ function requestformentor(props) {
         year: user.year,
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         description: desc,
-        problems: finalValue
+        problems: finalValue,
+        userId
       })
       .then(function () {
         console.log("Done");

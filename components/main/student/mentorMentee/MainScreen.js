@@ -14,23 +14,22 @@ import { timeDifference } from "../../../utils";
 import firebase from "firebase";
 require("firebase/firestore");
 
-function Feed(props) {
-  const { posts, currentUser } = props;
+function MainScreen(props) {
+  const { discussionroom, currentUser } = props;
 
   if (currentUser === null || currentUser.filteredFeed === null) {
     return <View />;
   }
 
-  const [post, setPost] = useState(posts);
+  const [post, setPost] = useState(discussionroom);
   const [refreshing, setRefreshing] = useState(false);
-  const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
 
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection("DiscussionRoom")
       .orderBy("creation", "desc")
       .get()
       .then((snapshot) => {
@@ -67,53 +66,28 @@ function Feed(props) {
           }
           horizontal={false}
           data={post}
-          renderItem={({ item }) =>
-            FilterFeed.indexOf(item.faculty) !== -1 ? (
-              <View style={styles.card}>
-                <View style={styles.cardContent}>
-                  <TouchableOpacity
-                    style={{ flex: 1 }}
-                    onPress={() =>
-                      props.navigation.navigate("Discussion", {
-                        did: item.id,
-                      })
-                    }
-                  >
-                    <View style={{ flexDirection: "row" }}>
-                      <Image
-                        style={{
-                          width: 35,
-                          height: 35,
-                          borderRadius: 35 / 2,
-                          marginBottom: 10,
-                        }}
-                        source={{ uri: item.image }}
-                      />
-
-                      <View
-                        style={{
-                          marginLeft: 10,
-                          marginTop: 8,
-                          flexDirection: "row",
-                        }}
-                      >
-                        <Text style={styles.userName}>{item.postedBy}</Text>
-                      </View>
-                    </View>
-
-                    <Text numberOfLines={2} style={styles.title}>
-                      {item.title}
-                    </Text>
-                    <Text style={styles.faculty}>{item.faculty}</Text>
-                    <Text style={styles.postedTime}>
-                      Posted:{" "}
-                      {timeDifference(new Date(), item.creation.toDate())}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <View style={styles.cardContent}>
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={() =>
+                    props.navigation.navigate("View Room", {
+                      did: item.id,
+                    })
+                  }
+                >
+                  <Text numberOfLines={2} style={styles.title}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.faculty}>{item.description}</Text>
+                  <Text style={styles.postedTime}>
+                    Posted: {timeDifference(new Date(), item.creation.toDate())}
+                  </Text>
+                </TouchableOpacity>
               </View>
-            ) : null
-          }
+            </View>
+          )}
         />
       </View>
     </View>
@@ -248,8 +222,8 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (store) => ({
-  posts: store.userState.posts,
+  discussionroom: store.userState.discussionroom,
   currentUser: store.userState.currentUser,
 });
 
-export default connect(mapStateToProps, null)(Feed);
+export default connect(mapStateToProps, null)(MainScreen);

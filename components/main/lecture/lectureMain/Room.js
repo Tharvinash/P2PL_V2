@@ -19,6 +19,7 @@ function Room(props) {
   const [data, setData] = useState(0);
   const { discussionroom } = props;
   const [post, setPost] = useState(discussionroom);
+  const userId = firebase.auth().currentUser.uid;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -32,7 +33,10 @@ function Room(props) {
             const id = doc.id;
             return { id, ...data };
           });
-					setPost(posts)
+          const newArray = posts.filter((element) => element.createrId === userId);
+          setPost(newArray)
+          console.log(newArray)
+          console.log("focus")
         });
     }, [])
   );
@@ -48,8 +52,10 @@ function Room(props) {
           const id = doc.id;
           return { id, ...data };
         });
-				setPost(posts)
-				renderItem(posts)
+        const newArray = posts.filter((element) => element.createrId === userId);
+				setPost(newArray)
+        console.log(newArray)
+        setData(999)
       });
   }, [data]);
 
@@ -88,9 +94,10 @@ function Room(props) {
         {
           text: "Yes",
           onPress: () => {
+            console.log(data+" before")
            firebase.firestore().collection("DiscussionRoom").doc(x).delete();
-           renderItem()
-					//console.log(y)
+           setData(1)
+           console.log(data+" after")
           },
         },
         // The "No" button
@@ -98,8 +105,10 @@ function Room(props) {
         {
           text: "No",
         },
-      ]
+      ],
+
     );
+
   };
 
   const renderHiddenItem = (data) => (

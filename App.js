@@ -347,6 +347,17 @@ export class App extends Component {
                 options={{ headerTitle: "Request To Be Mentor" }}
                 navigation={this.props.navigation}
               />
+              <Stack.Screen
+                name="View Room"
+                component={ViewRoom}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="RoomReplyComment"
+                component={RoomReplyComment}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Reply" }}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </Provider>
