@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,7 +8,7 @@ import {
   Image,
   RefreshControl,
 } from "react-native";
-import { Icon } from "react-native-elements";
+
 import { connect } from "react-redux";
 import { timeDifference } from "../../../utils";
 import firebase from "firebase";

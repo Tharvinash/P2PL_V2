@@ -3,7 +3,8 @@ import {
   USER_POSTS_STATE_CHANGE,
   USER_COMMENT_STATE_CHANGE,
   USER_OPTION_STATE_CHANGE,
-  USER_REPORTEDDISCUSSION_STATE_CHANGE
+  USER_REPORTEDDISCUSSION_STATE_CHANGE,
+  DISCUSSION_ROOM_STATE_CHANGE
 } from "../constants/index";
 //, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, CLEAR_DATA
 
@@ -26,7 +27,7 @@ export function fetchUser() {
       .get()
       .then((snapshot) => {
         if (snapshot.exists) {
-         // console.log(snapshot.data())
+         //console.log(snapshot.data())
           dispatch({ type: USER_STATE_CHANGE, currentUser: snapshot.data() });
         } else {
           console.log("does not exist");
@@ -85,6 +86,24 @@ export function fetchOption() {
           return { id, ...data };
         });
         dispatch({ type: USER_OPTION_STATE_CHANGE, option });
+      });
+  };
+}
+
+
+export function fetchDiscussionRoom() {
+  return (dispatch) => {
+    firebase
+      .firestore()
+      .collection("DiscussionRoom")
+      .get()
+      .then((snapshot) => {
+        let discussionroom = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        dispatch({ type: DISCUSSION_ROOM_STATE_CHANGE, discussionroom });
       });
   };
 }

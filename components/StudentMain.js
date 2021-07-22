@@ -12,6 +12,7 @@ import {
   fetchUserComment,
   fetchOption,
   fetchReportedDiscussion,
+  discussionRoom
 } from "../redux/actions/index";
 import { Icon } from "react-native-elements";
 import firebase from "firebase";
@@ -254,6 +255,7 @@ const mapDispatchProps = (dispatch) =>
       fetchUserComment,
       fetchOption,
       fetchReportedDiscussion,
+      discussionRoom
     },
     dispatch
   );

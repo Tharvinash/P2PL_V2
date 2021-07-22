@@ -74,6 +74,10 @@ import Choose from "./components/main/student/mentorMentee/Choose";
 import RequestForMentor from "./components/main/student/mentorMentee/RequestForMentor";
 import RequestToBeMentor from "./components/main/student/mentorMentee/RequestToBeMentor";
 
+//LectureMentorMentee
+import CreateRoom from "./components/main/lecture/MentorMentee/CreateRoom";
+import ViewRoom from "./components/main/lecture/MentorMentee/ViewRoom";
+
 //Admin
 import AdminMainScreen from "./components/AdminMain";
 import ViewDiscussion from "./components/main/admin/ReportDiscussion/ViewDiscussion";
@@ -189,6 +193,16 @@ export class App extends Component {
               <Stack.Screen
                 name="Reply Discussion"
                 component={Reply}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="Create Room"
+                component={CreateRoom}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name="View Room"
+                component={ViewRoom}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>
@@ -317,13 +331,13 @@ export class App extends Component {
               <Stack.Screen
                 name="RequestForMentor"
                 component={RequestForMentor}
-                options={{ headerTitle: "Request For Mentor"}}
+                options={{ headerTitle: "Request For Mentor" }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
                 name="RequestToBeMentor"
                 component={RequestToBeMentor}
-                options={{ headerTitle: "Request To Be Mentor"}}
+                options={{ headerTitle: "Request To Be Mentor" }}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>

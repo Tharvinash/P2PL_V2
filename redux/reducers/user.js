@@ -3,7 +3,8 @@ import {
   USER_POSTS_STATE_CHANGE,
   USER_COMMENT_STATE_CHANGE,
   USER_OPTION_STATE_CHANGE,
-  USER_REPORTEDDISCUSSION_STATE_CHANGE
+  USER_REPORTEDDISCUSSION_STATE_CHANGE,
+  DISCUSSION_ROOM_STATE_CHANGE
 } from "../constants";
 // USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, CLEAR_DATA
 
@@ -37,11 +38,16 @@ export const user = (state = initialState, action) => {
         ...state,
         option: action.option,
       };
-      case USER_REPORTEDDISCUSSION_STATE_CHANGE:
-        return {
-          ...state,
-          reportedDiscussion: action.reportedDiscussion,
-        };
+    case USER_REPORTEDDISCUSSION_STATE_CHANGE:
+      return {
+        ...state,
+        reportedDiscussion: action.reportedDiscussion,
+      };
+    case DISCUSSION_ROOM_STATE_CHANGE:
+      return {
+        ...state,
+        discussionroom: action.discussionroom,
+      };
     //     case CLEAR_DATA:
     //         return initialState
     default:

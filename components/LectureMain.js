@@ -3,23 +3,23 @@ import { View, Alert, TouchableOpacity } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
-import firebase from 'firebase'
+import firebase from "firebase";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
   fetchUser,
   fetchUserPosts,
   fetchUserComment,
-  fetchReportedDiscussion
+  fetchReportedDiscussion,
+  fetchDiscussionRoom
 } from "../redux/actions/index";
 
-//lecture main 
+//lecture main
 import LectureFeed from "./main/lecture/lectureMain/LectureFeed";
 import LectureProfile from "./main/lecture/lectureMain/LectureProfile";
 import Room from "./main/lecture/lectureMain/Room";
-
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -33,83 +33,109 @@ function HomeStackScreen() {
   const navigation = useNavigation();
   return (
     <HomeStack.Navigator initialRouteName="Feed">
-      <HomeStack.Screen name="Feed" component={LectureFeed}  options={{ headerTitle: "P2PL", headerRight: () => (
-    <View style={{ flexDirection: "row", paddingRight: 15 }}>
-      <TouchableOpacity>
-        <Icon
-          name="ios-search"
-          type="ionicon"
-          size={30}
-          color="#000"
-          onPress={() => navigation.navigate("Search Results")}
-        />
-      </TouchableOpacity>
+      <HomeStack.Screen
+        name="Feed"
+        component={LectureFeed}
+        options={{
+          headerTitle: "P2PL",
+          headerRight: () => (
+            <View style={{ flexDirection: "row", paddingRight: 15 }}>
+              <TouchableOpacity>
+                <Icon
+                  name="ios-search"
+                  type="ionicon"
+                  size={30}
+                  color="#000"
+                  onPress={() => navigation.navigate("Search Results")}
+                />
+              </TouchableOpacity>
 
-      <TouchableOpacity>
-        <Icon
-          name="notifications-outline"
-          type="ionicon"
-          size={30}
-          color="#000"
-        />
-      </TouchableOpacity>
-    </View>
-  ), headerStyle:{backgroundColor:"#fff"}}}/>
+              <TouchableOpacity>
+                <Icon
+                  name="notifications-outline"
+                  type="ionicon"
+                  size={30}
+                  color="#000"
+                />
+              </TouchableOpacity>
+            </View>
+          ),
+          headerStyle: { backgroundColor: "#fff" },
+        }}
+      />
     </HomeStack.Navigator>
   );
 }
-
 
 function ProfileStackScreen() {
   return (
     <HomeStack.Navigator initialRouteName="Profile">
-      <HomeStack.Screen name="Profile" component={LectureProfile}  options={{ headerTitle: "Profile", headerRight: () => (
-  <View style={{ flexDirection: "row", paddingRight: 15 }}>
-    <TouchableOpacity>
-      <Icon
-        name="exit-outline"
-        type="ionicon"
-        size={30}
-        color="#000"
-        onPress={() => LogOut()}
+      <HomeStack.Screen
+        name="Profile"
+        component={LectureProfile}
+        options={{
+          headerTitle: "Profile",
+          headerRight: () => (
+            <View style={{ flexDirection: "row", paddingRight: 15 }}>
+              <TouchableOpacity>
+                <Icon
+                  name="exit-outline"
+                  type="ionicon"
+                  size={30}
+                  color="#000"
+                  onPress={() => LogOut()}
+                />
+              </TouchableOpacity>
+            </View>
+          )
+        }}
       />
-    </TouchableOpacity>
-  </View>
-) }}/>
     </HomeStack.Navigator>
-  );
-}
-
-
-function LogOut(){
-  return Alert.alert(
-    "Log Out",
-    "Are you sure you want to log out ?",
-    [
-      // The "Yes" button
-      {
-        text: "Yes",
-        onPress: () => {
-          firebase.auth().signOut()
-        },
-      },
-      // The "No" button
-      // Does nothing but dismiss the dialog when tapped
-      {
-        text: "No",
-      },
-    ]
   );
 }
 
 function RoomStackScreen() {
+  const navigation = useNavigation();
   return (
     <HomeStack.Navigator initialRouteName="Room">
-      <HomeStack.Screen name="Room" component={Room}  options={{ headerTitle: "Discussion Room" }}/>
+      <HomeStack.Screen
+        name="Room"
+        component={Room}
+        options={{ headerTitle: "Discussion Room",
+        headerRight: () => (
+          <View style={{ flexDirection: "row", paddingRight: 15 }}>
+            <TouchableOpacity>
+              <Icon
+                name="add-circle-outline"
+                type="ionicon"
+                size={30}
+                color="#000"
+                onPress={() => navigation.navigate("Create Room")}
+              />
+            </TouchableOpacity>
+          </View>
+        ) }}
+      />
     </HomeStack.Navigator>
   );
 }
 
+function LogOut() {
+  return Alert.alert("Log Out", "Are you sure you want to log out ?", [
+    // The "Yes" button
+    {
+      text: "Yes",
+      onPress: () => {
+        firebase.auth().signOut();
+      },
+    },
+    // The "No" button
+    // Does nothing but dismiss the dialog when tapped
+    {
+      text: "No",
+    },
+  ]);
+}
 
 export class Main extends Component {
   componentDidMount() {
@@ -118,6 +144,7 @@ export class Main extends Component {
     this.props.fetchUserPosts();
     this.props.fetchUserComment();
     this.props.fetchReportedDiscussion();
+    this.props.fetchDiscussionRoom();
   }
   render() {
     // const { currentUser } = this.props;
@@ -140,7 +167,11 @@ export class Main extends Component {
           component={RoomStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account-group" color={color} size={26} />
+              <MaterialCommunityIcons
+                name="account-group"
+                color={color}
+                size={26}
+              />
             ),
           }}
         />
@@ -179,7 +210,10 @@ const mapStateToProps = (store) => ({
 });
 
 const mapDispatchProps = (dispatch) =>
-  bindActionCreators({ fetchUser, fetchUserPosts, fetchUserComment, fetchReportedDiscussion }, dispatch);
+  bindActionCreators(
+    { fetchUser, fetchUserPosts, fetchUserComment, fetchReportedDiscussion, fetchDiscussionRoom},
+    dispatch
+  );
 //, fetchUserPosts, fetchUserFollowing, clearData
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);
