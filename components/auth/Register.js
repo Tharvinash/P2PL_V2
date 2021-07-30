@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import {
   Text,
   View,
-  Button,
+  Alert,
   TextInput,
   StyleSheet,
   TouchableOpacity,
   Picker,
 } from "react-native";
+import validator from "validator";
 import firebase from "firebase";
 import "firebase/firestore";
 
@@ -20,19 +21,150 @@ export class Register extends Component {
       password: "",
       name: "",
       faculty: null,
-			year: ''
+      year: null,
+      data: [],
     };
 
     this.onSignUp = this.onSignUp.bind(this);
   }
 
-	updateYear = (year) => {
-	this.setState({ year: year })
- }
+  updateYear = (year) => {
+    this.setState({ year: year });
+  };
 
- updateFaculty = (faculty) => {
-	this.setState({ faculty: faculty })
- }
+  updateFaculty = (faculty) => {
+    this.setState({ faculty: faculty });
+  };
+
+
+  getData() {
+    setTimeout(() => {
+      firebase
+        .firestore()
+        .collection("Student")
+        .get()
+        .then((snapshot) => {
+          let studentEmail = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            return { ...data };
+          });
+          this.setState({
+            data: studentEmail,
+          });
+        });
+    }, 1000);
+  }
+
+  componentDidMount() {
+    this.getData();
+  }
+
+  validate() {
+    const { email, password, name, faculty, year, data } = this.state;
+    const found = data.some((el) => el.email === email);
+    const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    // ------------------------------------------------------------------------ //
+
+    if (!name.trim()) {
+      return Alert.alert("Invalid Name", "Please enter a valid user name", [
+        {
+          text: "Retry",
+        },
+      ]);
+    }
+
+    if (email.match(mailformat)) {
+      if (!found) {
+        return Alert.alert(
+          "Email doesn't exsist",
+          "Contact admin for further details",
+          [
+            // The "Yes" button
+            {
+              text: "Contact Admin",
+              // onPress: () => {
+              //   firebase
+              //     .firestore()
+              //     .collection("Discussion")
+              //     .doc(discussionId)
+              //     .delete();
+
+              // },
+            },
+            {
+              text: "Retry",
+            },
+          ]
+        );
+      }
+    } else {
+      return Alert.alert(
+        "Invalid Email Address",
+        "You have entered and invalid email address",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }
+
+    if (!password.trim()) {
+      return Alert.alert(
+        "Invalid password",
+        "The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }else{
+      if (validator.isStrongPassword(password, {
+        minLength: 8, minLowercase: 1,
+        minUppercase: 1, minNumbers: 1, minSymbols: 1
+      })) {
+        console.log('Is Strong Password')
+      } else {
+        return Alert.alert(
+          "Invalid password",
+          "The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ",
+          [
+            {
+              text: "Retry",
+            },
+          ]
+        );
+      }
+    }
+
+    if(faculty == null){
+      return Alert.alert(
+        "Invalid faculty input",
+        "Please choose a faculty",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }
+
+    if(year == null){
+      return Alert.alert(
+        "Invalid year input",
+        "Please choose your current year of study",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }
+
+    this.onSignUp();
+
+  }
 
   onSignUp() {
     const { email, password, name, faculty, year } = this.state;
@@ -48,9 +180,9 @@ export class Register extends Component {
             name,
             email,
             FavDiscussion: [],
-						faculty,
-						status:0,
-						year,
+            faculty,
+            status: 0,
+            year,
             fca: true,
             fp: true,
             fs: true,
@@ -136,7 +268,7 @@ export class Register extends Component {
             selectedValue={this.state.faculty}
             style={{ height: 50, width: 300, color: "#000", marginTop: -10 }}
             itemStyle={{ fontFamily: "Poppins" }}
-						onValueChange={this.updateFaculty}
+            onValueChange={this.updateFaculty}
           >
             <Picker.Item
               label="FACULTY OF EDUCATION"
@@ -206,7 +338,7 @@ export class Register extends Component {
           <Picker
             selectedValue={this.state.year}
             style={{ height: 50, width: 300, color: "#000", marginTop: -10 }}
-						onValueChange={this.updateYear}
+            onValueChange={this.updateYear}
           >
             <Picker.Item label="Year 1" value="1" />
             <Picker.Item label="Year 2" value="2" />
@@ -216,7 +348,7 @@ export class Register extends Component {
           </Picker>
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={() => this.onSignUp()}>
+        <TouchableOpacity style={styles.button} onPress={() => this.validate()}>
           <Text style={styles.text}>Register</Text>
         </TouchableOpacity>
       </View>
@@ -281,7 +413,7 @@ const styles = StyleSheet.create({
     width: 275,
     borderRadius: 12,
     padding: 10,
-		fontSize:15
+    fontSize: 15,
   },
 });
 
