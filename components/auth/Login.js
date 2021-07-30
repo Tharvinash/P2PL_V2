@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {
   Text,
   View,
-  Button,
+  Alert,
   TextInput,
   StyleSheet,
   TouchableOpacity,
@@ -22,6 +22,37 @@ export class Login extends Component {
     this.onSignUp = this.onSignUp.bind(this);
   }
 
+  validation(){
+    const { email, password } = this.state;
+    const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    
+    if (!email.match(mailformat)) {
+      return Alert.alert(
+        "Invalid Email Address",
+        "You have entered and invalid email address",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }
+
+    if (!password.trim()) {
+      return Alert.alert(
+        "Incorrect password",
+        "You have entered and incorrect password",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }
+
+    this.onSignUp();
+  }
+
   onSignUp() {
     const { email, password } = this.state;
     firebase
@@ -31,7 +62,15 @@ export class Login extends Component {
         console.log("Logged In");
       })
       .catch((error) => {
-        console.log(error);
+          return Alert.alert(
+            "Invalid access",
+            "Wrong email or password",
+            [
+              {
+                text: "Retry",
+              },
+            ]
+          );
       });
   }
 
@@ -56,7 +95,7 @@ export class Login extends Component {
           onChangeText={(password) => this.setState({ password })}
         />
 
-        <TouchableOpacity style={styles.button} onPress={() => this.onSignUp()}>
+        <TouchableOpacity style={styles.button} onPress={() => this.validation()}>
           <Text style={styles.text}>Sign In</Text>
         </TouchableOpacity>
       </View>
