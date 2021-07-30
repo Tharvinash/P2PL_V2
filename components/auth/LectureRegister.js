@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import {
   Text,
   View,
-  Button,
+  Alert,
   TextInput,
   StyleSheet,
   TouchableOpacity,
   Picker,
 } from "react-native";
+import validator from "validator";
 import DropDownPicker from "react-native-dropdown-picker";
 import firebase from "firebase";
 import "firebase/firestore";
@@ -21,7 +22,7 @@ export class Register extends Component {
       password: "",
       name: "",
       faculty: null,
-      year: "",
+      data:[]
     };
 
     this.onSignUp = this.onSignUp.bind(this);
@@ -35,8 +36,125 @@ export class Register extends Component {
     this.setState({ faculty: faculty });
   };
 
+  getData() {
+    setTimeout(() => {
+      firebase
+        .firestore()
+        .collection("Lecture")
+        .get()
+        .then((snapshot) => {
+          let lectureEmail = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            return { ...data };
+          });
+          this.setState({
+            data: lectureEmail,
+          });
+        });
+    }, 1000);
+  }
+
+  componentDidMount() {
+    this.getData();
+  }
+
+  validate() {
+    const { email, password, name, faculty, data } = this.state;
+    const found = data.some((el) => el.email === email);
+    const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    // ------------------------------------------------------------------------ //
+
+    if (!name.trim()) {
+      return Alert.alert("Invalid Name", "Please enter a valid user name", [
+        {
+          text: "Retry",
+        },
+      ]);
+    }
+
+    if (email.match(mailformat)) {
+      if (!found) {
+        return Alert.alert(
+          "Email doesn't exsist",
+          "Contact admin for further details",
+          [
+            // The "Yes" button
+            {
+              text: "Contact Admin",
+              // onPress: () => {
+              //   firebase
+              //     .firestore()
+              //     .collection("Discussion")
+              //     .doc(discussionId)
+              //     .delete();
+
+              // },
+            },
+            {
+              text: "Retry",
+            },
+          ]
+        );
+      }
+    } else {
+      return Alert.alert(
+        "Invalid Email Address",
+        "You have entered and invalid email address",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }
+
+    if (!password.trim()) {
+      return Alert.alert(
+        "Invalid password",
+        "The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }else{
+      if (validator.isStrongPassword(password, {
+        minLength: 8, minLowercase: 1,
+        minUppercase: 1, minNumbers: 1, minSymbols: 1
+      })) {
+        console.log('Is Strong Password')
+      } else {
+        return Alert.alert(
+          "Invalid password",
+          "The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ",
+          [
+            {
+              text: "Retry",
+            },
+          ]
+        );
+      }
+    }
+
+    if(faculty == null){
+      return Alert.alert(
+        "Invalid faculty input",
+        "Please choose a faculty",
+        [
+          {
+            text: "Retry",
+          },
+        ]
+      );
+    }
+
+    this.onSignUp();
+
+  }
+
   onSignUp() {
-    const { email, password, name, faculty, year } = this.state;
+    const { email, password, name, faculty} = this.state;
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
@@ -48,10 +166,8 @@ export class Register extends Component {
           .set({
             name,
             email,
-            FavDiscussion: [],
             faculty,
             status: 1,
-            year,
             fca: true,
             fp: true,
             fs: true,
@@ -203,7 +319,7 @@ export class Register extends Component {
           </Picker>
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={() => this.onSignUp()}>
+        <TouchableOpacity style={styles.button} onPress={() => this.validate()}>
           <Text style={styles.text}>Register</Text>
         </TouchableOpacity>
       </View>
