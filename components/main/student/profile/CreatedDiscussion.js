@@ -5,20 +5,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  FlatList,
 } from "react-native";
 import { connect } from "react-redux";
 import firebase from "firebase";
-import { Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/native";
 import { SwipeListView } from "react-native-swipe-list-view";
+import DiscussinCard from "../../component/discussionCard";
 
 function Cd(props) {
  
-
   const [data, setData] = useState(0);
   const { posts } = props;
-  const [post, setPost] = useState(posts);
+  const [post, setPost] = useState([]);
   const userId = firebase.auth().currentUser.uid;
 
   useFocusEffect(
@@ -57,23 +55,15 @@ function Cd(props) {
   }, [data]);
 
   const renderItem = (data) => (
-    <View style={styles.card}>
-      <View style={styles.cardContent}>
-        <TouchableOpacity
-          style={{ flex: 1 }}
-          onPress={() =>
-            props.navigation.navigate("Created Discussion", {
-              did: data.item.id,
-            })
-          }
-        >
-          <Text numberOfLines={2} style={styles.title}>
-            {data.item.title}
-          </Text>
-          <Text style={styles.faculty}>{data.item.faculty}</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <DiscussinCard
+    title={data.item.title}
+    faculty={data.item.faculty}
+    onSelect={() =>
+      props.navigation.navigate("Created Discussion", {
+        did: data.item.id,
+      })
+    }
+  />
   );
 
   const closeRow = (rowKey) => {

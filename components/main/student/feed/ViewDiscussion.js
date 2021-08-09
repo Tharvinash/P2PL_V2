@@ -12,7 +12,6 @@ import {
   Share,
   ScrollView,
   Dimensions,
-  ActivityIndicator,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
@@ -20,9 +19,8 @@ import { connect } from "react-redux";
 import firebase from "firebase";
 import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
-import moment from "moment";
 import { timeDifference } from "../../../utils";
-import { RefreshControlBase } from "react-native";
+import CommentCard from "../../component/commentCard";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
@@ -127,7 +125,7 @@ function ViewDiscussion(props) {
           });
           setComment(comment);
         });
-
+      setData(88)
       firebase
         .firestore()
         .collection("users")
@@ -201,7 +199,7 @@ function ViewDiscussion(props) {
           image: cu.image,
           likeBy: [],
           numOfLike: 0,
-          numberOfReply: 0
+          numberOfReply: 0,
         })
         .then(function () {
           setModalVisible(!isModalVisible);
@@ -305,7 +303,6 @@ function ViewDiscussion(props) {
   };
 
   const Delete = (cid) => {
-
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
@@ -466,148 +463,32 @@ function ViewDiscussion(props) {
         data={comment}
         renderItem={({ item }) =>
           item.discussionId === discussionId ? (
-            <View>
-              <View style={{ flexDirection: "row" }}>
-                <View>
-                  <Image
-                    style={{
-                      marginRight: 15,
-                      width: 35,
-                      height: 35,
-                      borderRadius: 35 / 2,
-                    }}
-                    source={{
-                      uri: item.image,
-                    }}
-                  />
-
-                  <View
-                    style={{
-                      marginRight: 10,
-                      paddingTop: 10,
-                    }}
-                  >
-                    {item.verify ? (
-                      <Icon
-                        name="checkmark-circle"
-                        type="ionicon"
-                        size={25}
-                        color="#140F38"
-                      />
-                    ) : null}
-                  </View>
-                </View>
-                <View style={styles.commentCon}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.userT}>{item.postedBy} </Text>
-                    {item.creation === null ? (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        Now
-                      </Text>
-                    ) : (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
-                    )}
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.userC}>{item.comment}</Text>
-                  </View>
-
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        marginRight: 3,
-                        fontFamily: "Poppins",
-                      }}
-                    >
-                      {item.numOfLike}
-                    </Text>
-                    {item.likeBy.includes(userId) ? (
-                      <Icon
-                        style={{
-                          paddingLeft: 10,
-                        }}
-                        name="heart"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          removeLike(item.id, item.numOfLike, item.likeBy)
-                        }
-                      />
-                    ) : (
-                      <Icon
-                        style={{
-                          paddingLeft: 10,
-                        }}
-                        name="heart-outline"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          addLike(item.id, item.numOfLike, item.likeBy)
-                        }
-                      />
-                    )}
-                    {item.userId === userId ? (
-                      <View style={{ flexDirection: "row" }}>
-                        <Icon
-                          style={{
-                            paddingLeft: 10,
-                          }}
-                          name="trash-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() => Delete(item.id)}
-                        />
-                        <Icon
-                          style={{
-                            paddingLeft: 10,
-                          }}
-                          name="create-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() => EditComment(item.id)}
-                        />
-                      </View>
-                    ) : null}
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="chatbubble-ellipses-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() => props.navigation.navigate("Reply Discussion", { cid: item.id, time: timeDifference(new Date(), item.creation.toDate()), xxx : item.likeBy.includes(userId), mainCommentAuthorName: item.postedBy  })}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        marginRight: 3,
-                        fontFamily: "Poppins",
-                      }}
-                    >
-                      ({item.numberOfReply})
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
+            <CommentCard
+              picture={item.image}
+              verify={item.verify}
+              postedBy={item.postedBy}
+              creation={item.creation}
+              comment={item.comment}
+              numOfLike={item.numOfLike}
+              likeBy={item.likeBy.includes(userId)}
+              removeLike={() =>
+                removeLike(item.id, item.numOfLike, item.likeBy)
+              }
+              addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
+              firstUserId={item.userId}
+              secondUserId={userId}
+              delete={() => Delete(item.id)}
+              editComment={() => EditComment(item.id)}
+              numberOfReply={item.numberOfReply}
+              onSelect={() =>
+                props.navigation.navigate("Reply Discussion", {
+                  cid: item.id,
+                  time: timeDifference(new Date(), item.creation.toDate()),
+                  xxx: item.likeBy.includes(userId),
+                  mainCommentAuthorName: item.postedBy,
+                })
+              }
+            />
           ) : null
         }
       />

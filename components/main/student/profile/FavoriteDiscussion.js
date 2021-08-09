@@ -8,30 +8,26 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import firebase from "firebase";
-import { bindActionCreators } from "redux"; //call  function from action
-import { fetchUserPosts } from "../../../../redux/actions/index";
+import DiscussinCard from "../../component/discussionCard";
 import { useFocusEffect } from "@react-navigation/native";
-import { SwipeListView } from "react-native-swipe-list-view";
 
 function FavDiscussion(props) {
   const [userPosts, setUserPosts] = useState([]);
   const userId = firebase.auth().currentUser.uid;
 
   useEffect(() => {
-    props.fetchUserPosts();
-    const { posts } = props;
     firebase
-    .firestore()
-    .collection("Discussion")
-    .get()
-    .then((snapshot) => {
-      let posts = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        const id = doc.id;
-        return { id, ...data };
+      .firestore()
+      .collection("Discussion")
+      .get()
+      .then((snapshot) => {
+        let posts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setUserPosts(posts);
       });
-      setUserPosts(posts);
-    });
   }, [props.route.params.uid]);
 
   useFocusEffect(
@@ -62,23 +58,15 @@ function FavDiscussion(props) {
         keyExtractor={(userPosts) => userPosts.id}
         renderItem={({ item }) =>
           item.favBy.includes(userId) ? (
-            <View style={styles.card}>
-              <View style={styles.cardContent}>
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() =>
-                    props.navigation.navigate("Discussion", {
-                      did: item.id,
-                    })
-                  }
-                >
-                  <Text numberOfLines={2} style={styles.title}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.faculty}>{item.faculty}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <DiscussinCard
+              title={item.title}
+              faculty={item.faculty}
+              onSelect={() =>
+                props.navigation.navigate("Discussion", {
+                  did: item.id,
+                })
+              }
+            />
           ) : null
         }
       />
@@ -140,7 +128,5 @@ const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
   posts: store.userState.posts,
 });
-const mapDispatchProps = (dispatch) =>
-  bindActionCreators({ fetchUserPosts }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchProps)(FavDiscussion);
+export default connect(mapStateToProps)(FavDiscussion);

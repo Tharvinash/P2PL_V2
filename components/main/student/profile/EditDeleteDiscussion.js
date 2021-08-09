@@ -23,6 +23,7 @@ import firebase from "firebase";
 import { timeDifference } from "../../../utils";
 import Modal from "react-native-modal";
 import Images from "react-native-scalable-image";
+import CommentCard from "../../component/commentCard";
 
 require("firebase/firestore");
 import { useFocusEffect } from "@react-navigation/native";
@@ -36,6 +37,11 @@ function EditDeleteDiscussion(props) {
   const [data, setData] = useState(null);
   const [image, setImage] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [editComment, setEditComment] = useState("");
+  const [commentId, setCommentId] = useState(null);
+  const [isEditCommentModalVisible, setEditCommentModalVisible] =
+    useState(false);
+
 
   const discussionId = props.route.params.did;
   // console.log(discussionId)
@@ -45,9 +51,8 @@ function EditDeleteDiscussion(props) {
     React.useCallback(() => {
       const { currentUser, posts, comments } = props;
       setPostedBy(currentUser.name);
-      setComment(comments);
       setUser(currentUser);
-
+      setData(88);
       firebase
         .firestore()
         .collection("Discussion")
@@ -103,21 +108,27 @@ function EditDeleteDiscussion(props) {
     });
   }, [data]);
 
-  // useEffect(() => {
-  //   const { currentUser, posts, comments } = props;
-  //   setComment(comments);
-  //   setUser(currentUser);
+  const uploadUpdatedComment = () => {
+    if (!editComment.trim()) {
+      alert("Please Enter Comment");
+      return;
+    } else {
+      firebase
+        .firestore()
+        .collection("Comment")
+        .doc(commentId)
+        .update({
+          comment: editComment,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          console.log("save");
+        });
+      setEditCommentModalVisible(!isEditCommentModalVisible);
+    }
 
-  //   firebase
-  //     .firestore()
-  //     .collection("Discussion")
-  //     .doc(props.route.params.did)
-  //     .get()
-  //     .then((snapshot) => {
-  //       // console.log(snapshot.data())
-  //       setUserPosts(snapshot.data());
-  //     });
-  // }, [props.route.params.uid]);
+    setData(88);
+  };
 
   if (user === null) {
     return <View />;
@@ -131,6 +142,11 @@ function EditDeleteDiscussion(props) {
     props.navigation.navigate("Edit Discussion", {
       did: discussionId,
     })
+  };
+
+
+  const toggleEditComment = () => {
+    setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
   const Delete = () => {
@@ -236,6 +252,7 @@ function EditDeleteDiscussion(props) {
         likeBy: [],
         numOfLike: 0,
         image: user.image,
+        numberOfReply:0
       })
       .then(function () {
         setModalVisible(!isModalVisible);
@@ -243,10 +260,23 @@ function EditDeleteDiscussion(props) {
     setData(57);
   };
 
+  const EditComment = (cid) => {
+    setCommentId(cid);
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cid)
+      .get()
+      .then((snapshot) => {
+        setEditComment(snapshot.data().comment);
+      });
+    setEditCommentModalVisible(!isEditCommentModalVisible);
+  };
+
   return (
     <ScrollView>
       <View style={styles.container}>
-        <View style={{ flexDirection: "row"}}>
+        <View style={{ flexDirection: "row" }}>
           <Text style={styles.title}>{userPosts.title}</Text>
         </View>
         {userPosts.downloadURL && (
@@ -276,179 +306,32 @@ function EditDeleteDiscussion(props) {
           data={comment}
           renderItem={({ item }) =>
             item.discussionId === discussionId ? (
-              <View>
-                <View style={{ flexDirection: "row" }}>
-                  <View>
-                    <Image
-                      style={{
-                        marginRight: 15,
-                        width: 35,
-                        height: 35,
-                        borderRadius: 35 / 2,
-                      }}
-                      source={{
-                        uri: item.image,
-                      }}
-                    />
-
-                    <View
-                      style={{
-                        marginRight: 10,
-                        paddingTop: 10,
-                      }}
-                    >
-                      {item.verify ? (
-                        <Icon
-                          name="checkmark-circle"
-                          type="ionicon"
-                          size={25}
-                          color="#140F38"
-                        />
-                      ) : null}
-                    </View>
-                  </View>
-                  <View style={styles.commentCon}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={styles.userT}>{item.postedBy} </Text>
-                      {item.creation === null ? (
-                        <Text style={(styles.userC, { marginRight: 20 })}>
-                          Now
-                        </Text>
-                      ) : (
-                        <Text style={(styles.userC, { marginRight: 20 })}>
-                          {timeDifference(new Date(), item.creation.toDate())}
-                        </Text>
-                      )}
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={styles.userC}>{item.comment}</Text>
-                    </View>
-
-                    {item.likeBy.includes(userId) ? (
-                      <View style={{ flexDirection: "row" }}>
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            marginRight: 3,
-                            fontFamily: "Poppins",
-                          }}
-                        >
-                          {item.numOfLike}
-                        </Text>
-                        <Icon
-                          style={{
-                            flexDirection: "row-reverse",
-                            paddingLeft: 10,
-                          }}
-                          name="heart"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() =>
-                            removeLike(item.id, item.numOfLike, item.likeBy)
-                          }
-                        />
-
-                        {item.userId === userId ? (
-                          <View style={{ flexDirection: "row" }}>
-                            <Icon
-                              style={{
-                                flexDirection: "row-reverse",
-                                paddingLeft: 10,
-                              }}
-                              name="trash-outline"
-                              type="ionicon"
-                              size={20}
-                              color="#000"
-                              onPress={() => DeleteComment(item.id)}
-                            />
-                            <Icon
-                              style={{
-                                flexDirection: "row-reverse",
-                                paddingLeft: 10,
-                              }}
-                              name="create-outline"
-                              type="ionicon"
-                              size={20}
-                              color="#000"
-                              onPress={() =>
-                                props.navigation.navigate("EditComment", {
-                                  cid: item.id,
-                                })
-                              }
-                            />
-                          </View>
-                        ) : null}
-                      </View>
-                    ) : (
-                      <View style={{ flexDirection: "row" }}>
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            marginRight: 3,
-                            fontFamily: "Poppins",
-                          }}
-                        >
-                          {item.numOfLike}
-                        </Text>
-                        <Icon
-                          style={{
-                            flexDirection: "row-reverse",
-                            paddingLeft: 10,
-                          }}
-                          name="heart-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() =>
-                            addLike(item.id, item.numOfLike, item.likeBy)
-                          }
-                        />
-                        {item.userId === userId ? (
-                          <View style={{ flexDirection: "row" }}>
-                            <Icon
-                              style={{
-                                flexDirection: "row-reverse",
-                                paddingLeft: 10,
-                              }}
-                              name="trash-outline"
-                              type="ionicon"
-                              size={20}
-                              color="#000"
-                              onPress={() => DeleteComment(item.id)}
-                            />
-                            <Icon
-                              style={{
-                                flexDirection: "row-reverse",
-                                paddingLeft: 10,
-                              }}
-                              name="create-outline"
-                              type="ionicon"
-                              size={20}
-                              color="#000"
-                              onPress={() =>
-                                props.navigation.navigate("EditComment", {
-                                  cid: item.id,
-                                })
-                              }
-                            />
-                          </View>
-                        ) : null}
-                      </View>
-                    )}
-                  </View>
-                </View>
-              </View>
+              <CommentCard
+                picture={item.image}
+                verify={item.verify}
+                postedBy={item.postedBy}
+                creation={item.creation}
+                comment={item.comment}
+                numOfLike={item.numOfLike}
+                likeBy={item.likeBy.includes(userId)}
+                removeLike={() =>
+                  removeLike(item.id, item.numOfLike, item.likeBy)
+                }
+                addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
+                firstUserId={item.userId}
+                secondUserId={userId}
+                delete={() => DeleteComment(item.id)}
+                editComment={() => EditComment(item.id)}
+                numberOfReply={item.numberOfReply}
+                onSelect={() =>
+                  props.navigation.navigate("Reply Discussion", {
+                    cid: item.id,
+                    time: timeDifference(new Date(), item.creation.toDate()),
+                    xxx: item.likeBy.includes(userId),
+                    mainCommentAuthorName: item.postedBy,
+                  })
+                }
+              />
             ) : null
           }
         />
@@ -496,6 +379,52 @@ function EditDeleteDiscussion(props) {
                   <TouchableOpacity
                     style={styles.blogout}
                     onPress={toggleModal}
+                  >
+                    <Text style={styles.Ltext}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal isVisible={isEditCommentModalVisible}>
+            <View style={{ justifyContent: "center" }}>
+              <View style={{ marginLeft: 8 }}>
+                <TextInput
+                  style={styles.input}
+                  value={editComment}
+                  placeholderTextColor="#000"
+                  multiline={true}
+                  onChangeText={(editComment) => setEditComment(editComment)}
+                />
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignContent: "space-between",
+                }}
+              >
+                <View
+                  style={{
+                    paddingHorizontal: 20,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={styles.blogout}
+                    onPress={() => uploadUpdatedComment()}
+                  >
+                    <Text style={styles.Ltext}>Update Comment</Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    paddingHorizontal: 20,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={styles.blogout}
+                    onPress={toggleEditComment}
                   >
                     <Text style={styles.Ltext}>Cancel</Text>
                   </TouchableOpacity>
