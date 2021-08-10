@@ -8,10 +8,10 @@ const commentCard = (props) => {
   return (
     <View>
       <View style={{ flexDirection: "row" }}>
-        <View>
+        <View style={{ flexDirection: "column" }}>
           <Image
             style={{
-              marginRight: 15,
+              marginRight: 10,
               width: 35,
               height: 35,
               borderRadius: 35 / 2,
@@ -20,7 +20,6 @@ const commentCard = (props) => {
               uri: props.picture,
             }}
           />
-
           <View
             style={{
               marginRight: 10,
@@ -59,16 +58,17 @@ const commentCard = (props) => {
             ) : null}
           </View>
         </View>
-        <View style={styles.commentCon}>
+        <View style={styles.mainBubble}>
+          <View style={{marginLeft:5}}>
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
             }}
           >
-            <Text style={styles.userT}>{props.postedBy} </Text>
+            <Text style={styles.userName}>{props.postedBy} </Text>
             {props.creation === null ? (
-              <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
+              <Text style={(styles.time, { marginRight: 20 })}>Now</Text>
             ) : (
               <Text style={(styles.userC, { marginRight: 20 })}>
                 {timeDifference(new Date(), props.creation.toDate())}
@@ -162,6 +162,7 @@ const commentCard = (props) => {
               ({props.numberOfReply})
             </Text>
           </View>
+          </View>
         </View>
       </View>
     </View>
@@ -169,17 +170,19 @@ const commentCard = (props) => {
 };
 
 const styles = StyleSheet.create({
-  commentCon: {
+  mainBubble: {
     borderColor: "#E3562A",
     borderBottomWidth: 5,
-    width: 300,
+    width: "85 %",
     paddingVertical: 3,
+    backgroundColor:"#D3D3D3",
+    borderRadius: 10
   },
 
-  userT: {
+  userName: {
     fontFamily: "Poppins",
-    fontWeight: "600",
-    fontSize: 15,
+    fontWeight: 'bold', 
+    fontSize: 17,
   },
 
   userC: {
@@ -187,6 +190,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontSize: 15,
   },
+
+
 });
 
 export default commentCard;

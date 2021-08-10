@@ -21,6 +21,7 @@ import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
 import CommentCard from "../../component/commentCard";
+import { FAB } from 'react-native-elements';
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
@@ -402,7 +403,7 @@ function ViewDiscussion(props) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View
         style={{
           flexDirection: "row",
@@ -493,11 +494,8 @@ function ViewDiscussion(props) {
           ) : null
         }
       />
+      
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
-          <Text style={styles.Ltext}>Add Comment</Text>
-        </TouchableOpacity>
-
         <Modal isVisible={isModalVisible}>
           <View style={{ justifyContent: "center" }}>
             <View style={{ marginLeft: 8 }}>
@@ -617,18 +615,32 @@ function ViewDiscussion(props) {
           </View>
         </Modal>
       </View>
-    </ScrollView>
+      <FAB 
+      placement="right" 
+      title="Add"
+      overlayColor="#000"
+      style={styles.floatButton} 
+      onPress={toggleModal}
+      icon={
+        <Icon
+        name="add-outline"
+        type="ionicon"
+        size={30}
+        color="#fff"
+      />
+
+      }
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
-    // marginTop: 20,
+    margin: 10,
     marginBottom: 5,
-    // marginLeft: 20,
-    // marginLeft:20
+
   },
 
   titlex: {
@@ -640,6 +652,13 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-start",
+  },
+
+  floatButton:{
+    position: "absolute",
+    right:    0,
+    bottom:   0,
+    backgroundColor: "#E3562A",
   },
 
   titley: {
