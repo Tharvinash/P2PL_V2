@@ -50,6 +50,7 @@ import LandingScreen from "./components/auth/Landing";
 import RegisterScreen from "./components/auth/Register";
 import LoginScreen from "./components/auth/Login";
 import LectureRegister from "./components/auth/LectureRegister";
+import ResetPassword from "./components/auth/ResetPassword";
 
 //Main Screen
 import MainScreen from "./components/StudentMain";
@@ -148,6 +149,7 @@ export class App extends Component {
             />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
             <Stack.Screen name="LectureRegister" component={LectureRegister} />
           </Stack.Navigator>
         </NavigationContainer>

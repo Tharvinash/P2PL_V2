@@ -1,29 +1,19 @@
 import React, { Component } from "react";
-import {
-  Text,
-  View,
-  Alert,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { Text, View, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import firebase  from "firebase";
+import { func } from "prop-types";
 
-import firebase from "firebase";
-
-export class Login extends Component {
+class ResetPassword extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      email: "",
-      password: "",
+      email: ""
     };
-
-    this.onSignUp = this.onSignUp.bind(this);
   }
 
-  validation(){
-    const { email, password } = this.state;
+	validation(){
+    const { email } = this.state;
     const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     
     if (!email.match(mailformat)) {
@@ -38,48 +28,23 @@ export class Login extends Component {
       );
     }
 
-    if (!password.trim()) {
-      return Alert.alert(
-        "Incorrect password",
-        "You have entered and incorrect password",
-        [
-          {
-            text: "Retry",
-          },
-        ]
-      );
-    }
-
-    this.onSignUp();
+    this.sendEmail();
   }
 
-  onSignUp() {
-    const { email, password } = this.state;
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((result) => {
-        console.log("Logged In");
-      })
-      .catch((error) => {
-          return Alert.alert(
-            "Invalid access",
-            "Wrong email or password",
-            [
-              {
-                text: "Retry",
-              },
-            ]
-          );
-      });
+	sendEmail = () => {
+		firebase.auth().sendPasswordResetEmail(this.state.email).then(function(){
+			console.log("email sent")
+		}).catch(function (e) {
+			alert(e)
+		})
+		this.props.navigation.navigate('Login')
   }
 
   render() {
     return (
       <View style={styles.container}>
         <View>
-          <Text style={styles.title}>Welcome</Text>
-          <Text style={styles.title2}>Sign in with your account</Text>
+          <Text style={styles.title2}>Forgot your password ?</Text>
         </View>
         <TextInput
           style={styles.input}
@@ -87,18 +52,9 @@ export class Login extends Component {
           placeholderTextColor="#000"
           onChangeText={(email) => this.setState({ email })}
         />
-        <TextInput
-          style={styles.input}
-          placeholderTextColor="#000"
-          placeholder="Password"
-          secureTextEntry={true}
-          onChangeText={(password) => this.setState({ password })}
-        />
-
         <TouchableOpacity style={styles.button} onPress={() => this.validation()}>
-          <Text style={styles.text}>Sign In</Text>
+          <Text style={styles.text}>Send Email</Text>
         </TouchableOpacity>
-        <Text style={styles.title2} onPress={() =>this.props.navigation.navigate('ResetPassword')}>Forgot Password </Text>
       </View>
     );
   }
@@ -163,5 +119,4 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
   },
 });
-
-export default Login;
+export default ResetPassword;
