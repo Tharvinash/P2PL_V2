@@ -6,10 +6,37 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  SafeAreaView,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { ListItem, BottomSheet } from "react-native-elements";
 import Modal from "react-native-modal";
 export default function Landing({ navigation }) {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsVisible(false);
+    }, [])
+  );
+
+  const list = [
+    {
+      title: "Register as Student",
+      onPress: () => navigation.navigate("Register"),
+    },
+    {
+      title: "Register as Lecture",
+      onPress: () => navigation.navigate("LectureRegister"),
+    },
+    {
+      title: "Cancel",
+      containerStyle: { backgroundColor: "red" },
+      titleStyle: { color: "white" },
+      onPress: () => setIsVisible(false),
+    },
+  ];
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -22,7 +49,10 @@ export default function Landing({ navigation }) {
         <Text style={styles.title}>Peer to Peer Learning Platform</Text>
       </View>
       <View style={{ padding: 20 }}>
-        <TouchableOpacity style={styles.button} onPress={() => toggleModal()}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setIsVisible(true)}
+        >
           <Text style={styles.text}>REGISTER</Text>
         </TouchableOpacity>
       </View>
@@ -32,6 +62,23 @@ export default function Landing({ navigation }) {
       >
         <Text style={styles.text}>LOGIN</Text>
       </TouchableOpacity>
+
+      <BottomSheet
+        isVisible={isVisible}
+        containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+      >
+        {list.map((l, i) => (
+          <ListItem
+            key={i}
+            containerStyle={l.containerStyle}
+            onPress={l.onPress}
+          >
+            <ListItem.Content>
+              <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+        ))}
+      </BottomSheet>
 
       <Modal isVisible={isModalVisible}>
         <View style={styles.container}>
@@ -52,7 +99,10 @@ export default function Landing({ navigation }) {
             </TouchableOpacity>
           </View>
           <View style={{ justifyContent: "center" }}>
-            <TouchableOpacity style={styles.button} onPress={() => toggleModal()}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => toggleModal()}
+            >
               <Text style={styles.text}>Cancel</Text>
             </TouchableOpacity>
           </View>

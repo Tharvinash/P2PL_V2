@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Icon } from "react-native-elements";
 import { timeDifference } from "../../utils";
 
@@ -58,112 +58,178 @@ const commentCard = (props) => {
             ) : null}
           </View>
         </View>
-        <View style={styles.mainBubble}>
-          <View style={{marginLeft:5}}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
+        {props.firstUserId === props.secondUserId ? (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.mainBubble}
+            onLongPress={props.xxx}
+            delayLongPress={500}
           >
-            <Text style={styles.userName}>{props.postedBy} </Text>
-            {props.creation === null ? (
-              <Text style={(styles.time, { marginRight: 20 })}>Now</Text>
-            ) : (
-              <Text style={(styles.userC, { marginRight: 20 })}>
-                {timeDifference(new Date(), props.creation.toDate())}
-              </Text>
-            )}
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={styles.userC}>{props.comment}</Text>
-          </View>
-
-          <View style={{ flexDirection: "row" }}>
-            <Text
-              style={{
-                fontSize: 15,
-                marginRight: 3,
-                fontFamily: "Poppins",
-              }}
-            >
-              {props.numOfLike}
-            </Text>
-            {props.likeBy ? (
-              <Icon
+            <View style={{ marginLeft: 5 }}>
+              <View
                 style={{
-                  paddingLeft: 10,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                 }}
-                name="heart"
-                type="ionicon"
-                size={20}
-                color="#000"
-                onPress={props.removeLike}
-              />
-            ) : (
-              <Icon
-                style={{
-                  paddingLeft: 10,
-                }}
-                name="heart-outline"
-                type="ionicon"
-                size={20}
-                color="#000"
-                onPress={props.addLike}
-              />
-            )}
-            {props.firstUserId === props.secondUserId ? (
-              <View style={{ flexDirection: "row" }}>
-                <Icon
-                  style={{
-                    paddingLeft: 10,
-                  }}
-                  name="trash-outline"
-                  type="ionicon"
-                  size={20}
-                  color="#000"
-                  onPress={props.delete}
-                />
-                <Icon
-                  style={{
-                    paddingLeft: 10,
-                  }}
-                  name="create-outline"
-                  type="ionicon"
-                  size={20}
-                  color="#000"
-                  onPress={props.editComment}
-                />
+              >
+                <Text style={styles.userName}>{props.postedBy} </Text>
+                {props.creation === null ? (
+                  <Text style={(styles.time, { marginRight: 20 })}>Now</Text>
+                ) : (
+                  <Text style={(styles.userC, { marginRight: 20 })}>
+                    {timeDifference(new Date(), props.creation.toDate())}
+                  </Text>
+                )}
               </View>
-            ) : null}
-            <Icon
-              style={{
-                paddingLeft: 10,
-              }}
-              name="chatbubble-ellipses-outline"
-              type="ionicon"
-              size={20}
-              color="#000"
-              a
-              onPress={props.onSelect}
-            />
-            <Text
-              style={{
-                fontSize: 15,
-                marginRight: 3,
-                fontFamily: "Poppins",
-              }}
-            >
-              ({props.numberOfReply})
-            </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={styles.userC}>{props.comment}</Text>
+              </View>
+
+              <View style={{ flexDirection: "row" }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    marginRight: 3,
+                    fontFamily: "Poppins",
+                  }}
+                >
+                  {props.numOfLike}
+                </Text>
+                {props.likeBy ? (
+                  <Icon
+                    style={{
+                      paddingLeft: 10,
+                    }}
+                    name="heart"
+                    type="ionicon"
+                    size={20}
+                    color="#000"
+                    onPress={props.removeLike}
+                  />
+                ) : (
+                  <Icon
+                    style={{
+                      paddingLeft: 10,
+                    }}
+                    name="heart-outline"
+                    type="ionicon"
+                    size={20}
+                    color="#000"
+                    onPress={props.addLike}
+                  />
+                )}
+                <Icon
+                  style={{
+                    paddingLeft: 10,
+                  }}
+                  name="chatbubble-ellipses-outline"
+                  type="ionicon"
+                  size={20}
+                  color="#000"
+                  a
+                  onPress={props.onSelect}
+                />
+                <Text
+                  style={{
+                    fontSize: 15,
+                    marginRight: 3,
+                    fontFamily: "Poppins",
+                  }}
+                >
+                  ({props.numberOfReply})
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.mainBubble}>
+            <View style={{ marginLeft: 5 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={styles.userName}>{props.postedBy} </Text>
+                {props.creation === null ? (
+                  <Text style={(styles.time, { marginRight: 20 })}>Now</Text>
+                ) : (
+                  <Text style={(styles.userC, { marginRight: 20 })}>
+                    {timeDifference(new Date(), props.creation.toDate())}
+                  </Text>
+                )}
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={styles.userC}>{props.comment}</Text>
+              </View>
+
+              <View style={{ flexDirection: "row" }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    marginRight: 3,
+                    fontFamily: "Poppins",
+                  }}
+                >
+                  {props.numOfLike}
+                </Text>
+                {props.likeBy ? (
+                  <Icon
+                    style={{
+                      paddingLeft: 10,
+                    }}
+                    name="heart"
+                    type="ionicon"
+                    size={20}
+                    color="#000"
+                    onPress={props.removeLike}
+                  />
+                ) : (
+                  <Icon
+                    style={{
+                      paddingLeft: 10,
+                    }}
+                    name="heart-outline"
+                    type="ionicon"
+                    size={20}
+                    color="#000"
+                    onPress={props.addLike}
+                  />
+                )}
+                <Icon
+                  style={{
+                    paddingLeft: 10,
+                  }}
+                  name="chatbubble-ellipses-outline"
+                  type="ionicon"
+                  size={20}
+                  color="#000"
+                  a
+                  onPress={props.onSelect}
+                />
+                <Text
+                  style={{
+                    fontSize: 15,
+                    marginRight: 3,
+                    fontFamily: "Poppins",
+                  }}
+                >
+                  ({props.numberOfReply})
+                </Text>
+              </View>
+            </View>
           </View>
-          </View>
-        </View>
+        )}
       </View>
     </View>
   );
@@ -175,13 +241,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 5,
     width: "85 %",
     paddingVertical: 3,
-    backgroundColor:"#D3D3D3",
-    borderRadius: 10
+    backgroundColor: "#D3D3D3",
+    borderRadius: 10,
+    marginBottom: 5,
   },
 
   userName: {
     fontFamily: "Poppins",
-    fontWeight: 'bold', 
+    fontWeight: "bold",
     fontSize: 17,
   },
 
@@ -190,8 +257,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontSize: 15,
   },
-
-
 });
 
 export default commentCard;

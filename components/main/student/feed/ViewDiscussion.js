@@ -21,7 +21,7 @@ import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
 import CommentCard from "../../component/commentCard";
-import { FAB } from 'react-native-elements';
+import { FAB, ListItem, BottomSheet } from "react-native-elements";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
@@ -40,8 +40,28 @@ function ViewDiscussion(props) {
   const [data, setData] = useState(null);
   const [cu, setCu] = useState(currentUser);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
+  const [isVisible, setIsVisible] = useState(false);
+  const [temporaryId, setTemporaryId] = useState(null);
+
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
+
+  const list = [
+    {
+      title: "Edit",
+      onPress: () => EditComment(temporaryId),
+    },
+    {
+      title: "Delete",
+      onPress: () => Delete(temporaryId),
+    },
+    {
+      title: "Cancel",
+      containerStyle: { backgroundColor: "red" },
+      titleStyle: { color: "white" },
+      onPress: () => setIsVisible(false),
+    },
+  ];
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -126,7 +146,7 @@ function ViewDiscussion(props) {
           });
           setComment(comment);
         });
-      setData(88)
+      setData(88);
       firebase
         .firestore()
         .collection("users")
@@ -181,6 +201,11 @@ function ViewDiscussion(props) {
 
   const toggleReport = () => {
     setReportVisible(!isReportVisible);
+  };
+
+  const toggleVisibility = (cid) => {
+    setIsVisible(true);
+    setTemporaryId(cid);
   };
 
   const UploadComment = () => {
@@ -466,7 +491,7 @@ function ViewDiscussion(props) {
           item.discussionId === discussionId ? (
             <CommentCard
               picture={item.image}
-              status = {0}
+              status={0}
               verify={item.verify}
               postedBy={item.postedBy}
               creation={item.creation}
@@ -476,6 +501,7 @@ function ViewDiscussion(props) {
               removeLike={() =>
                 removeLike(item.id, item.numOfLike, item.likeBy)
               }
+              xxx={() => toggleVisibility(item.id)}
               addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
               firstUserId={item.userId}
               secondUserId={userId}
@@ -494,7 +520,24 @@ function ViewDiscussion(props) {
           ) : null
         }
       />
-      
+
+      <BottomSheet
+        isVisible={isVisible}
+        containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+      >
+        {list.map((l, i) => (
+          <ListItem
+            key={i}
+            containerStyle={l.containerStyle}
+            onPress={l.onPress}
+          >
+            <ListItem.Content>
+              <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+        ))}
+      </BottomSheet>
+
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <Modal isVisible={isModalVisible}>
           <View style={{ justifyContent: "center" }}>
@@ -615,21 +658,13 @@ function ViewDiscussion(props) {
           </View>
         </Modal>
       </View>
-      <FAB 
-      placement="right" 
-      title="Add"
-      overlayColor="#000"
-      style={styles.floatButton} 
-      onPress={toggleModal}
-      icon={
-        <Icon
-        name="add-outline"
-        type="ionicon"
-        size={30}
-        color="#fff"
-      />
-
-      }
+      <FAB
+        placement="right"
+        title="Add"
+        overlayColor="#000"
+        style={styles.floatButton}
+        onPress={toggleModal}
+        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
     </View>
   );
@@ -640,7 +675,6 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10,
     marginBottom: 5,
-
   },
 
   titlex: {
@@ -654,10 +688,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
 
-  floatButton:{
+  floatButton: {
     position: "absolute",
-    right:    0,
-    bottom:   0,
+    right: 0,
+    bottom: 0,
     backgroundColor: "#E3562A",
   },
 
