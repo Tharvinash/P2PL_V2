@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, Image} from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { Icon } from "react-native-elements";
 import { timeDifference } from "../../utils";
 
 const commentCard = (props) => {
+  const a = props.verify;
   return (
     <View>
       <View style={{ flexDirection: "row" }}>
@@ -26,13 +27,35 @@ const commentCard = (props) => {
               paddingTop: 10,
             }}
           >
-            {props.verify ? (
-              <Icon
-                name="checkmark-circle"
-                type="ionicon"
-                size={25}
-                color="#140F38"
-              />
+            {props.status == 0 ? (
+              props.verify ? (
+                <Icon
+                  name="checkmark-circle"
+                  type="ionicon"
+                  size={25}
+                  color="#140F38"
+                />
+              ) : null
+            ) : null}
+
+            {props.status == 1 ? (
+              props.verify ? (
+                <Icon
+                  name="checkmark-circle"
+                  type="ionicon"
+                  size={25}
+                  color="#140F38"
+                  onPress={props.removeVerifyComment}
+                />
+              ) : (
+                <Icon
+                  name="checkmark-circle-outline"
+                  type="ionicon"
+                  size={25}
+                  color="#140F38"
+                  onPress={props.verifyComment}
+                />
+              )
             ) : null}
           </View>
         </View>
@@ -62,7 +85,6 @@ const commentCard = (props) => {
           </View>
 
           <View style={{ flexDirection: "row" }}>
-            
             <Text
               style={{
                 fontSize: 15,
@@ -147,15 +169,14 @@ const commentCard = (props) => {
 };
 
 const styles = StyleSheet.create({
-
-	commentCon: {
+  commentCon: {
     borderColor: "#E3562A",
     borderBottomWidth: 5,
     width: 300,
     paddingVertical: 3,
   },
 
-	userT: {
+  userT: {
     fontFamily: "Poppins",
     fontWeight: "600",
     fontSize: 15,
@@ -166,7 +187,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontSize: 15,
   },
-
 });
 
 export default commentCard;

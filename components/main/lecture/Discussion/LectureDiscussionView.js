@@ -20,7 +20,7 @@ import firebase from "firebase";
 import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
-import { version } from "react-dom";
+import CommentCard from "../../component/commentCard";
 require("firebase/firestore");
 
 function LectureDiscussionView(props) {
@@ -389,182 +389,35 @@ function LectureDiscussionView(props) {
         data={comment}
         renderItem={({ item }) =>
           item.discussionId === discussionId ? (
-            <View>
-              <View style={{ flexDirection: "row" }}>
-                <View>
-                  <Image
-                    style={{
-                      marginRight: 15,
-                      width: 35,
-                      height: 35,
-                      borderRadius: 35 / 2,
-                    }}
-                    source={{
-                      uri: item.image,
-                    }}
-                  />
-                  <View
-                    style={{
-                      marginRight: 10,
-                      paddingTop: 10,
-                    }}
-                  >
-                    {item.verify ? (
-                      <Icon
-                        name="checkmark-circle"
-                        type="ionicon"
-                        size={25}
-                        color="#140F38"
-                        onPress={() => removeVerifyComment(item.id)}
-                      />
-                    ) : (
-                      <Icon
-                        name="checkmark-circle-outline"
-                        type="ionicon"
-                        size={25}
-                        color="#140F38"
-                        onPress={() => verifyComment(item.id)}
-                      />
-                    )}
-                  </View>
-                </View>
-                <View style={styles.commentCon}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.userT}>{item.postedBy} </Text>
-                    {item.creation === null ? (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        Now
-                      </Text>
-                    ) : (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
-                    )}
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.userC}>{item.comment}</Text>
-                  </View>
-                  <View style={{ flexDirection: "row" }}>
-                    {item.likeBy.includes(userId) ? (
-                      <View style={{ flexDirection: "row" }}>
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            marginRight: 3,
-                            fontFamily: "Poppins",
-                          }}
-                        >
-                          {item.numOfLike}
-                        </Text>
-                        <Icon
-                          style={{
-                            flexDirection: "row-reverse",
-                            paddingLeft: 10,
-                          }}
-                          name="heart"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() =>
-                            removeLike(item.id, item.numOfLike, item.likeBy)
-                          }
-                        />
-                      </View>
-                    ) : (
-                      <View style={{ flexDirection: "row" }}>
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            marginRight: 3,
-                            fontFamily: "Poppins",
-                          }}
-                        >
-                          {item.numOfLike}
-                        </Text>
-                        <Icon
-                          style={{
-                            flexDirection: "row-reverse",
-                            paddingLeft: 10,
-                          }}
-                          name="heart-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() =>
-                            addLike(item.id, item.numOfLike, item.likeBy)
-                          }
-                        />
-                      </View>
-                    )}
-                    {item.userId === userId ? (
-                      <View style={{ flexDirection: "row" }}>
-                        <Icon
-                          style={{
-                            flexDirection: "row-reverse",
-                            paddingLeft: 10,
-                          }}
-                          name="trash-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() => Delete(item.id)}
-                        />
-                        <Icon
-                          style={{
-                            flexDirection: "row-reverse",
-                            paddingLeft: 10,
-                          }}
-                          name="create-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() => EditComment(item.id)}
-                        />
-                      </View>
-                    ) : null}
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="chatbubble-ellipses-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() =>
-                        props.navigation.navigate("Reply Discussion", {
-                          cid: item.id,
-                          time: timeDifference(
-                            new Date(),
-                            item.creation.toDate()
-                          ),
-                          xxx: item.likeBy.includes(userId),
-                          mainCommentAuthorName: item.postedBy,
-                        })
-                      }
-                    />
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        marginRight: 3,
-                        fontFamily: "Poppins",
-                      }}
-                    >
-                      ({item.numberOfReply})
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
+            <CommentCard
+              picture={item.image}
+              status = {1}
+              verify={item.verify}
+              postedBy={item.postedBy}
+              creation={item.creation}
+              comment={item.comment}
+              numOfLike={item.numOfLike}
+              likeBy={item.likeBy.includes(userId)}
+              removeLike={() =>
+                removeLike(item.id, item.numOfLike, item.likeBy)
+              }
+              addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
+              firstUserId={item.userId}
+              secondUserId={userId}
+              delete={() => Delete(item.id)}
+              editComment={() => EditComment(item.id)}
+              numberOfReply={item.numberOfReply}
+              removeVerifyComment = {() => removeVerifyComment(item.id)}
+              verifyComment = {() => verifyComment(item.id)}
+              onSelect={() =>
+                props.navigation.navigate("Reply Discussion", {
+                  cid: item.id,
+                  time: timeDifference(new Date(), item.creation.toDate()),
+                  xxx: item.likeBy.includes(userId),
+                  mainCommentAuthorName: item.postedBy,
+                })
+              }
+            />
           ) : null
         }
       />

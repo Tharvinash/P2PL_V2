@@ -308,6 +308,7 @@ function EditDeleteDiscussion(props) {
             item.discussionId === discussionId ? (
               <CommentCard
                 picture={item.image}
+                status = {0}
                 verify={item.verify}
                 postedBy={item.postedBy}
                 creation={item.creation}

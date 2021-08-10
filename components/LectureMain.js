@@ -13,7 +13,8 @@ import {
   fetchUserPosts,
   fetchUserComment,
   fetchReportedDiscussion,
-  fetchDiscussionRoom
+  fetchDiscussionRoom,
+  fetchOption
 } from "../redux/actions/index";
 
 //lecture main
@@ -145,6 +146,7 @@ export class Main extends Component {
     this.props.fetchUserComment();
     this.props.fetchReportedDiscussion();
     this.props.fetchDiscussionRoom();
+    this.props.fetchOption();
   }
   render() {
     // const { currentUser } = this.props;
@@ -211,7 +213,7 @@ const mapStateToProps = (store) => ({
 
 const mapDispatchProps = (dispatch) =>
   bindActionCreators(
-    { fetchUser, fetchUserPosts, fetchUserComment, fetchReportedDiscussion, fetchDiscussionRoom},
+    { fetchUser, fetchUserPosts, fetchUserComment, fetchReportedDiscussion, fetchDiscussionRoom, fetchOption},
     dispatch
   );
 //, fetchUserPosts, fetchUserFollowing, clearData
