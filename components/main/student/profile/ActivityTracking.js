@@ -1,67 +1,164 @@
 import React, { useState, useEffect } from "react";
 import {
   Image,
-  View,
+  Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
+  View,
+  ActivityIndicator,
+  Animated,
+  LogBox,
+  TouchableOpacityBase,
 } from "react-native";
-
-import ImageView from "react-native-image-view";
+import MentionsTextInput from "react-native-mentions";
+import ParsedText from 'react-native-parsed-text';
+import firebase from "firebase";
+require("firebase/firestore");
+require("firebase/firebase-storage");
 
 export default function FavDiscussion(props) {
+  const [datas, setDatas] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [caption, setCaption] = useState("");
 
-const images = [
-  {
-    uri: "https://images.unsplash.com/photo-1571501679680-de32f1e7aad4",
-  },
+  const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
 
-];
+  useEffect(() => {
+    LogBox.ignoreLogs(["Animated: `useNativeDriver`"]);
+  }, []);
 
-  const [visible, setIsVisible] = useState(false);
+  const renderSuggestionsRow = ({ item }, hidePanel) => {
+    return (
+      <TouchableOpacity onPress={() => onSuggestionTap(item.name, hidePanel)}>
+        <View style={styles.suggestionsRowContainer}>
+          <View style={styles.userIconBox}>
+            <Image
+              style={{ aspectRatio: 1 / 1, height: 45 }}
+              source={{
+                uri: item.image,
+              }}
+            />
+          </View>
+          <View style={styles.userDetailsBox}>
+            <Text style={styles.displayNameText}>{item.name}</Text>
+            <Text style={styles.usernameText}>@{item.name}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const onSuggestionTap = (name, hidePanel) => {
+    hidePanel();
+    const comment = caption.slice(0, -keyword.length);
+    setCaption(comment + "@" + name + " ");
+  };
+
   const xxx = () => {
-    setIsVisible(!visible);
+    console.log(caption)
+  };
+
+  const callback = (keyword) => {
+    setKeyword(keyword);
+    firebase
+      .firestore()
+      .collection("users")
+      .where("name", ">=", keyword.substring(1))
+      .limit(10)
+      .get()
+      .then((snapshot) => {
+        let result = snapshot.docs.map((doc) => {
+          const datas = doc.data();
+          const id = doc.id;
+          return { id, ...datas };
+        });
+        setDatas(result);
+      });
   };
 
   return (
-    <ImageView
-    images={images}
-    visible={true}
-    onRequestClose={() => setIsVisible(false)}
-  />
-    // <View>
-    //   {visible ? (
-    //     <TouchableOpacity onPress={() => xxx()}>
-    //       <Image
-    //         style={styles.tinyLogo}
-    //         source={{
-    //           uri: "https://reactnative.dev/img/tiny_logo.png",
-    //         }}
-    //       />
-    //     </TouchableOpacity>
-    //   ) : (
-    //     <ImageView
-    //       images={images}
-    //       imageIndex={0}
-    //       visible={visible}
-    //       onRequestClose={() => setIsVisible(true)}
-    //     />
-    //   )}
-    //   <View></View>
-    // </View>
+    <View>
+      <MentionsTextInput
+        textInputStyle={{
+          borderColor: "#ebebeb",
+          borderWidth: 1,
+          padding: 5,
+          fontSize: 15,
+          width: "100%",
+        }}
+        suggestionsPanelStyle={{ backgroundColor: "rgba(100,100,100,0.1)" }}
+        loadingComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              width: 200,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator />
+          </View>
+        )}
+        textInputMinHeight={30}
+        textInputMaxHeight={80}
+        trigger={"@"}
+        triggerLocation={"new-word-only"} // 'new-word-only', 'anywhere'
+        value={caption}
+        onChangeText={setCaption}
+        triggerCallback={callback.bind(this)}
+        renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+        suggestionsData={datas}
+        keyExtractor={(item, index) => item.name}
+        suggestionRowHeight={45}
+        horizontal={false}
+        MaxVisibleRowCount={3}
+      />
+
+      <TouchableOpacity onPress={()=>xxx()}>
+        <Text>see result</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 50,
+    height: 300,
+    justifyContent: "flex-end",
+    paddingTop: 100,
   },
-  tinyLogo: {
-    width: 50,
-    height: 50,
+  suggestionsRowContainer: {
+    flexDirection: "row",
   },
-  logo: {
-    width: 66,
-    height: 58,
+  userAvatarBox: {
+    width: 35,
+    paddingTop: 2,
+  },
+  userIconBox: {
+    height: 45,
+    width: 45,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#54c19c",
+  },
+  usernameInitials: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 14,
+  },
+  userDetailsBox: {
+    flex: 1,
+    justifyContent: "center",
+    paddingLeft: 10,
+    paddingRight: 15,
+  },
+  displayNameText: {
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  usernameText: {
+    fontSize: 12,
+    color: "rgba(0,0,0,0.6)",
   },
 });
+ 

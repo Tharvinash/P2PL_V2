@@ -1,10 +1,51 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
 import { Icon } from "react-native-elements";
 import { timeDifference } from "../../utils";
+import ImageView from "react-native-image-viewing";
+import PDFReader from "rn-pdf-reader-js";
+import { WebView } from "react-native-webview";
+import ParsedText from "react-native-parsed-text";
+import * as Linking from "expo-linking";
 
 const commentCard = (props) => {
   const a = props.verify;
+  const ccc =
+    "https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/doc%2F1234%2Fconference-template-a4.docx?alt=media&token=384f0e85-edf5-4ecb-9fac-31efbe44cd49";
+
+  const [data, setData] = useState(false);
+  const [web, setWeb] = useState(false);
+
+  const handleUrlPress = (url, matchIndex /*: number*/) => {
+    Linking.openURL(url);
+  };
+
+  const handlePhonePress = (phone, matchIndex /*: number*/) => {
+    Alert.alert(`${phone} has been pressed!`);
+  };
+
+  const handleNamePress = (name, matchIndex /*: number*/) => {
+    Alert.alert(`Hello ${name}`);
+  };
+
+  const handleEmailPress = (email, matchIndex /*: number*/) => {
+    Alert.alert(`send email to ${email}`);
+  };
+
+  const renderText = (matchingString, matches) => {
+    // matches => ["[@michel:5455345]", "@michel", "5455345"]
+    let pattern = /\[(@[^:]+):([^\]]+)\]/i;
+    let match = matchingString.match(pattern);
+    console.log(24);
+    return `^^${match[1]}^^`;
+  };
+
+  const images = [
+    {
+      uri: props.picture,
+    },
+  ];
+
   return (
     <View>
       <View style={{ flexDirection: "row" }}>
@@ -87,7 +128,39 @@ const commentCard = (props) => {
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={styles.userC}>{props.comment}</Text>
+                <ParsedText
+                  style={styles.userC}
+                  parse={[
+                    { type: "url", style: styles.url, onPress: handleUrlPress },
+                    {
+                      type: "phone",
+                      style: styles.phone,
+                      onPress: handlePhonePress,
+                    },
+                    {
+                      type: "email",
+                      style: styles.email,
+                      onPress: handleEmailPress,
+                    },
+                    {
+                      pattern: /Bob|David/,
+                      style: styles.name,
+                      onPress: handleNamePress,
+                    },
+                    {
+                      pattern: /\[(@[^:]+):([^\]]+)\]/i,
+                      style: styles.username,
+                      onPress: handleNamePress,
+                      renderText: renderText,
+                    },
+                    { pattern: /42/, style: styles.magicNumber },
+                    { pattern: /#(\w+)/, style: styles.hashTag },
+                  ]}
+                  childrenProps={{ allowFontScaling: false }}
+                >
+                  {props.comment}
+                </ParsedText>
+                
               </View>
 
               <View style={{ flexDirection: "row" }}>
@@ -172,7 +245,6 @@ const commentCard = (props) => {
               >
                 <Text style={styles.userC}>{props.comment}</Text>
               </View>
-
               <View style={{ flexDirection: "row" }}>
                 <Text
                   style={{
@@ -231,6 +303,24 @@ const commentCard = (props) => {
           </View>
         )}
       </View>
+
+      <TouchableOpacity onPress={() => setData(true)}>
+        <Text>Image</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => setWeb(true)}>
+        <Text>doc</Text>
+      </TouchableOpacity>
+
+      <ImageView
+        images={images}
+        imageIndex={0}
+        visible={data}
+        onRequestClose={() => setData(false)}
+        swipeToCloseEnabled={true}
+      />
+
+      {web ? <WebView source={{ uri: ccc }} /> : null}
     </View>
   );
 };
@@ -246,6 +336,11 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 
+  attachedImage: {
+    width: 50,
+    height: 50,
+  },
+
   userName: {
     fontFamily: "Poppins",
     fontWeight: "bold",
@@ -256,6 +351,38 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
     lineHeight: 20,
     fontSize: 15,
+  },
+
+  url: {
+    color: 'red',
+    textDecorationLine: 'underline',
+  },
+
+  email: {
+    textDecorationLine: 'underline',
+  },
+
+  text: {
+    color: 'black',
+    fontSize: 15,
+  },
+
+  phone: {
+    color: 'blue',
+    textDecorationLine: 'underline',
+  },
+
+  name: {
+    color: 'red',
+  },
+
+  username: {
+    color: 'green',
+    fontWeight: 'bold'
+  },
+
+  hashTag: {
+    fontStyle: 'italic',
   },
 });
 

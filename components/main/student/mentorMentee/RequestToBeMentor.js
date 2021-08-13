@@ -24,6 +24,7 @@ function requesttobementor(props) {
   const [user, setUser] = useState(currentUser);
   const [finalValue, setFinalValue] = useState([]);
   const [Doc, setDoc] = useState(null);
+  const [name, setName] = useState(null);
   const [desc, setDesc] = useState("");
   const [qualification, setQualification] = useState("");
   const userId = firebase.auth().currentUser.uid;
@@ -33,13 +34,21 @@ function requesttobementor(props) {
 
     if (!result.cancelled) {
       setDoc(result.uri);
+      setName(result.name)
     }
+    console.log(result)
   };
 
   const uploadDoc = async () => {
+
+   if(name.contains(".docx")){
+    const childPath = `doc/${1234}/${name}`;
+    console.log(childPath);
+   }else{
     const childPath = `doc/${1234}/${Math.random().toString(36)}`;
     console.log(childPath);
-
+   }
+    
     const response = await fetch(Doc);
     const blob = await response.blob();
 

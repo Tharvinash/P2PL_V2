@@ -9,20 +9,19 @@ import {
   TouchableOpacity,
   Alert,
   Image,
-  Share,
+  Animated,
   ScrollView,
   Dimensions,
+  LogBox,
   ActivityIndicator,
 } from "react-native";
 import { Icon } from "react-native-elements";
+import MentionsTextInput from "react-native-mentions";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import firebase from "firebase";
-import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
-import moment from "moment";
 import { timeDifference } from "../../../utils";
-import { RefreshControlBase } from "react-native";
 require("firebase/firestore");
 
 function ViewRoom(props) {
@@ -39,9 +38,13 @@ function ViewRoom(props) {
   const [comment, setComment] = useState("");
   const [data, setData] = useState(null);
   const [cu, setCu] = useState(currentUser);
+  const [keyword, setKeyword] = useState("");
+  const [caption, setCaption] = useState("");
+  const [datas, setDatas] = useState("");
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
+  const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
 
   //   useLayoutEffect(() => {
   //     props.navigation.setOptions({
@@ -76,7 +79,8 @@ function ViewRoom(props) {
   //   }, [data]);
   // props.navigation.setParams({ toggleReport: toggleReport })
   useEffect(() => {
-    const { currentUser} = props;
+    LogBox.ignoreLogs(["Animated: `useNativeDriver`"]);
+    const { currentUser } = props;
     if (currentUser.FavDiscussion !== null) {
       setUser(currentUser);
     }
@@ -146,7 +150,6 @@ function ViewRoom(props) {
     return <View />;
   }
 
-
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
@@ -155,7 +158,54 @@ function ViewRoom(props) {
     setModalVisible(!isModalVisible);
   };
 
+  const renderSuggestionsRow = ({ item }, hidePanel) => {
+    return (
+      <TouchableOpacity onPress={() => onSuggestionTap(item.name, hidePanel)}>
+        <View style={styles.suggestionsRowContainer}>
+          <View style={styles.userIconBox}>
+            <Image
+              style={{ aspectRatio: 1 / 1, height: 45 }}
+              source={{
+                uri: item.image,
+              }}
+            />
+          </View>
+          <View style={styles.userDetailsBox}>
+            <Text style={styles.displayNameText}>{item.name}</Text>
+            <Text style={styles.usernameText}>@{item.name}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
+  const onSuggestionTap = (name, hidePanel) => {
+    hidePanel();
+    const comment = caption.slice(0, -keyword.length);
+    setCaption(comment + "@" + name + " ");
+  };
+
+  const xxx = () => {
+    console.log(caption)
+  };
+
+  const callback = (keyword) => {
+    setKeyword(keyword);
+    firebase
+      .firestore()
+      .collection("users")
+      .where("name", ">=", keyword.substring(1))
+      .limit(10)
+      .get()
+      .then((snapshot) => {
+        let result = snapshot.docs.map((doc) => {
+          const datas = doc.data();
+          const id = doc.id;
+          return { id, ...datas };
+        });
+        setDatas(result);
+      });
+  };
 
   const UploadComment = () => {
     if (!newComment.trim()) {
@@ -192,7 +242,11 @@ function ViewRoom(props) {
         {
           text: "Yes",
           onPress: () => {
-            firebase.firestore().collection("DiscussionRoomComment").doc(cid).delete();
+            firebase
+              .firestore()
+              .collection("DiscussionRoomComment")
+              .doc(cid)
+              .delete();
             setData(4);
           },
         },
@@ -487,12 +541,42 @@ function ViewRoom(props) {
         <Modal isVisible={isModalVisible}>
           <View style={{ justifyContent: "center" }}>
             <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                placeholder="Add comments here"
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(newComment) => setNewComment(newComment)}
+              <MentionsTextInput
+                textInputStyle={{
+                  borderColor: "#ebebeb",
+                  borderWidth: 1,
+                  padding: 5,
+                  fontSize: 15,
+                  width: "100%",
+                }}
+                suggestionsPanelStyle={{
+                  backgroundColor: "rgba(100,100,100,0.1)",
+                }}
+                loadingComponent={() => (
+                  <View
+                    style={{
+                      flex: 1,
+                      width: 200,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ActivityIndicator />
+                  </View>
+                )}
+                textInputMinHeight={30}
+                textInputMaxHeight={80}
+                trigger={"@"}
+                triggerLocation={"new-word-only"} // 'new-word-only', 'anywhere'
+                value={caption}
+                onChangeText={setCaption}
+                triggerCallback={callback.bind(this)}
+                renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+                suggestionsData={datas}
+                keyExtractor={(item, index) => item.name}
+                suggestionRowHeight={45}
+                horizontal={false}
+                MaxVisibleRowCount={3}
               />
             </View>
 
@@ -574,6 +658,45 @@ function ViewRoom(props) {
             </View>
           </View>
         </Modal>
+      </View>
+      <View
+        style={{ height: 300, justifyContent: "flex-end", paddingTop: 100 }}
+      >
+        <MentionsTextInput
+        textInputStyle={{
+          borderColor: "#ebebeb",
+          borderWidth: 1,
+          padding: 5,
+          fontSize: 15,
+          width: "100%",
+        }}
+        suggestionsPanelStyle={{ backgroundColor: "rgba(100,100,100,0.1)" }}
+        loadingComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              width: 200,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator />
+          </View>
+        )}
+        textInputMinHeight={30}
+        textInputMaxHeight={80}
+        trigger={"@"}
+        triggerLocation={"new-word-only"} // 'new-word-only', 'anywhere'
+        value={caption}
+        onChangeText={setCaption}
+        triggerCallback={callback.bind(this)}
+        renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+        suggestionsData={datas}
+        keyExtractor={(item, index) => item.name}
+        suggestionRowHeight={45}
+        horizontal={false}
+        MaxVisibleRowCount={3}
+      />
       </View>
     </ScrollView>
   );
@@ -703,6 +826,40 @@ const styles = StyleSheet.create({
     fontSize: 15,
     justifyContent: "space-between",
     paddingTop: 8,
+  },
+
+  suggestionsRowContainer: {
+    flexDirection: "row",
+  },
+  userAvatarBox: {
+    width: 35,
+    paddingTop: 2,
+  },
+  userIconBox: {
+    height: 45,
+    width: 45,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#54c19c",
+  },
+  usernameInitials: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 14,
+  },
+  userDetailsBox: {
+    flex: 1,
+    justifyContent: "center",
+    paddingLeft: 10,
+    paddingRight: 15,
+  },
+  displayNameText: {
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  usernameText: {
+    fontSize: 12,
+    color: "rgba(0,0,0,0.6)",
   },
 });
 

@@ -13,6 +13,8 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
+import ImageView from "react-native-image-viewing";
+import * as ImagePicker from "expo-image-picker";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
@@ -22,11 +24,13 @@ import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
 import CommentCard from "../../component/commentCard";
 import { FAB, ListItem, BottomSheet } from "react-native-elements";
+import * as DocumentPicker from "expo-document-picker";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
   const { currentUser, options } = props;
   const [isModalVisible, setModalVisible] = useState(false);
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
   const [commentId, setCommentId] = useState(null);
@@ -42,6 +46,10 @@ function ViewDiscussion(props) {
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const [isVisible, setIsVisible] = useState(false);
   const [temporaryId, setTemporaryId] = useState(null);
+  const [image, setImage] = useState(null);
+  const [Doc, setDoc] = useState(null);
+  const [name, setName] = useState(null);
+  const [datatwo, setDataTwo] = useState(true);
 
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
@@ -97,6 +105,17 @@ function ViewDiscussion(props) {
   // props.navigation.setParams({ toggleReport: toggleReport })
   useEffect(() => {
     const { currentUser, comments } = props;
+
+    (async () => {
+      // const cameraStatus = await Camera.requestPermissionsAsync();
+      // setHasCameraPermission(cameraStatus.status === 'granted');
+
+      const galleryStatus =
+        await ImagePicker.requestCameraRollPermissionsAsync();
+      setHasGalleryPermission(galleryStatus.status === "granted");
+    })();
+
+
     if (currentUser.FavDiscussion !== null) {
       setUser(currentUser);
     }
@@ -233,6 +252,127 @@ function ViewDiscussion(props) {
       setData(57);
     }
   };
+
+  const pickDocument = async () => {
+    let result = await DocumentPicker.getDocumentAsync({});
+
+    if (!result.cancelled) {
+      setDoc(result.uri);
+      setName(result.name)
+    }
+    console.log(result)
+  };
+
+
+  const uploadDoc = async () => {
+
+    if(name.contains(".docx")){
+     const childPath = `doc/${1234}/${name}`;
+     console.log(childPath);
+    }else{
+     const childPath = `doc/${1234}/${Math.random().toString(36)}`;
+     console.log(childPath);
+    }
+     
+     const response = await fetch(Doc);
+     const blob = await response.blob();
+ 
+     const task = firebase.storage().ref().child(childPath).put(blob);
+ 
+     const taskProgress = (snapshot) => {
+       console.log(`transferred: ${snapshot.bytesTransferred}`);
+     };
+ 
+     const taskCompleted = () => {
+       task.snapshot.ref.getDownloadURL().then((snapshot) => {
+         savePostDoc(snapshot);
+       });
+     };
+ 
+     const taskError = (snapshot) => {
+       console.log(snapshot);
+     };
+ 
+     task.on("state_changed", taskProgress, taskError, taskCompleted);
+   };
+
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      // aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+      console.log(result.uri)
+    }
+  };
+
+
+  const uploadImage = async () => {
+
+
+    setModalVisible(!isModalVisible);
+    if (image != null) {
+      //const uri = props.route.params.image;
+      const childPath = `post/${
+        firebase.auth().currentUser.uid
+      }/${Math.random().toString(36)}`;
+      console.log(childPath);
+
+      const response = await fetch(image);
+      const blob = await response.blob();
+
+      const task = firebase.storage().ref().child(childPath).put(blob);
+
+      const taskProgress = (snapshot) => {
+        console.log(`transferred: ${snapshot.bytesTransferred}`);
+      };
+
+      const taskCompleted = () => {
+        task.snapshot.ref.getDownloadURL().then((snapshot) => {
+          savePostData(snapshot, title, description);
+          console.log("downloadUri" + snapshot);
+          setModalVisible(!isModalVisible);
+        });
+      };
+
+      const taskError = (snapshot) => {
+        console.log(snapshot);
+      };
+
+      task.on("state_changed", taskProgress, taskError, taskCompleted);
+    } else {
+      firebase
+        .firestore()
+        .collection("Discussion")
+        .add({
+          userId,
+          title,
+          faculty,
+          description,
+          postedBy: currentUser.name,
+          image: currentUser.image,
+          favBy: [],
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(function () {
+          setModalVisible(!isModalVisible);
+          props.navigation.popToTop();
+          console.log("Done");
+        });
+    }
+  };
+
+  if (hasGalleryPermission === false) {
+    return <View />;
+  }
+  if (hasGalleryPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
 
   const AddFavDiscussion = () => {
     const FD = user.FavDiscussion;
@@ -427,6 +567,11 @@ function ViewDiscussion(props) {
     setData(88);
   };
 
+
+  const downlaodDoc = () => {
+    console.log(36)
+  };
+
   return (
     <View style={styles.container}>
       <View
@@ -506,6 +651,7 @@ function ViewDiscussion(props) {
               firstUserId={item.userId}
               secondUserId={userId}
               delete={() => Delete(item.id)}
+              downlaodDoc={() => downlaodDoc()}
               editComment={() => EditComment(item.id)}
               numberOfReply={item.numberOfReply}
               onSelect={() =>
@@ -541,13 +687,33 @@ function ViewDiscussion(props) {
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <Modal isVisible={isModalVisible}>
           <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
+            <View style={styles.searchSection}>
               <TextInput
-                style={styles.input}
+               style={styles.input}
                 placeholder="Add comments here"
                 placeholderTextColor="#000"
                 multiline={true}
                 onChangeText={(newComment) => setNewComment(newComment)}
+              />
+              <Icon
+              style={styles.searchIcon}
+                name="attach-outline"
+                type="ionicon"
+                size={30}
+                color="#000"
+                onPress={() => {
+                  pickDocument();
+                }}
+              />
+              <Icon
+              style={styles.searchIcon}
+                name="image-outline"
+                type="ionicon"
+                size={30}
+                color="#000"
+                onPress={() => {
+                  pickImage();
+                }}
               />
             </View>
 
@@ -725,16 +891,25 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 18,
   },
-
-  input: {
-    height: 60,
+  searchSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
     borderColor: "#E3562A",
     borderWidth: 1,
-    backgroundColor: "#FFF",
-    width: 340,
     borderRadius: 12,
-    padding: 10,
-    fontFamily: "Poppins",
+    padding: 8,
+},
+  input: {
+    flex: 1,
+    paddingTop: 10,
+    paddingRight: 10,
+    paddingBottom: 10,
+    paddingLeft: 0,
+    backgroundColor: '#fff',
+    color: '#424242',
+    
   },
 
   title: {
