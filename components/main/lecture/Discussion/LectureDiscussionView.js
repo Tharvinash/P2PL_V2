@@ -12,7 +12,12 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
+//---------reusable component-----------//
 import Report from "../../component/report";
+import AddComment from "../../component/addComment";
+import EditCommentCom from "../../component/editComment";
+
+import { FAB, ListItem, BottomSheet } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
@@ -37,6 +42,8 @@ function LectureDiscussionView(props) {
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
   const [data, setData] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [temporaryId, setTemporaryId] = useState(null);
   const [editComment, setEditComment] = useState("");
   const [cu, setCu] = useState(currentUser);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
@@ -44,11 +51,27 @@ function LectureDiscussionView(props) {
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
 
+  const list = [
+    {
+      title: "Edit",
+      onPress: () => EditComment(temporaryId),
+    },
+    {
+      title: "Delete",
+      onPress: () => Delete(temporaryId),
+    },
+    {
+      title: "Cancel",
+      containerStyle: { backgroundColor: "red" },
+      titleStyle: { color: "white" },
+      onPress: () => setIsVisible(false),
+    },
+  ];
+
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", paddingRight: 15 }}>
-          
           <TouchableOpacity>
             <Icon
               name="alert-circle-outline"
@@ -106,6 +129,11 @@ function LectureDiscussionView(props) {
     setReportVisible(!isReportVisible);
   };
 
+  const toggleVisibility = (cid) => {
+    setIsVisible(true);
+    setTemporaryId(cid);
+  };
+
   useEffect(() => {
     const { currentUser, comments } = props;
     setUser(currentUser);
@@ -155,8 +183,7 @@ function LectureDiscussionView(props) {
 
   useFocusEffect(
     React.useCallback(() => {
-
-        firebase
+      firebase
         .firestore()
         .collection("Comment")
         .orderBy("creation", "asc")
@@ -169,7 +196,6 @@ function LectureDiscussionView(props) {
           });
           setComment(comment);
         });
-
     }, [])
   );
 
@@ -198,7 +224,7 @@ function LectureDiscussionView(props) {
           image: cu.image,
           likeBy: [],
           numOfLike: 0,
-          numberOfReply: 0
+          numberOfReply: 0,
         })
         .then(function () {
           setModalVisible(!isModalVisible);
@@ -359,7 +385,9 @@ function LectureDiscussionView(props) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      contentContainerStyle={{ flex: 1, margin: 10, marginBottom: 5 }}
+    >
       <Text style={styles.title}>{userPosts.title}</Text>
 
       {userPosts.downloadURL && (
@@ -392,7 +420,7 @@ function LectureDiscussionView(props) {
           item.discussionId === discussionId ? (
             <CommentCard
               picture={item.image}
-              status = {1}
+              status={1}
               verify={item.verify}
               postedBy={item.postedBy}
               creation={item.creation}
@@ -402,14 +430,15 @@ function LectureDiscussionView(props) {
               removeLike={() =>
                 removeLike(item.id, item.numOfLike, item.likeBy)
               }
+              xxx={() => toggleVisibility(item.id)}
               addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
               firstUserId={item.userId}
               secondUserId={userId}
               delete={() => Delete(item.id)}
               editComment={() => EditComment(item.id)}
               numberOfReply={item.numberOfReply}
-              removeVerifyComment = {() => removeVerifyComment(item.id)}
-              verifyComment = {() => verifyComment(item.id)}
+              removeVerifyComment={() => removeVerifyComment(item.id)}
+              verifyComment={() => verifyComment(item.id)}
               onSelect={() =>
                 props.navigation.navigate("Reply Discussion", {
                   cid: item.id,
@@ -422,56 +451,41 @@ function LectureDiscussionView(props) {
           ) : null
         }
       />
+
+      <BottomSheet
+        isVisible={isVisible}
+        containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+      >
+        {list.map((l, i) => (
+          <ListItem
+            key={i}
+            containerStyle={l.containerStyle}
+            onPress={l.onPress}
+          >
+            <ListItem.Content>
+              <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+        ))}
+      </BottomSheet>
+
+      <FAB
+        placement="right"
+        title="Add"
+        overlayColor="#000"
+        style={styles.floatButton}
+        onPress={toggleModal}
+        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
+      />
+
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
-          <Text style={styles.Ltext}>Add Comment</Text>
-        </TouchableOpacity>
-
         <Modal isVisible={isEditCommentModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                value={editComment}
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(editComment) => setEditComment(editComment)}
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => uploadUpdatedComment()}
-                >
-                  <Text style={styles.Ltext}>Update Comment</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={toggleEditComment}
-                >
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <EditCommentCom
+            editComment={editComment}
+            setEditComment={(editComment) => setEditComment(editComment)}
+            uploadUpdatedComment={() => uploadUpdatedComment()}
+            toggleEditComment={() => toggleEditComment()}
+          />
         </Modal>
 
         <Modal isVisible={isReportVisible}>
@@ -483,8 +497,8 @@ function LectureDiscussionView(props) {
               data={newOption}
               renderItem={({ item }) => (
                 <Report
-                Option = {item.Option}
-                sendReport ={()=>sendReport(item.Option)}
+                  Option={item.Option}
+                  sendReport={() => sendReport(item.Option)}
                 />
               )}
             />
@@ -497,47 +511,13 @@ function LectureDiscussionView(props) {
         </Modal>
 
         <Modal isVisible={isModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                placeholder="Add comments here"
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(newComment) => setNewComment(newComment)}
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => UploadComment()}
-                >
-                  <Text style={styles.Ltext}>Add Comment</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <AddComment
+            setNewComment={(newComment) => setNewComment(newComment)}
+            pickDocument={() => pickDocument()}
+            pickImage={() => pickImage()}
+            UploadComment={() => UploadComment()}
+            toggleModal={() => toggleModal()}
+          />
         </Modal>
       </View>
     </ScrollView>
