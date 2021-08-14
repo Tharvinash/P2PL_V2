@@ -13,7 +13,12 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import ImageView from "react-native-image-viewing";
+//---------reusable component-----------//
+import Report from "../../component/report";
+import AddComment from "../../component/addComment";
+import EditCommentCom from "../../component/editComment";
+
+//----------------------------------------------
 import * as ImagePicker from "expo-image-picker";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
@@ -114,7 +119,6 @@ function ViewDiscussion(props) {
         await ImagePicker.requestCameraRollPermissionsAsync();
       setHasGalleryPermission(galleryStatus.status === "granted");
     })();
-
 
     if (currentUser.FavDiscussion !== null) {
       setUser(currentUser);
@@ -258,44 +262,41 @@ function ViewDiscussion(props) {
 
     if (!result.cancelled) {
       setDoc(result.uri);
-      setName(result.name)
+      setName(result.name);
     }
-    console.log(result)
+    console.log(result);
   };
 
-
   const uploadDoc = async () => {
-
-    if(name.contains(".docx")){
-     const childPath = `doc/${1234}/${name}`;
-     console.log(childPath);
-    }else{
-     const childPath = `doc/${1234}/${Math.random().toString(36)}`;
-     console.log(childPath);
+    if (name.contains(".docx")) {
+      const childPath = `doc/${1234}/${name}`;
+      console.log(childPath);
+    } else {
+      const childPath = `doc/${1234}/${Math.random().toString(36)}`;
+      console.log(childPath);
     }
-     
-     const response = await fetch(Doc);
-     const blob = await response.blob();
- 
-     const task = firebase.storage().ref().child(childPath).put(blob);
- 
-     const taskProgress = (snapshot) => {
-       console.log(`transferred: ${snapshot.bytesTransferred}`);
-     };
- 
-     const taskCompleted = () => {
-       task.snapshot.ref.getDownloadURL().then((snapshot) => {
-         savePostDoc(snapshot);
-       });
-     };
- 
-     const taskError = (snapshot) => {
-       console.log(snapshot);
-     };
- 
-     task.on("state_changed", taskProgress, taskError, taskCompleted);
-   };
 
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        savePostDoc(snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -307,14 +308,11 @@ function ViewDiscussion(props) {
 
     if (!result.cancelled) {
       setImage(result.uri);
-      console.log(result.uri)
+      console.log(result.uri);
     }
   };
 
-
   const uploadImage = async () => {
-
-
     setModalVisible(!isModalVisible);
     if (image != null) {
       //const uri = props.route.params.image;
@@ -567,13 +565,14 @@ function ViewDiscussion(props) {
     setData(88);
   };
 
-
   const downlaodDoc = () => {
-    console.log(36)
+    console.log(36);
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={{ flex: 1, margin: 10, marginBottom: 5 }}
+    >
       <View
         style={{
           flexDirection: "row",
@@ -686,114 +685,22 @@ function ViewDiscussion(props) {
 
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <Modal isVisible={isModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={styles.searchSection}>
-              <TextInput
-               style={styles.input}
-                placeholder="Add comments here"
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(newComment) => setNewComment(newComment)}
-              />
-              <Icon
-              style={styles.searchIcon}
-                name="attach-outline"
-                type="ionicon"
-                size={30}
-                color="#000"
-                onPress={() => {
-                  pickDocument();
-                }}
-              />
-              <Icon
-              style={styles.searchIcon}
-                name="image-outline"
-                type="ionicon"
-                size={30}
-                color="#000"
-                onPress={() => {
-                  pickImage();
-                }}
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => UploadComment()}
-                >
-                  <Text style={styles.Ltext}>Add Comment</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <AddComment
+            setNewComment={(newComment) => setNewComment(newComment)}
+            pickDocument={() => pickDocument()}
+            pickImage={() => pickImage()}
+            UploadComment={() => UploadComment()}
+            toggleModal={() => toggleModal()}
+          />
         </Modal>
 
         <Modal isVisible={isEditCommentModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                value={editComment}
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(editComment) => setEditComment(editComment)}
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => uploadUpdatedComment()}
-                >
-                  <Text style={styles.Ltext}>Update Comment</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={toggleEditComment}
-                >
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <EditCommentCom
+            editComment={editComment}
+            setEditComment={(editComment) => setEditComment(editComment)}
+            uploadUpdatedComment={() => uploadUpdatedComment()}
+            toggleEditComment={() => toggleEditComment()}
+          />
         </Modal>
 
         <Modal isVisible={isReportVisible}>
@@ -804,16 +711,10 @@ function ViewDiscussion(props) {
               extraData={newOption}
               data={newOption}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() => sendReport(item.Option)}
-                >
-                  <View style={styles.card}>
-                    <View style={styles.cardContent}>
-                      <Text style={styles.titlex}>{item.Option}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+                <Report
+                  Option={item.Option}
+                  sendReport={() => sendReport(item.Option)}
+                />
               )}
             />
           </View>
@@ -832,7 +733,7 @@ function ViewDiscussion(props) {
         onPress={toggleModal}
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -892,24 +793,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 18,
   },
   searchSection: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
     borderColor: "#E3562A",
     borderWidth: 1,
     borderRadius: 12,
     padding: 8,
-},
+  },
   input: {
     flex: 1,
     paddingTop: 10,
     paddingRight: 10,
     paddingBottom: 10,
     paddingLeft: 0,
-    backgroundColor: '#fff',
-    color: '#424242',
-    
+    backgroundColor: "#fff",
+    color: "#424242",
   },
 
   title: {

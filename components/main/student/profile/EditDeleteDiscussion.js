@@ -17,6 +17,11 @@ import {
   TextInput,
   Dimensions,
 } from "react-native";
+
+//---------reusable component-----------//
+import AddComment from "../../component/addComment";
+import EditCommentCom from "../../component/editComment";
+
 import { connect } from "react-redux";
 import { Icon } from "react-native-elements";
 import firebase from "firebase";
@@ -24,6 +29,10 @@ import { timeDifference } from "../../../utils";
 import Modal from "react-native-modal";
 import Images from "react-native-scalable-image";
 import CommentCard from "../../component/commentCard";
+
+import * as ImagePicker from "expo-image-picker";
+import { FAB, ListItem, BottomSheet } from "react-native-elements";
+import * as DocumentPicker from "expo-document-picker";
 
 require("firebase/firestore");
 import { useFocusEffect } from "@react-navigation/native";
@@ -39,9 +48,27 @@ function EditDeleteDiscussion(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [editComment, setEditComment] = useState("");
   const [commentId, setCommentId] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [temporaryId, setTemporaryId] = useState(null);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
 
+  const list = [
+    {
+      title: "Edit",
+      onPress: () => EditComment(temporaryId),
+    },
+    {
+      title: "Delete",
+      onPress: () => Delete(temporaryId),
+    },
+    {
+      title: "Cancel",
+      containerStyle: { backgroundColor: "red" },
+      titleStyle: { color: "white" },
+      onPress: () => setIsVisible(false),
+    },
+  ];
 
   const discussionId = props.route.params.did;
   // console.log(discussionId)
@@ -141,12 +168,16 @@ function EditDeleteDiscussion(props) {
   const EditDiscussion = () => {
     props.navigation.navigate("Edit Discussion", {
       did: discussionId,
-    })
+    });
   };
-
 
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
+  };
+
+  const toggleVisibility = (cid) => {
+    setIsVisible(true);
+    setTemporaryId(cid);
   };
 
   const Delete = () => {
@@ -252,7 +283,7 @@ function EditDeleteDiscussion(props) {
         likeBy: [],
         numOfLike: 0,
         image: user.image,
-        numberOfReply:0
+        numberOfReply: 0,
       })
       .then(function () {
         setModalVisible(!isModalVisible);
@@ -274,7 +305,9 @@ function EditDeleteDiscussion(props) {
   };
 
   return (
-    <ScrollView>
+    <ScrollView
+    contentContainerStyle={{ flex: 1}}
+    >
       <View style={styles.container}>
         <View style={{ flexDirection: "row" }}>
           <Text style={styles.title}>{userPosts.title}</Text>
@@ -308,7 +341,7 @@ function EditDeleteDiscussion(props) {
             item.discussionId === discussionId ? (
               <CommentCard
                 picture={item.image}
-                status = {0}
+                status={0}
                 verify={item.verify}
                 postedBy={item.postedBy}
                 creation={item.creation}
@@ -318,6 +351,7 @@ function EditDeleteDiscussion(props) {
                 removeLike={() =>
                   removeLike(item.id, item.numOfLike, item.likeBy)
                 }
+                xxx={() => toggleVisibility(item.id)}
                 addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
                 firstUserId={item.userId}
                 secondUserId={userId}
@@ -336,11 +370,34 @@ function EditDeleteDiscussion(props) {
             ) : null
           }
         />
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
-          <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
-            <Text style={styles.Ltext}>Add Comment</Text>
-          </TouchableOpacity>
 
+        <BottomSheet
+          isVisible={isVisible}
+          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+        >
+          {list.map((l, i) => (
+            <ListItem
+              key={i}
+              containerStyle={l.containerStyle}
+              onPress={l.onPress}
+            >
+              <ListItem.Content>
+                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          ))}
+        </BottomSheet>
+
+        <FAB
+        placement="right"
+        title="Add"
+        overlayColor="#000"
+        style={styles.floatButton}
+        onPress={toggleModal}
+        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
+      />
+
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
           <Modal isVisible={isModalVisible}>
             <View style={{ justifyContent: "center" }}>
               <View style={{ marginLeft: 8 }}>
@@ -388,50 +445,12 @@ function EditDeleteDiscussion(props) {
             </View>
           </Modal>
           <Modal isVisible={isEditCommentModalVisible}>
-            <View style={{ justifyContent: "center" }}>
-              <View style={{ marginLeft: 8 }}>
-                <TextInput
-                  style={styles.input}
-                  value={editComment}
-                  placeholderTextColor="#000"
-                  multiline={true}
-                  onChangeText={(editComment) => setEditComment(editComment)}
-                />
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignContent: "space-between",
-                }}
-              >
-                <View
-                  style={{
-                    paddingHorizontal: 20,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={styles.blogout}
-                    onPress={() => uploadUpdatedComment()}
-                  >
-                    <Text style={styles.Ltext}>Update Comment</Text>
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    paddingHorizontal: 20,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={styles.blogout}
-                    onPress={toggleEditComment}
-                  >
-                    <Text style={styles.Ltext}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
+            <EditCommentCom
+              editComment={editComment}
+              setEditComment={(editComment) => setEditComment(editComment)}
+              uploadUpdatedComment={() => uploadUpdatedComment()}
+              toggleEditComment={() => toggleEditComment()}
+            />
           </Modal>
         </View>
       </View>

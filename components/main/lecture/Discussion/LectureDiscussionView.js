@@ -12,6 +12,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
+import Report from "../../component/report";
 import { useFocusEffect } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
@@ -481,16 +482,10 @@ function LectureDiscussionView(props) {
               extraData={newOption}
               data={newOption}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() => sendReport(item.Option)}
-                >
-                  <View style={styles.card}>
-                    <View style={styles.cardContent}>
-                      <Text style={styles.titlex}>{item.Option}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+                <Report
+                Option = {item.Option}
+                sendReport ={()=>sendReport(item.Option)}
+                />
               )}
             />
           </View>

@@ -13,11 +13,12 @@ import {
 import MentionsTextInput from "react-native-mentions";
 import ParsedText from 'react-native-parsed-text';
 import firebase from "firebase";
+import { ScrollView } from "react-native-gesture-handler";
 require("firebase/firestore");
 require("firebase/firebase-storage");
 
 export default function FavDiscussion(props) {
-  const [datas, setDatas] = useState("");
+  const [data, setData] = useState("");
   const [keyword, setKeyword] = useState("");
   const [caption, setCaption] = useState("");
 
@@ -68,16 +69,20 @@ export default function FavDiscussion(props) {
       .get()
       .then((snapshot) => {
         let result = snapshot.docs.map((doc) => {
-          const datas = doc.data();
+          const data = doc.data();
           const id = doc.id;
-          return { id, ...datas };
+          return { id, ...data };
         });
-        setDatas(result);
+        setData(result);
       });
   };
 
   return (
-    <View>
+    <ScrollView contentContainerStyle={{ justifyContent:"flex-end", flex: 1 }}>
+      <View style={{justifyContent:"flex-start"}}>
+      <Text>jhbuyg</Text>
+      </View>
+
       <MentionsTextInput
         textInputStyle={{
           borderColor: "#ebebeb",
@@ -107,7 +112,7 @@ export default function FavDiscussion(props) {
         onChangeText={setCaption}
         triggerCallback={callback.bind(this)}
         renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-        suggestionsData={datas}
+        suggestionsData={data}
         keyExtractor={(item, index) => item.name}
         suggestionRowHeight={45}
         horizontal={false}
@@ -117,14 +122,14 @@ export default function FavDiscussion(props) {
       <TouchableOpacity onPress={()=>xxx()}>
         <Text>see result</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     height: 300,
-    justifyContent: "flex-end",
+    justifyContent: "center",
     paddingTop: 100,
   },
   suggestionsRowContainer: {
@@ -161,4 +166,3 @@ const styles = StyleSheet.create({
     color: "rgba(0,0,0,0.6)",
   },
 });
- 
