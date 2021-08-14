@@ -51,10 +51,11 @@ function ViewDiscussion(props) {
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const [isVisible, setIsVisible] = useState(false);
   const [temporaryId, setTemporaryId] = useState(null);
-  const [image, setImage] = useState(null);
-  const [Doc, setDoc] = useState(null);
+  const [image, setImage] = useState(null); //save local uri
+  const [Doc, setDoc] = useState(null); //save local uri
   const [name, setName] = useState(null);
-  const [datatwo, setDataTwo] = useState(true);
+  const [imageURI, setImageURI] = useState(null);
+  const [docURI, setDocURI] = useState(null);
 
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
@@ -110,7 +111,8 @@ function ViewDiscussion(props) {
   // props.navigation.setParams({ toggleReport: toggleReport })
   useEffect(() => {
     const { currentUser, comments } = props;
-
+    setDoc(null);
+    setImage(null);
     (async () => {
       // const cameraStatus = await Camera.requestPermissionsAsync();
       // setHasCameraPermission(cameraStatus.status === 'granted');
@@ -231,7 +233,7 @@ function ViewDiscussion(props) {
     setTemporaryId(cid);
   };
 
-  const UploadComment = () => {
+  const finalCommentUpload = (doc, img) => {
     if (!newComment.trim()) {
       alert("Please Enter Comment");
       return;
@@ -249,6 +251,8 @@ function ViewDiscussion(props) {
           likeBy: [],
           numOfLike: 0,
           numberOfReply: 0,
+          attachedDocument: doc,
+          attachedImage: img,
         })
         .then(function () {
           setModalVisible(!isModalVisible);
@@ -257,45 +261,31 @@ function ViewDiscussion(props) {
     }
   };
 
+  const UploadComment = () => {
+    if (image == null && Doc == null) {
+      finalCommentUpload();
+    }
+
+    if (image != null && Doc != null) {
+      uploadDocV2();
+    }
+
+    if (image == null && Doc != null) {
+      uploadDoc();
+    }
+
+    if (image != null && Doc == null) {
+      uploadImage();
+    }
+  };
+
   const pickDocument = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
-
     if (!result.cancelled) {
       setDoc(result.uri);
       setName(result.name);
+      console.log(result.name);
     }
-    console.log(result);
-  };
-
-  const uploadDoc = async () => {
-    if (name.contains(".docx")) {
-      const childPath = `doc/${1234}/${name}`;
-      console.log(childPath);
-    } else {
-      const childPath = `doc/${1234}/${Math.random().toString(36)}`;
-      console.log(childPath);
-    }
-
-    const response = await fetch(Doc);
-    const blob = await response.blob();
-
-    const task = firebase.storage().ref().child(childPath).put(blob);
-
-    const taskProgress = (snapshot) => {
-      console.log(`transferred: ${snapshot.bytesTransferred}`);
-    };
-
-    const taskCompleted = () => {
-      task.snapshot.ref.getDownloadURL().then((snapshot) => {
-        savePostDoc(snapshot);
-      });
-    };
-
-    const taskError = (snapshot) => {
-      console.log(snapshot);
-    };
-
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
   };
 
   const pickImage = async () => {
@@ -308,61 +298,117 @@ function ViewDiscussion(props) {
 
     if (!result.cancelled) {
       setImage(result.uri);
-      console.log(result.uri);
     }
   };
 
+  const uploadDoc = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(snapshot, null);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
   const uploadImage = async () => {
-    setModalVisible(!isModalVisible);
-    if (image != null) {
-      //const uri = props.route.params.image;
-      const childPath = `post/${
-        firebase.auth().currentUser.uid
-      }/${Math.random().toString(36)}`;
-      console.log(childPath);
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
 
-      const response = await fetch(image);
-      const blob = await response.blob();
+    const response = await fetch(image);
+    const blob = await response.blob();
 
-      const task = firebase.storage().ref().child(childPath).put(blob);
+    const task = firebase.storage().ref().child(childPath).put(blob);
 
-      const taskProgress = (snapshot) => {
-        console.log(`transferred: ${snapshot.bytesTransferred}`);
-      };
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
 
-      const taskCompleted = () => {
-        task.snapshot.ref.getDownloadURL().then((snapshot) => {
-          savePostData(snapshot, title, description);
-          console.log("downloadUri" + snapshot);
-          setModalVisible(!isModalVisible);
-        });
-      };
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(null, snapshot);
+      });
+    };
 
-      const taskError = (snapshot) => {
-        console.log(snapshot);
-      };
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
 
-      task.on("state_changed", taskProgress, taskError, taskCompleted);
-    } else {
-      firebase
-        .firestore()
-        .collection("Discussion")
-        .add({
-          userId,
-          title,
-          faculty,
-          description,
-          postedBy: currentUser.name,
-          image: currentUser.image,
-          favBy: [],
-          creation: firebase.firestore.FieldValue.serverTimestamp(),
-        })
-        .then(function () {
-          setModalVisible(!isModalVisible);
-          props.navigation.popToTop();
-          console.log("Done");
-        });
-    }
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV2 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        uploadImageV2(snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV2 = async (docSnapshot) => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(docSnapshot, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
   };
 
   if (hasGalleryPermission === false) {
@@ -570,7 +616,7 @@ function ViewDiscussion(props) {
   };
 
   return (
-    <View style={{flex:1}}>
+    <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ margin: 10, marginBottom: 5 }}>
         <View
           style={{
@@ -639,6 +685,8 @@ function ViewDiscussion(props) {
                 postedBy={item.postedBy}
                 creation={item.creation}
                 comment={item.comment}
+                attachedDocument = {item.attachedDocument}
+                attachedImage ={item.attachedImage}
                 numOfLike={item.numOfLike}
                 likeBy={item.likeBy.includes(userId)}
                 removeLike={() =>

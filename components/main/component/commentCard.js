@@ -161,47 +161,51 @@ const commentCard = (props) => {
                   {props.comment}
                 </ParsedText>
               </View>
-              <View style={styles.attachment}>
-                <TouchableOpacity
-                  style={styles.icon}
-                  onPress={() => setData(true)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Poppins",
-                    }}
+              {props.attachedImage != null ? (
+                <View style={styles.attachment}>
+                  <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setData(true)}
                   >
-                    Image
-                  </Text>
-                  <Icon
-                    name="download-outline"
-                    type="ionicon"
-                    size={25}
-                    color="#000"
-                  />
-                </TouchableOpacity>
-              </View>
+                    <Text
+                      style={{
+                        fontFamily: "Poppins",
+                      }}
+                    >
+                      Image
+                    </Text>
+                    <Icon
+                      name="download-outline"
+                      type="ionicon"
+                      size={25}
+                      color="#000"
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : null}
 
-              <View style={styles.attachment}>
-                <TouchableOpacity
-                  style={styles.icon}
-                  onPress={() => setWeb(true)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Poppins",
-                    }}
+              {props.attachedDocument != null ? (
+                <View style={styles.attachment}>
+                  <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setWeb(true)}
                   >
-                    Doc
-                  </Text>
-                  <Icon
-                    name="download-outline"
-                    type="ionicon"
-                    size={25}
-                    color="#000"
-                  />
-                </TouchableOpacity>
-              </View>
+                    <Text
+                      style={{
+                        fontFamily: "Poppins",
+                      }}
+                    >
+                      Doc
+                    </Text>
+                    <Icon
+                      name="download-outline"
+                      type="ionicon"
+                      size={25}
+                      color="#000"
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : null}
               <View style={{ flexDirection: "row" }}>
                 <Text
                   style={{
@@ -309,47 +313,52 @@ const commentCard = (props) => {
                   {props.comment}
                 </ParsedText>
               </View>
-              <View style={styles.attachment}>
-                <TouchableOpacity
-                  style={styles.icon}
-                  onPress={() => setData(true)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Poppins",
-                    }}
+              {props.attachedImage != null ? (
+                <View style={styles.attachment}>
+                  <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setData(true)}
                   >
-                    Image
-                  </Text>
-                  <Icon
-                    name="download-outline"
-                    type="ionicon"
-                    size={25}
-                    color="#000"
-                  />
-                </TouchableOpacity>
-              </View>
+                    <Text
+                      style={{
+                        fontFamily: "Poppins",
+                      }}
+                    >
+                      Image
+                    </Text>
+                    <Icon
+                      name="download-outline"
+                      type="ionicon"
+                      size={25}
+                      color="#000"
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : null}
 
-              <View style={styles.attachment}>
-                <TouchableOpacity
-                  style={styles.icon}
-                  onPress={() => setWeb(true)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Poppins",
-                    }}
+              {props.attachedDocument != null ? (
+                <View style={styles.attachment}>
+                  <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setWeb(true)}
                   >
-                    Doc
-                  </Text>
-                  <Icon
-                    name="download-outline"
-                    type="ionicon"
-                    size={25}
-                    color="#000"
-                  />
-                </TouchableOpacity>
-              </View>
+                    <Text
+                      style={{
+                        fontFamily: "Poppins",
+                      }}
+                    >
+                      Doc
+                    </Text>
+                    <Icon
+                      name="download-outline"
+                      type="ionicon"
+                      size={25}
+                      color="#000"
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+
               <View style={{ flexDirection: "row" }}>
                 <Text
                   style={{
