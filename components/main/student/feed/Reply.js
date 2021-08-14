@@ -17,6 +17,13 @@ require("firebase/firestore");
 import { Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/native";
 import { timeDifference } from "../../../utils";
+import ImageView from "react-native-image-viewing";
+import { WebView } from "react-native-webview";
+import ParsedText from "react-native-parsed-text";
+import * as Linking from "expo-linking";
+import AddComment from "../../component/addComment";
+import EditCommentCom from "../../component/editComment";
+import { ListItem, BottomSheet } from "react-native-elements";
 
 function Reply(props) {
   const { currentUser } = props;
@@ -35,6 +42,10 @@ function Reply(props) {
   const [newReply, setNewReply] = useState("");
   const [replyComment, setReplyComment] = useState([]);
   const [likeBy, setLikeBy] = useState(props.route.params.xxx);
+  const [isVisible, setIsVisible] = useState(false);
+  const [temporaryId, setTemporaryId] = useState(null);
+  const [isVisibleV2, setIsVisibleV2] = useState(false);
+  const [temporaryIdSubComment, setTemporaryIdSubComment] = useState(null);
   const [mainCommentAuthorName, setMainCommentAuthorName] = useState(
     props.route.params.mainCommentAuthorName
   );
@@ -50,6 +61,74 @@ function Reply(props) {
 
   const userId = firebase.auth().currentUser.uid;
   const time = props.route.params.time;
+
+  const list = [
+    {
+      title: "Edit",
+      onPress: () => EditComment(temporaryId),
+    },
+    {
+      title: "Delete",
+      onPress: () => Delete(temporaryId),
+    },
+    {
+      title: "Cancel",
+      containerStyle: { backgroundColor: "red" },
+      titleStyle: { color: "white" },
+      onPress: () => setIsVisible(false),
+    },
+  ];
+
+  const listV2 = [
+    {
+      title: "Edit",
+      onPress: () => EditReplyComment(temporaryId),
+    },
+    {
+      title: "Delete",
+      onPress: () => DeleteReplyComment(temporaryId),
+    },
+    {
+      title: "Cancel",
+      containerStyle: { backgroundColor: "red" },
+      titleStyle: { color: "white" },
+      onPress: () => setIsVisibleV2(false),
+    },
+  ];
+
+  const handleUrlPress = (url, matchIndex /*: number*/) => {
+    Linking.openURL(url);
+  };
+
+  const handlePhonePress = (phone, matchIndex /*: number*/) => {
+    Alert.alert(`${phone} has been pressed!`);
+  };
+
+  const handleNamePress = (name, matchIndex /*: number*/) => {
+    Alert.alert(`Hello ${name}`);
+  };
+
+  const handleEmailPress = (email, matchIndex /*: number*/) => {
+    Alert.alert(`send email to ${email}`);
+  };
+
+  const toggleVisibility = (cid) => {
+    setIsVisible(true);
+    setTemporaryId(cid);
+  };
+
+  const toggleVisibilityV2 = (cid) => {
+    setIsVisibleV2(true);
+    setTemporaryId(cid);
+  };
+
+  const renderText = (matchingString, matches) => {
+    // matches => ["[@michel:5455345]", "@michel", "5455345"]
+    let pattern = /\[(@[^:]+):([^\]]+)\]/i;
+    let match = matchingString.match(pattern);
+    console.log(24);
+    return `^^${match[1]}^^`;
+  };
 
   useEffect(() => {
     firebase
@@ -540,100 +619,212 @@ function Reply(props) {
                 ) : null}
               </View>
             </View>
-            <View style={styles.commentCon}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
+            {mainComment.userId === userId ? (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.mainBubble}
+                onLongPress={() => toggleVisibility(mainComment.id)}
+                delayLongPress={500}
               >
-                <Text style={styles.userT}>{mainComment.postedBy} </Text>
-                {mainComment.creation === null ? (
-                  <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
-                ) : (
-                  <Text style={(styles.userC, { marginRight: 20 })}>
-                    {time}
-                  </Text>
-                )}
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={styles.userC}>{mainComment.comment}</Text>
-              </View>
-
-              <View style={{ flexDirection: "row" }}>
-                <Text
+                <View
                   style={{
-                    fontSize: 15,
-                    marginRight: 3,
-                    fontFamily: "Poppins",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
                   }}
                 >
-                  {mainComment.numOfLike}
-                </Text>
-                {likeBy ? (
-                  <Icon
-                    style={{
-                      paddingLeft: 10,
-                    }}
-                    name="heart"
-                    type="ionicon"
-                    size={20}
-                    color="#000"
-                    onPress={() => removeLike(mainComment.numOfLike)}
-                  />
-                ) : (
-                  <Icon
-                    style={{
-                      paddingLeft: 10,
-                    }}
-                    name="heart-outline"
-                    type="ionicon"
-                    size={20}
-                    color="#000"
-                    onPress={() => addLike(mainComment.numOfLike)}
-                  />
-                )}
-                {mainComment.userId === userId ? (
-                  <View style={{ flexDirection: "row" }}>
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="trash-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() => Delete(mainComment.id)}
-                    />
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="create-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() => EditComment(mainComment.id)}
-                    />
-                  </View>
-                ) : null}
-                <Icon
+                  <Text style={styles.userT}>{mainComment.postedBy} </Text>
+                  {mainComment.creation === null ? (
+                    <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
+                  ) : (
+                    <Text style={(styles.userC, { marginRight: 20 })}>
+                      {time}
+                    </Text>
+                  )}
+                </View>
+                <View
                   style={{
-                    paddingLeft: 10,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
                   }}
-                  name="arrow-redo-outline"
-                  type="ionicon"
-                  size={20}
-                  color="#000"
-                  onPress={() => toggleReplyComment()}
-                />
+                >
+                  <ParsedText
+                    style={styles.userC}
+                    parse={[
+                      {
+                        type: "url",
+                        style: styles.url,
+                        onPress: handleUrlPress,
+                      },
+                      {
+                        type: "phone",
+                        style: styles.phone,
+                        onPress: handlePhonePress,
+                      },
+                      {
+                        type: "email",
+                        style: styles.email,
+                        onPress: handleEmailPress,
+                      },
+                      {
+                        pattern: /\[(@[^:]+):([^\]]+)\]/i,
+                        style: styles.username,
+                        onPress: handleNamePress,
+                        renderText: renderText,
+                      },
+                      { pattern: /#(\w+)/, style: styles.hashTag },
+                    ]}
+                    childrenProps={{ allowFontScaling: false }}
+                  >
+                    {mainComment.comment}
+                  </ParsedText>
+                </View>
+
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      marginRight: 3,
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    {mainComment.numOfLike}
+                  </Text>
+                  {likeBy ? (
+                    <Icon
+                      style={{
+                        paddingLeft: 10,
+                      }}
+                      name="heart"
+                      type="ionicon"
+                      size={20}
+                      color="#000"
+                      onPress={() => removeLike(mainComment.numOfLike)}
+                    />
+                  ) : (
+                    <Icon
+                      style={{
+                        paddingLeft: 10,
+                      }}
+                      name="heart-outline"
+                      type="ionicon"
+                      size={20}
+                      color="#000"
+                      onPress={() => addLike(mainComment.numOfLike)}
+                    />
+                  )}
+                  <Icon
+                    style={{
+                      paddingLeft: 10,
+                    }}
+                    name="arrow-redo-outline"
+                    type="ionicon"
+                    size={20}
+                    color="#000"
+                    onPress={() => toggleReplyComment()}
+                  />
+                </View>
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.mainBubble}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={styles.userT}>{mainComment.postedBy} </Text>
+                  {mainComment.creation === null ? (
+                    <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
+                  ) : (
+                    <Text style={(styles.userC, { marginRight: 20 })}>
+                      {time}
+                    </Text>
+                  )}
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <ParsedText
+                    style={styles.userC}
+                    parse={[
+                      {
+                        type: "url",
+                        style: styles.url,
+                        onPress: handleUrlPress,
+                      },
+                      {
+                        type: "phone",
+                        style: styles.phone,
+                        onPress: handlePhonePress,
+                      },
+                      {
+                        type: "email",
+                        style: styles.email,
+                        onPress: handleEmailPress,
+                      },
+                      {
+                        pattern: /\[(@[^:]+):([^\]]+)\]/i,
+                        style: styles.username,
+                        onPress: handleNamePress,
+                        renderText: renderText,
+                      },
+                      { pattern: /#(\w+)/, style: styles.hashTag },
+                    ]}
+                    childrenProps={{ allowFontScaling: false }}
+                  >
+                    {mainComment.comment}
+                  </ParsedText>
+                </View>
+
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      marginRight: 3,
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    {mainComment.numOfLike}
+                  </Text>
+                  {likeBy ? (
+                    <Icon
+                      style={{
+                        paddingLeft: 10,
+                      }}
+                      name="heart"
+                      type="ionicon"
+                      size={20}
+                      color="#000"
+                      onPress={() => removeLike(mainComment.numOfLike)}
+                    />
+                  ) : (
+                    <Icon
+                      style={{
+                        paddingLeft: 10,
+                      }}
+                      name="heart-outline"
+                      type="ionicon"
+                      size={20}
+                      color="#000"
+                      onPress={() => addLike(mainComment.numOfLike)}
+                    />
+                  )}
+                  <Icon
+                    style={{
+                      paddingLeft: 10,
+                    }}
+                    name="arrow-redo-outline"
+                    type="ionicon"
+                    size={20}
+                    color="#000"
+                    onPress={() => toggleReplyComment()}
+                  />
+                </View>
               </View>
-            </View>
+            )}
           </View>
         </View>
         {/* ------------------------------------  reply comment  ------------------------- */}
@@ -642,403 +833,456 @@ function Reply(props) {
             horizontal={false}
             extraData={replyComment}
             data={replyComment}
-            renderItem={({ item }) => (
-              <View>
-                <View style={{ flexDirection: "row" }}>
-                  <View>
-                    <Image
-                      style={{
-                        marginRight: 15,
-                        width: 28,
-                        height: 28,
-                        borderRadius: 28 / 2,
-                      }}
-                      source={{
-                        uri: item.image,
-                      }}
-                    />
+            renderItem={({ item }) =>
+              item.userId === userId ? (
+                <View>
+                  <View style={{ flexDirection: "row" }}>
+                    <View>
+                      <Image
+                        style={{
+                          marginRight: 15,
+                          width: 28,
+                          height: 28,
+                          borderRadius: 28 / 2,
+                        }}
+                        source={{
+                          uri: item.image,
+                        }}
+                      />
 
-                    <View
-                      style={{
-                        marginRight: 10,
-                        paddingTop: 10,
-                      }}
-                    >
-                      {loginCurrentUser.status == 1 ? (
-                        <View>
-                          {item.verify ? (
-                            <Icon
-                              name="checkmark-circle"
-                              type="ionicon"
-                              size={20}
-                              color="#140F38"
-                              onPress={() => removeVerifyReplyComment(item.id)}
-                            />
-                          ) : (
-                            <Icon
-                              name="checkmark-circle-outline"
-                              type="ionicon"
-                              size={20}
-                              color="#140F38"
-                              onPress={() => verifyReplyComment(item.id)}
-                            />
-                          )}
-                        </View>
-                      ) : null}
+                      <View
+                        style={{
+                          marginRight: 10,
+                          paddingTop: 10,
+                        }}
+                      >
+                        {loginCurrentUser.status == 1 ? (
+                          <View>
+                            {item.verify ? (
+                              <Icon
+                                name="checkmark-circle"
+                                type="ionicon"
+                                size={20}
+                                color="#140F38"
+                                onPress={() =>
+                                  removeVerifyReplyComment(item.id)
+                                }
+                              />
+                            ) : (
+                              <Icon
+                                name="checkmark-circle-outline"
+                                type="ionicon"
+                                size={20}
+                                color="#140F38"
+                                onPress={() => verifyReplyComment(item.id)}
+                              />
+                            )}
+                          </View>
+                        ) : null}
 
-                      {loginCurrentUser.status == 0 ? (
-                        <View>
-                          {item.verify ? (
-                            <Icon
-                              name="checkmark-circle"
-                              type="ionicon"
-                              size={20}
-                              color="#140F38"
-                            />
-                          ) : null}
-                        </View>
-                      ) : null}
+                        {loginCurrentUser.status == 0 ? (
+                          <View>
+                            {item.verify ? (
+                              <Icon
+                                name="checkmark-circle"
+                                type="ionicon"
+                                size={20}
+                                color="#140F38"
+                              />
+                            ) : null}
+                          </View>
+                        ) : null}
+                      </View>
                     </View>
-                  </View>
-                  <View style={styles.commentCon}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      style={styles.mainBubble}
+                      onLongPress={() => toggleVisibilityV2(item.id)}
+                      delayLongPress={500}
                     >
                       <View
                         style={{
                           flexDirection: "row",
+                          justifyContent: "space-between",
                         }}
                       >
-                        <Text style={styles.userT}>{item.postedBy} </Text>
-                        {item.mainCommentId !== mainCommentId &&
-                        item.repliedTo !== currentUserName ? (
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Icon
+                        <View
+                          style={{
+                            flexDirection: "row",
+                          }}
+                        >
+                          <Text style={styles.userT}>{item.postedBy} </Text>
+                          {item.mainCommentId !== mainCommentId &&
+                          item.repliedTo !== currentUserName ? (
+                            <View
                               style={{
-                                paddingTop: 4,
+                                flexDirection: "row",
                               }}
-                              name="caret-forward-outline"
-                              type="ionicon"
-                              size={13}
-                              color="#000"
-                            />
-                            <Text style={styles.userT}>{item.repliedTo} </Text>
+                            >
+                              <Icon
+                                style={{
+                                  paddingTop: 4,
+                                }}
+                                name="caret-forward-outline"
+                                type="ionicon"
+                                size={13}
+                                color="#000"
+                              />
+                              <Text style={styles.userT}>
+                                {item.repliedTo}{" "}
+                              </Text>
+                            </View>
+                          ) : null}
+                        </View>
+
+                        {item.creation === null ? (
+                          <Text style={(styles.userC, { marginRight: 20 })}>
+                            Now
+                          </Text>
+                        ) : (
+                          <Text
+                            style={
+                              (styles.userC,
+                              { marginRight: 20, paddingRight: 8 })
+                            }
+                          >
+                            {timeDifference(new Date(), item.creation.toDate())}
+                          </Text>
+                        )}
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          paddingRight: 8,
+                        }}
+                      >
+                        <Text style={styles.userC}>{item.comment}</Text>
+                      </View>
+
+                      <View style={{ flexDirection: "row" }}>
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            marginRight: 3,
+                            fontFamily: "Poppins",
+                          }}
+                        >
+                          {item.numOfLike}
+                        </Text>
+                        {item.likeBy.includes(userId) ? (
+                          <Icon
+                            style={{
+                              paddingLeft: 10,
+                            }}
+                            name="heart"
+                            type="ionicon"
+                            size={20}
+                            color="#000"
+                            onPress={() =>
+                              RemoveLikeToReplyComment(
+                                item.id,
+                                item.numOfLike,
+                                item.likeBy
+                              )
+                            }
+                          />
+                        ) : (
+                          <Icon
+                            style={{
+                              paddingLeft: 10,
+                            }}
+                            name="heart-outline"
+                            type="ionicon"
+                            size={20}
+                            color="#000"
+                            onPress={() =>
+                              AddLikeToReplyComment(
+                                item.id,
+                                item.numOfLike,
+                                item.likeBy
+                              )
+                            }
+                          />
+                        )}
+                        <Icon
+                          name="arrow-redo-outline"
+                          type="ionicon"
+                          size={20}
+                          color="#000"
+                          onPress={() =>
+                            toggleSubReplyComment(item.id, item.postedBy)
+                          }
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <View>
+                  <View style={{ flexDirection: "row" }}>
+                    <View>
+                      <Image
+                        style={{
+                          marginRight: 15,
+                          width: 28,
+                          height: 28,
+                          borderRadius: 28 / 2,
+                        }}
+                        source={{
+                          uri: item.image,
+                        }}
+                      />
+
+                      <View
+                        style={{
+                          marginRight: 10,
+                          paddingTop: 10,
+                        }}
+                      >
+                        {loginCurrentUser.status == 1 ? (
+                          <View>
+                            {item.verify ? (
+                              <Icon
+                                name="checkmark-circle"
+                                type="ionicon"
+                                size={20}
+                                color="#140F38"
+                                onPress={() =>
+                                  removeVerifyReplyComment(item.id)
+                                }
+                              />
+                            ) : (
+                              <Icon
+                                name="checkmark-circle-outline"
+                                type="ionicon"
+                                size={20}
+                                color="#140F38"
+                                onPress={() => verifyReplyComment(item.id)}
+                              />
+                            )}
+                          </View>
+                        ) : null}
+
+                        {loginCurrentUser.status == 0 ? (
+                          <View>
+                            {item.verify ? (
+                              <Icon
+                                name="checkmark-circle"
+                                type="ionicon"
+                                size={20}
+                                color="#140F38"
+                              />
+                            ) : null}
                           </View>
                         ) : null}
                       </View>
-
-                      {item.creation === null ? (
-                        <Text style={(styles.userC, { marginRight: 20 })}>
-                          Now
-                        </Text>
-                      ) : (
-                        <Text
-                          style={
-                            (styles.userC, { marginRight: 20, paddingRight: 8 })
-                          }
-                        >
-                          {timeDifference(new Date(), item.creation.toDate())}
-                        </Text>
-                      )}
                     </View>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        paddingRight: 8,
-                      }}
-                    >
-                      <Text style={styles.userC}>{item.comment}</Text>
-                    </View>
-
-                    <View style={{ flexDirection: "row" }}>
-                      <Text
+                    <View style={styles.mainBubble}>
+                      <View
                         style={{
-                          fontSize: 15,
-                          marginRight: 3,
-                          fontFamily: "Poppins",
+                          flexDirection: "row",
+                          justifyContent: "space-between",
                         }}
                       >
-                        {item.numOfLike}
-                      </Text>
-                      {item.likeBy.includes(userId) ? (
-                        <Icon
+                        <View
                           style={{
-                            paddingLeft: 10,
+                            flexDirection: "row",
                           }}
-                          name="heart"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() =>
-                            RemoveLikeToReplyComment(
-                              item.id,
-                              item.numOfLike,
-                              item.likeBy
-                            )
-                          }
-                        />
-                      ) : (
-                        <Icon
-                          style={{
-                            paddingLeft: 10,
-                          }}
-                          name="heart-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() =>
-                            AddLikeToReplyComment(
-                              item.id,
-                              item.numOfLike,
-                              item.likeBy
-                            )
-                          }
-                        />
-                      )}
-                      {item.userId === userId ? (
-                        <View style={{ flexDirection: "row" }}>
-                          <Icon
-                            style={{
-                              paddingLeft: 10,
-                            }}
-                            name="trash-outline"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() => DeleteReplyComment(item.id)}
-                          />
-                          <Icon
-                            style={{
-                              paddingLeft: 10,
-                            }}
-                            name="create-outline"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() => EditReplyComment(item.id)}
-                          />
+                        >
+                          <Text style={styles.userT}>{item.postedBy} </Text>
+                          {item.mainCommentId !== mainCommentId &&
+                          item.repliedTo !== currentUserName ? (
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Icon
+                                style={{
+                                  paddingTop: 4,
+                                }}
+                                name="caret-forward-outline"
+                                type="ionicon"
+                                size={13}
+                                color="#000"
+                              />
+                              <Text style={styles.userT}>
+                                {item.repliedTo}{" "}
+                              </Text>
+                            </View>
+                          ) : null}
                         </View>
-                      ) : null}
-                      <Icon
-                        name="arrow-redo-outline"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          toggleSubReplyComment(item.id, item.postedBy)
-                        }
-                      />
+
+                        {item.creation === null ? (
+                          <Text style={(styles.userC, { marginRight: 20 })}>
+                            Now
+                          </Text>
+                        ) : (
+                          <Text
+                            style={
+                              (styles.userC,
+                              { marginRight: 20, paddingRight: 8 })
+                            }
+                          >
+                            {timeDifference(new Date(), item.creation.toDate())}
+                          </Text>
+                        )}
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          paddingRight: 8,
+                        }}
+                      >
+                        <Text style={styles.userC}>{item.comment}</Text>
+                      </View>
+
+                      <View style={{ flexDirection: "row" }}>
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            marginRight: 3,
+                            fontFamily: "Poppins",
+                          }}
+                        >
+                          {item.numOfLike}
+                        </Text>
+                        {item.likeBy.includes(userId) ? (
+                          <Icon
+                            style={{
+                              paddingLeft: 10,
+                            }}
+                            name="heart"
+                            type="ionicon"
+                            size={20}
+                            color="#000"
+                            onPress={() =>
+                              RemoveLikeToReplyComment(
+                                item.id,
+                                item.numOfLike,
+                                item.likeBy
+                              )
+                            }
+                          />
+                        ) : (
+                          <Icon
+                            style={{
+                              paddingLeft: 10,
+                            }}
+                            name="heart-outline"
+                            type="ionicon"
+                            size={20}
+                            color="#000"
+                            onPress={() =>
+                              AddLikeToReplyComment(
+                                item.id,
+                                item.numOfLike,
+                                item.likeBy
+                              )
+                            }
+                          />
+                        )}
+                        <Icon
+                          name="arrow-redo-outline"
+                          type="ionicon"
+                          size={20}
+                          color="#000"
+                          onPress={() =>
+                            toggleSubReplyComment(item.id, item.postedBy)
+                          }
+                        />
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
-            )}
+              )
+            }
           />
         </View>
+        {/* BottomSheet for main comment */}
+        <BottomSheet
+          isVisible={isVisible}
+          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+        >
+          {list.map((l, i) => (
+            <ListItem
+              key={i}
+              containerStyle={l.containerStyle}
+              onPress={l.onPress}
+            >
+              <ListItem.Content>
+                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          ))}
+        </BottomSheet>
+
+        {/* BottomSheet for sub comment */}
+        <BottomSheet
+          isVisible={isVisibleV2}
+          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+        >
+          {listV2.map((l, i) => (
+            <ListItem
+              key={i}
+              containerStyle={l.containerStyle}
+              onPress={l.onPress}
+            >
+              <ListItem.Content>
+                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          ))}
+        </BottomSheet>
 
         {/* Edit Reply Modal */}
         <Modal isVisible={isEditCommentModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                value={editComment}
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(editComment) => setEditComment(editComment)}
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => uploadUpdatedComment()}
-                >
-                  <Text style={styles.Ltext}>Update Comment</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={toggleEditComment}
-                >
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <EditCommentCom
+            editComment={editComment}
+            setEditComment={(editComment) => setEditComment(editComment)}
+            uploadUpdatedComment={() => uploadUpdatedComment()}
+            toggleEditComment={() => toggleEditComment()}
+          />
         </Modal>
 
         {/* Reply Comment Modal */}
         <Modal isVisible={isReplyCommentModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                value={newReply}
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(newReply) => setNewReply(newReply)}
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => ReplyComment()}
-                >
-                  <Text style={styles.Ltext}>Reply Comment</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={toggleReplyComment}
-                >
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <AddComment
+            setNewComment={(newReply) => setNewReply(newReply)}
+            pickDocument={() => pickDocument()}
+            pickImage={() => pickImage()}
+            UploadComment={() => ReplyComment()}
+            toggleModal={() => toggleReplyComment()}
+          />
         </Modal>
 
         {/* Reply to Reply Comment Modal */}
 
         <Modal isVisible={isReplySubCommentModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                value={replyOfSubComment}
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(replyOfSubComment) =>
-                  setReplyOfSubComment(replyOfSubComment)
-                }
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => ReplySubComment()}
-                >
-                  <Text style={styles.Ltext}>Post Reply</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={toggleSubReplyComment}
-                >
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <AddComment
+            setNewComment={(replyOfSubComment) =>
+              setReplyOfSubComment(replyOfSubComment)
+            }
+            pickDocument={() => pickDocument()}
+            pickImage={() => pickImage()}
+            UploadComment={() => ReplySubComment()}
+            toggleModal={() => toggleSubReplyComment()}
+          />
         </Modal>
 
         {/* Edit Reply Comment */}
 
         <Modal isVisible={isEditReplyCommentModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                value={editReplyComment}
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(editReplyComment) =>
-                  setEditReplyComment(editReplyComment)
-                }
-              />
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => UploadEditSubComment()}
-                >
-                  <Text style={styles.Ltext}>Update Reply</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={toggleReplyEditComment}
-                >
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <EditCommentCom
+            editComment={editReplyComment}
+            setEditComment={(editReplyComment) =>
+              setEditReplyComment(editReplyComment)
+            }
+            uploadUpdatedComment={() => UploadEditSubComment()}
+            toggleEditComment={() => toggleReplyEditComment()}
+          />
         </Modal>
       </View>
     </ScrollView>
@@ -1053,6 +1297,16 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     // marginLeft: 20,
     // marginLeft:20
+  },
+
+  mainBubble: {
+    borderColor: "#E3562A",
+    borderBottomWidth: 5,
+    width: "87%",
+    padding: 5,
+    backgroundColor: "#D3D3D3",
+    borderRadius: 10,
+    marginBottom: 5,
   },
 
   titlex: {
@@ -1169,6 +1423,38 @@ const styles = StyleSheet.create({
     fontSize: 15,
     justifyContent: "space-between",
     paddingTop: 8,
+  },
+
+  url: {
+    color: "red",
+    textDecorationLine: "underline",
+  },
+
+  email: {
+    textDecorationLine: "underline",
+  },
+
+  text: {
+    color: "black",
+    fontSize: 15,
+  },
+
+  phone: {
+    color: "blue",
+    textDecorationLine: "underline",
+  },
+
+  name: {
+    color: "red",
+  },
+
+  username: {
+    color: "green",
+    fontWeight: "bold",
+  },
+
+  hashTag: {
+    fontStyle: "italic",
   },
 });
 
