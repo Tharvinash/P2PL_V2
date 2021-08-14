@@ -570,161 +570,161 @@ function ViewDiscussion(props) {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flex: 1, margin: 10, marginBottom: 5 }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          alignContent: "space-between",
-          paddingRight: 35,
-        }}
-      >
-        <View>
-          <Text style={styles.title}>{userPosts.title}</Text>
-        </View>
-
-        <View>
-          {user.FavDiscussion.includes(discussionId) ? (
-            <Icon
-              name="bookmark"
-              type="ionicon"
-              size={35}
-              Color="#000"
-              onPress={() => RemoveFavDiscussion()}
-            />
-          ) : (
-            <Icon
-              name="bookmark-outline"
-              type="ionicon"
-              size={35}
-              Color="#000"
-              onPress={() => AddFavDiscussion()}
-            />
-          )}
-        </View>
-      </View>
-
-      {userPosts.downloadURL && (
+    <View style={{flex:1}}>
+      <ScrollView contentContainerStyle={{ margin: 10, marginBottom: 5 }}>
         <View
           style={{
             flexDirection: "row",
-            paddingBottom: 10,
-            justifyContent: "center",
+            alignContent: "space-between",
+            paddingRight: 35,
           }}
         >
-          {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
-          <Images
-            width={Dimensions.get("window").width} // height will be calculated automatically
-            source={{ uri: userPosts.downloadURL }}
-          />
+          <View>
+            <Text style={styles.title}>{userPosts.title}</Text>
+          </View>
+
+          <View>
+            {user.FavDiscussion.includes(discussionId) ? (
+              <Icon
+                name="bookmark"
+                type="ionicon"
+                size={35}
+                Color="#000"
+                onPress={() => RemoveFavDiscussion()}
+              />
+            ) : (
+              <Icon
+                name="bookmark-outline"
+                type="ionicon"
+                size={35}
+                Color="#000"
+                onPress={() => AddFavDiscussion()}
+              />
+            )}
+          </View>
         </View>
-      )}
 
-      <View style={styles.desc}>
-        <Text style={styles.descT}>{userPosts.description}</Text>
-      </View>
-      <View style={{ paddingBottom: 10 }}>
-        <Text style={styles.comT}>Comments:</Text>
-      </View>
-      <FlatList
-        horizontal={false}
-        extraData={comment}
-        data={comment}
-        renderItem={({ item }) =>
-          item.discussionId === discussionId ? (
-            <CommentCard
-              picture={item.image}
-              status={0}
-              verify={item.verify}
-              postedBy={item.postedBy}
-              creation={item.creation}
-              comment={item.comment}
-              numOfLike={item.numOfLike}
-              likeBy={item.likeBy.includes(userId)}
-              removeLike={() =>
-                removeLike(item.id, item.numOfLike, item.likeBy)
-              }
-              xxx={() => toggleVisibility(item.id)}
-              addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
-              firstUserId={item.userId}
-              secondUserId={userId}
-              delete={() => Delete(item.id)}
-              downlaodDoc={() => downlaodDoc()}
-              editComment={() => EditComment(item.id)}
-              numberOfReply={item.numberOfReply}
-              onSelect={() =>
-                props.navigation.navigate("Reply Discussion", {
-                  cid: item.id,
-                  time: timeDifference(new Date(), item.creation.toDate()),
-                  xxx: item.likeBy.includes(userId),
-                  mainCommentAuthorName: item.postedBy,
-                })
-              }
-            />
-          ) : null
-        }
-      />
-
-      <BottomSheet
-        isVisible={isVisible}
-        containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-      >
-        {list.map((l, i) => (
-          <ListItem
-            key={i}
-            containerStyle={l.containerStyle}
-            onPress={l.onPress}
+        {userPosts.downloadURL && (
+          <View
+            style={{
+              flexDirection: "row",
+              paddingBottom: 10,
+              justifyContent: "center",
+            }}
           >
-            <ListItem.Content>
-              <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-            </ListItem.Content>
-          </ListItem>
-        ))}
-      </BottomSheet>
-
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <Modal isVisible={isModalVisible}>
-          <AddComment
-            setNewComment={(newComment) => setNewComment(newComment)}
-            pickDocument={() => pickDocument()}
-            pickImage={() => pickImage()}
-            UploadComment={() => UploadComment()}
-            toggleModal={() => toggleModal()}
-          />
-        </Modal>
-
-        <Modal isVisible={isEditCommentModalVisible}>
-          <EditCommentCom
-            editComment={editComment}
-            setEditComment={(editComment) => setEditComment(editComment)}
-            uploadUpdatedComment={() => uploadUpdatedComment()}
-            toggleEditComment={() => toggleEditComment()}
-          />
-        </Modal>
-
-        <Modal isVisible={isReportVisible}>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text style={styles.titley}>Why are you reporting this post</Text>
-            <FlatList
-              horizontal={false}
-              extraData={newOption}
-              data={newOption}
-              renderItem={({ item }) => (
-                <Report
-                  Option={item.Option}
-                  sendReport={() => sendReport(item.Option)}
-                />
-              )}
+            {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
+            <Images
+              width={Dimensions.get("window").width} // height will be calculated automatically
+              source={{ uri: userPosts.downloadURL }}
             />
           </View>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <TouchableOpacity style={styles.blogout} onPress={toggleReport}>
-              <Text style={styles.Ltext}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-      </View>
+        )}
+
+        <View style={styles.desc}>
+          <Text style={styles.descT}>{userPosts.description}</Text>
+        </View>
+        <View style={{ paddingBottom: 10 }}>
+          <Text style={styles.comT}>Comments:</Text>
+        </View>
+        <FlatList
+          horizontal={false}
+          extraData={comment}
+          data={comment}
+          renderItem={({ item }) =>
+            item.discussionId === discussionId ? (
+              <CommentCard
+                picture={item.image}
+                status={0}
+                verify={item.verify}
+                postedBy={item.postedBy}
+                creation={item.creation}
+                comment={item.comment}
+                numOfLike={item.numOfLike}
+                likeBy={item.likeBy.includes(userId)}
+                removeLike={() =>
+                  removeLike(item.id, item.numOfLike, item.likeBy)
+                }
+                xxx={() => toggleVisibility(item.id)}
+                addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
+                firstUserId={item.userId}
+                secondUserId={userId}
+                delete={() => Delete(item.id)}
+                downlaodDoc={() => downlaodDoc()}
+                editComment={() => EditComment(item.id)}
+                numberOfReply={item.numberOfReply}
+                onSelect={() =>
+                  props.navigation.navigate("Reply Discussion", {
+                    cid: item.id,
+                    time: timeDifference(new Date(), item.creation.toDate()),
+                    xxx: item.likeBy.includes(userId),
+                    mainCommentAuthorName: item.postedBy,
+                  })
+                }
+              />
+            ) : null
+          }
+        />
+
+        <BottomSheet
+          isVisible={isVisible}
+          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+        >
+          {list.map((l, i) => (
+            <ListItem
+              key={i}
+              containerStyle={l.containerStyle}
+              onPress={l.onPress}
+            >
+              <ListItem.Content>
+                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          ))}
+        </BottomSheet>
+
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <Modal isVisible={isModalVisible}>
+            <AddComment
+              setNewComment={(newComment) => setNewComment(newComment)}
+              pickDocument={() => pickDocument()}
+              pickImage={() => pickImage()}
+              UploadComment={() => UploadComment()}
+              toggleModal={() => toggleModal()}
+            />
+          </Modal>
+
+          <Modal isVisible={isEditCommentModalVisible}>
+            <EditCommentCom
+              editComment={editComment}
+              setEditComment={(editComment) => setEditComment(editComment)}
+              uploadUpdatedComment={() => uploadUpdatedComment()}
+              toggleEditComment={() => toggleEditComment()}
+            />
+          </Modal>
+
+          <Modal isVisible={isReportVisible}>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <Text style={styles.titley}>Why are you reporting this post</Text>
+              <FlatList
+                horizontal={false}
+                extraData={newOption}
+                data={newOption}
+                renderItem={({ item }) => (
+                  <Report
+                    Option={item.Option}
+                    sendReport={() => sendReport(item.Option)}
+                  />
+                )}
+              />
+            </View>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <TouchableOpacity style={styles.blogout} onPress={toggleReport}>
+                <Text style={styles.Ltext}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        </View>
+      </ScrollView>
       <FAB
         placement="right"
         title="Add"
@@ -733,7 +733,7 @@ function ViewDiscussion(props) {
         onPress={toggleModal}
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
-    </ScrollView>
+    </View>
   );
 }
 

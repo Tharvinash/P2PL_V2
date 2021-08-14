@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Icon } from "react-native-elements";
 import { timeDifference } from "../../utils";
 import ImageView from "react-native-image-viewing";
-import PDFReader from "rn-pdf-reader-js";
 import { WebView } from "react-native-webview";
 import ParsedText from "react-native-parsed-text";
 import * as Linking from "expo-linking";
@@ -143,26 +149,59 @@ const commentCard = (props) => {
                       onPress: handleEmailPress,
                     },
                     {
-                      pattern: /Bob|David/,
-                      style: styles.name,
-                      onPress: handleNamePress,
-                    },
-                    {
                       pattern: /\[(@[^:]+):([^\]]+)\]/i,
                       style: styles.username,
                       onPress: handleNamePress,
                       renderText: renderText,
                     },
-                    { pattern: /42/, style: styles.magicNumber },
                     { pattern: /#(\w+)/, style: styles.hashTag },
                   ]}
                   childrenProps={{ allowFontScaling: false }}
                 >
                   {props.comment}
                 </ParsedText>
-                
+              </View>
+              <View style={styles.attachment}>
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => setData(true)}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    Image
+                  </Text>
+                  <Icon
+                    name="download-outline"
+                    type="ionicon"
+                    size={25}
+                    color="#000"
+                  />
+                </TouchableOpacity>
               </View>
 
+              <View style={styles.attachment}>
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => setWeb(true)}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    Doc
+                  </Text>
+                  <Icon
+                    name="download-outline"
+                    type="ionicon"
+                    size={25}
+                    color="#000"
+                  />
+                </TouchableOpacity>
+              </View>
               <View style={{ flexDirection: "row" }}>
                 <Text
                   style={{
@@ -243,7 +282,73 @@ const commentCard = (props) => {
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={styles.userC}>{props.comment}</Text>
+                <ParsedText
+                  style={styles.userC}
+                  parse={[
+                    { type: "url", style: styles.url, onPress: handleUrlPress },
+                    {
+                      type: "phone",
+                      style: styles.phone,
+                      onPress: handlePhonePress,
+                    },
+                    {
+                      type: "email",
+                      style: styles.email,
+                      onPress: handleEmailPress,
+                    },
+                    {
+                      pattern: /\[(@[^:]+):([^\]]+)\]/i,
+                      style: styles.username,
+                      onPress: handleNamePress,
+                      renderText: renderText,
+                    },
+                    { pattern: /#(\w+)/, style: styles.hashTag },
+                  ]}
+                  childrenProps={{ allowFontScaling: false }}
+                >
+                  {props.comment}
+                </ParsedText>
+              </View>
+              <View style={styles.attachment}>
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => setData(true)}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    Image
+                  </Text>
+                  <Icon
+                    name="download-outline"
+                    type="ionicon"
+                    size={25}
+                    color="#000"
+                  />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.attachment}>
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => setWeb(true)}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    Doc
+                  </Text>
+                  <Icon
+                    name="download-outline"
+                    type="ionicon"
+                    size={25}
+                    color="#000"
+                  />
+                </TouchableOpacity>
               </View>
               <View style={{ flexDirection: "row" }}>
                 <Text
@@ -303,15 +408,6 @@ const commentCard = (props) => {
           </View>
         )}
       </View>
-
-      <TouchableOpacity onPress={() => setData(true)}>
-        <Text>Image</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => setWeb(true)}>
-        <Text>doc</Text>
-      </TouchableOpacity>
-
       <ImageView
         images={images}
         imageIndex={0}
@@ -336,6 +432,24 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 
+  icon: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingRight: 5,
+  },
+
+  attachment: {
+    backgroundColor: "#808080",
+    height: 45,
+    marginRight: 5,
+    borderColor: "#000",
+    borderRadius: 5,
+    justifyContent: "center",
+    paddingLeft: 10,
+    elevation: 2,
+    marginVertical: 3,
+  },
+
   attachedImage: {
     width: 50,
     height: 50,
@@ -354,35 +468,35 @@ const styles = StyleSheet.create({
   },
 
   url: {
-    color: 'red',
-    textDecorationLine: 'underline',
+    color: "red",
+    textDecorationLine: "underline",
   },
 
   email: {
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
   },
 
   text: {
-    color: 'black',
+    color: "black",
     fontSize: 15,
   },
 
   phone: {
-    color: 'blue',
-    textDecorationLine: 'underline',
+    color: "blue",
+    textDecorationLine: "underline",
   },
 
   name: {
-    color: 'red',
+    color: "red",
   },
 
   username: {
-    color: 'green',
-    fontWeight: 'bold'
+    color: "green",
+    fontWeight: "bold",
   },
 
   hashTag: {
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
 });
 
