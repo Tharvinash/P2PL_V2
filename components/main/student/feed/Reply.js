@@ -10,19 +10,20 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { connect } from "react-redux";
 import Modal from "react-native-modal";
 import firebase from "firebase";
 require("firebase/firestore");
 import { Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/native";
-import { timeDifference } from "../../../utils";
-import ImageView from "react-native-image-viewing";
-import { WebView } from "react-native-webview";
 import ParsedText from "react-native-parsed-text";
 import * as Linking from "expo-linking";
 import AddComment from "../../component/addComment";
 import EditCommentCom from "../../component/editComment";
+import MainCommentCard from "../../component/mainCommentCard";
+import ReplyCommentCard from "../../component/replyCommentCard";
 import { ListItem, BottomSheet } from "react-native-elements";
 
 function Reply(props) {
@@ -45,11 +46,12 @@ function Reply(props) {
   const [isVisible, setIsVisible] = useState(false);
   const [temporaryId, setTemporaryId] = useState(null);
   const [isVisibleV2, setIsVisibleV2] = useState(false);
+  const [image, setImage] = useState(null); //save local uri
+  const [Doc, setDoc] = useState(null); //save local uri
   const [temporaryIdSubComment, setTemporaryIdSubComment] = useState(null);
   const [mainCommentAuthorName, setMainCommentAuthorName] = useState(
     props.route.params.mainCommentAuthorName
   );
-
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
   const [isEditReplyCommentModalVisible, setEditReplyCommentModalVisible] =
@@ -61,6 +63,12 @@ function Reply(props) {
 
   const userId = firebase.auth().currentUser.uid;
   const time = props.route.params.time;
+
+  const images = [
+    {
+      uri: props.attachedImage,
+    },
+  ];
 
   const list = [
     {
@@ -187,6 +195,284 @@ function Reply(props) {
       setData(24);
     }, [data])
   );
+
+  const pickDocument = async () => {
+    let result = await DocumentPicker.getDocumentAsync({});
+    if (!result.cancelled) {
+      setDoc(result.uri);
+      console.log(result.uri);
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      // aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+      console.log(result.uri);
+    }
+  };
+
+  const UploadComment = () => {
+    if (image == null && Doc == null) {
+      ReplyComment(null, null);
+    }
+
+    if (image != null && Doc != null) {
+      uploadDocV2();
+    }
+
+    if (image == null && Doc != null) {
+      uploadDoc();
+    }
+
+    if (image != null && Doc == null) {
+      uploadImage();
+    }
+  };
+
+  const UploadCommentV2 = () => {
+    if (image == null && Doc == null) {
+      ReplySubComment(null, null);
+    }
+
+    if (image != null && Doc != null) {
+      uploadDocV3();
+    }
+
+    if (image == null && Doc != null) {
+      uploadDocV1();
+    }
+
+    if (image != null && Doc == null) {
+      uploadImageV1();
+    }
+  };
+
+  const uploadDoc = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplyComment(snapshot, null);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImage = async () => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplyComment(null, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV2 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        uploadImageV2(snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV2 = async (docSnapshot) => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplyComment(docSnapshot, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV1 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplySubComment(snapshot, null);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV1 = async () => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplySubComment(null, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV3 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        uploadImageV3(snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV3 = async (docSnapshot) => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplySubComment(docSnapshot, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
 
   const addLike = (nol) => {
     const x = nol + 1;
@@ -323,7 +609,7 @@ function Reply(props) {
     setReplySubCommentModalVisible(!isReplySubCommentModalVisible);
   };
 
-  const ReplySubComment = () => {
+  const ReplySubComment = (doc, img) => {
     if (!replyOfSubComment.trim()) {
       alert("Please Enter Comment");
       return;
@@ -343,6 +629,8 @@ function Reply(props) {
           userId, // current user
           repliedTo: authorOfRepliedSubComment, // author of comment being replied
           mainCommentId: idOfRepliedSubComment, // id of comment being replied
+          attachedDocument: doc,
+          attachedImage: img,
         });
 
       const totalReply = mainComment.numberOfReply + 1;
@@ -352,10 +640,10 @@ function Reply(props) {
       setReplySubCommentModalVisible(!isReplySubCommentModalVisible);
     }
 
-    setData(55);
+    setData(59);
   };
 
-  const ReplyComment = () => {
+  const ReplyComment = (doc, img) => {
     if (!newReply.trim()) {
       alert("Please Enter Comment");
       return;
@@ -375,6 +663,8 @@ function Reply(props) {
           userId,
           repliedTo: mainCommentAuthorName,
           mainCommentId,
+          attachedDocument: doc,
+          attachedImage: img,
         });
 
       const totalReply = mainComment.numberOfReply + 1;
@@ -562,643 +852,78 @@ function Reply(props) {
       contentContainerStyle={{ alignItems: "center", justifyContent: "center" }}
     >
       <View style={styles.container}>
-        <View>
-          <View style={{ flexDirection: "row" }}>
-            <View>
-              <Image
-                style={{
-                  marginRight: 15,
-                  width: 35,
-                  height: 35,
-                  borderRadius: 35 / 2,
-                }}
-                source={{
-                  uri: mainComment.image,
-                }}
-              />
+        <MainCommentCard
+          picture={mainComment.image}
+          time={time}
+          status={loginCurrentUser.status}
+          verify={mainComment.verify}
+          postedBy={mainComment.postedBy}
+          creation={mainComment.creation}
+          comment={mainComment.comment}
+          attachedDocument={mainComment.attachedDocument}
+          attachedImage={mainComment.attachedImage}
+          numOfLike={mainComment.numOfLike}
+          likeBy={likeBy}
+          removeVerifyComment={() => removeVerifyComment()}
+          verifyComment={() => verifyComment()}
+          removeLike={() =>
+            removeLike(
+              mainComment.id,
+              mainComment.numOfLike,
+              mainComment.likeBy
+            )
+          }
+          xxx={() => toggleVisibility(mainComment.id)}
+          addLike={() =>
+            addLike(mainComment.id, mainComment.numOfLike, mainComment.likeBy)
+          }
+          firstUserId={mainComment.userId}
+          secondUserId={userId}
+          delete={() => Delete(mainComment.id)}
+          editComment={() => EditComment(mainComment.id)}
+          toggleReplyComment={() => toggleReplyComment()}
+        />
 
-              <View
-                style={{
-                  marginRight: 10,
-                  paddingTop: 10,
-                }}
-              >
-                {loginCurrentUser.status == 1 ? (
-                  <View>
-                    {mainComment.verify ? (
-                      <Icon
-                        name="checkmark-circle"
-                        type="ionicon"
-                        size={25}
-                        color="#140F38"
-                        onPress={() => removeVerifyComment()}
-                      />
-                    ) : (
-                      <Icon
-                        name="checkmark-circle-outline"
-                        type="ionicon"
-                        size={25}
-                        color="#140F38"
-                        onPress={() => verifyComment()}
-                      />
-                    )}
-                  </View>
-                ) : null}
-
-                {loginCurrentUser.status == 0 ? (
-                  <View>
-                    {mainComment.verify ? (
-                      <Icon
-                        name="checkmark-circle"
-                        type="ionicon"
-                        size={20}
-                        color="#140F38"
-                      />
-                    ) : null}
-                  </View>
-                ) : null}
-              </View>
-            </View>
-            {mainComment.userId === userId ? (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.mainBubble}
-                onLongPress={() => toggleVisibility(mainComment.id)}
-                delayLongPress={500}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={styles.userT}>{mainComment.postedBy} </Text>
-                  {mainComment.creation === null ? (
-                    <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
-                  ) : (
-                    <Text style={(styles.userC, { marginRight: 20 })}>
-                      {time}
-                    </Text>
-                  )}
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <ParsedText
-                    style={styles.userC}
-                    parse={[
-                      {
-                        type: "url",
-                        style: styles.url,
-                        onPress: handleUrlPress,
-                      },
-                      {
-                        type: "phone",
-                        style: styles.phone,
-                        onPress: handlePhonePress,
-                      },
-                      {
-                        type: "email",
-                        style: styles.email,
-                        onPress: handleEmailPress,
-                      },
-                      {
-                        pattern: /\[(@[^:]+):([^\]]+)\]/i,
-                        style: styles.username,
-                        onPress: handleNamePress,
-                        renderText: renderText,
-                      },
-                      { pattern: /#(\w+)/, style: styles.hashTag },
-                    ]}
-                    childrenProps={{ allowFontScaling: false }}
-                  >
-                    {mainComment.comment}
-                  </ParsedText>
-                </View>
-
-                <View style={{ flexDirection: "row" }}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      marginRight: 3,
-                      fontFamily: "Poppins",
-                    }}
-                  >
-                    {mainComment.numOfLike}
-                  </Text>
-                  {likeBy ? (
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="heart"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() => removeLike(mainComment.numOfLike)}
-                    />
-                  ) : (
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="heart-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() => addLike(mainComment.numOfLike)}
-                    />
-                  )}
-                  <Icon
-                    style={{
-                      paddingLeft: 10,
-                    }}
-                    name="arrow-redo-outline"
-                    type="ionicon"
-                    size={20}
-                    color="#000"
-                    onPress={() => toggleReplyComment()}
-                  />
-                </View>
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.mainBubble}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={styles.userT}>{mainComment.postedBy} </Text>
-                  {mainComment.creation === null ? (
-                    <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
-                  ) : (
-                    <Text style={(styles.userC, { marginRight: 20 })}>
-                      {time}
-                    </Text>
-                  )}
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <ParsedText
-                    style={styles.userC}
-                    parse={[
-                      {
-                        type: "url",
-                        style: styles.url,
-                        onPress: handleUrlPress,
-                      },
-                      {
-                        type: "phone",
-                        style: styles.phone,
-                        onPress: handlePhonePress,
-                      },
-                      {
-                        type: "email",
-                        style: styles.email,
-                        onPress: handleEmailPress,
-                      },
-                      {
-                        pattern: /\[(@[^:]+):([^\]]+)\]/i,
-                        style: styles.username,
-                        onPress: handleNamePress,
-                        renderText: renderText,
-                      },
-                      { pattern: /#(\w+)/, style: styles.hashTag },
-                    ]}
-                    childrenProps={{ allowFontScaling: false }}
-                  >
-                    {mainComment.comment}
-                  </ParsedText>
-                </View>
-
-                <View style={{ flexDirection: "row" }}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      marginRight: 3,
-                      fontFamily: "Poppins",
-                    }}
-                  >
-                    {mainComment.numOfLike}
-                  </Text>
-                  {likeBy ? (
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="heart"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() => removeLike(mainComment.numOfLike)}
-                    />
-                  ) : (
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="heart-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() => addLike(mainComment.numOfLike)}
-                    />
-                  )}
-                  <Icon
-                    style={{
-                      paddingLeft: 10,
-                    }}
-                    name="arrow-redo-outline"
-                    type="ionicon"
-                    size={20}
-                    color="#000"
-                    onPress={() => toggleReplyComment()}
-                  />
-                </View>
-              </View>
-            )}
-          </View>
-        </View>
         {/* ------------------------------------  reply comment  ------------------------- */}
         <View style={{ marginLeft: 30, marginTop: 5 }}>
           <FlatList
             horizontal={false}
             extraData={replyComment}
             data={replyComment}
-            renderItem={({ item }) =>
-              item.userId === userId ? (
-                <View>
-                  <View style={{ flexDirection: "row" }}>
-                    <View>
-                      <Image
-                        style={{
-                          marginRight: 15,
-                          width: 28,
-                          height: 28,
-                          borderRadius: 28 / 2,
-                        }}
-                        source={{
-                          uri: item.image,
-                        }}
-                      />
-
-                      <View
-                        style={{
-                          marginRight: 10,
-                          paddingTop: 10,
-                        }}
-                      >
-                        {loginCurrentUser.status == 1 ? (
-                          <View>
-                            {item.verify ? (
-                              <Icon
-                                name="checkmark-circle"
-                                type="ionicon"
-                                size={20}
-                                color="#140F38"
-                                onPress={() =>
-                                  removeVerifyReplyComment(item.id)
-                                }
-                              />
-                            ) : (
-                              <Icon
-                                name="checkmark-circle-outline"
-                                type="ionicon"
-                                size={20}
-                                color="#140F38"
-                                onPress={() => verifyReplyComment(item.id)}
-                              />
-                            )}
-                          </View>
-                        ) : null}
-
-                        {loginCurrentUser.status == 0 ? (
-                          <View>
-                            {item.verify ? (
-                              <Icon
-                                name="checkmark-circle"
-                                type="ionicon"
-                                size={20}
-                                color="#140F38"
-                              />
-                            ) : null}
-                          </View>
-                        ) : null}
-                      </View>
-                    </View>
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      style={styles.mainBubble}
-                      onLongPress={() => toggleVisibilityV2(item.id)}
-                      delayLongPress={500}
-                    >
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "row",
-                          }}
-                        >
-                          <Text style={styles.userT}>{item.postedBy} </Text>
-                          {item.mainCommentId !== mainCommentId &&
-                          item.repliedTo !== currentUserName ? (
-                            <View
-                              style={{
-                                flexDirection: "row",
-                              }}
-                            >
-                              <Icon
-                                style={{
-                                  paddingTop: 4,
-                                }}
-                                name="caret-forward-outline"
-                                type="ionicon"
-                                size={13}
-                                color="#000"
-                              />
-                              <Text style={styles.userT}>
-                                {item.repliedTo}{" "}
-                              </Text>
-                            </View>
-                          ) : null}
-                        </View>
-
-                        {item.creation === null ? (
-                          <Text style={(styles.userC, { marginRight: 20 })}>
-                            Now
-                          </Text>
-                        ) : (
-                          <Text
-                            style={
-                              (styles.userC,
-                              { marginRight: 20, paddingRight: 8 })
-                            }
-                          >
-                            {timeDifference(new Date(), item.creation.toDate())}
-                          </Text>
-                        )}
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          paddingRight: 8,
-                        }}
-                      >
-                        <Text style={styles.userC}>{item.comment}</Text>
-                      </View>
-
-                      <View style={{ flexDirection: "row" }}>
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            marginRight: 3,
-                            fontFamily: "Poppins",
-                          }}
-                        >
-                          {item.numOfLike}
-                        </Text>
-                        {item.likeBy.includes(userId) ? (
-                          <Icon
-                            style={{
-                              paddingLeft: 10,
-                            }}
-                            name="heart"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() =>
-                              RemoveLikeToReplyComment(
-                                item.id,
-                                item.numOfLike,
-                                item.likeBy
-                              )
-                            }
-                          />
-                        ) : (
-                          <Icon
-                            style={{
-                              paddingLeft: 10,
-                            }}
-                            name="heart-outline"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() =>
-                              AddLikeToReplyComment(
-                                item.id,
-                                item.numOfLike,
-                                item.likeBy
-                              )
-                            }
-                          />
-                        )}
-                        <Icon
-                          name="arrow-redo-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() =>
-                            toggleSubReplyComment(item.id, item.postedBy)
-                          }
-                        />
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ) : (
-                <View>
-                  <View style={{ flexDirection: "row" }}>
-                    <View>
-                      <Image
-                        style={{
-                          marginRight: 15,
-                          width: 28,
-                          height: 28,
-                          borderRadius: 28 / 2,
-                        }}
-                        source={{
-                          uri: item.image,
-                        }}
-                      />
-
-                      <View
-                        style={{
-                          marginRight: 10,
-                          paddingTop: 10,
-                        }}
-                      >
-                        {loginCurrentUser.status == 1 ? (
-                          <View>
-                            {item.verify ? (
-                              <Icon
-                                name="checkmark-circle"
-                                type="ionicon"
-                                size={20}
-                                color="#140F38"
-                                onPress={() =>
-                                  removeVerifyReplyComment(item.id)
-                                }
-                              />
-                            ) : (
-                              <Icon
-                                name="checkmark-circle-outline"
-                                type="ionicon"
-                                size={20}
-                                color="#140F38"
-                                onPress={() => verifyReplyComment(item.id)}
-                              />
-                            )}
-                          </View>
-                        ) : null}
-
-                        {loginCurrentUser.status == 0 ? (
-                          <View>
-                            {item.verify ? (
-                              <Icon
-                                name="checkmark-circle"
-                                type="ionicon"
-                                size={20}
-                                color="#140F38"
-                              />
-                            ) : null}
-                          </View>
-                        ) : null}
-                      </View>
-                    </View>
-                    <View style={styles.mainBubble}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "row",
-                          }}
-                        >
-                          <Text style={styles.userT}>{item.postedBy} </Text>
-                          {item.mainCommentId !== mainCommentId &&
-                          item.repliedTo !== currentUserName ? (
-                            <View
-                              style={{
-                                flexDirection: "row",
-                              }}
-                            >
-                              <Icon
-                                style={{
-                                  paddingTop: 4,
-                                }}
-                                name="caret-forward-outline"
-                                type="ionicon"
-                                size={13}
-                                color="#000"
-                              />
-                              <Text style={styles.userT}>
-                                {item.repliedTo}{" "}
-                              </Text>
-                            </View>
-                          ) : null}
-                        </View>
-
-                        {item.creation === null ? (
-                          <Text style={(styles.userC, { marginRight: 20 })}>
-                            Now
-                          </Text>
-                        ) : (
-                          <Text
-                            style={
-                              (styles.userC,
-                              { marginRight: 20, paddingRight: 8 })
-                            }
-                          >
-                            {timeDifference(new Date(), item.creation.toDate())}
-                          </Text>
-                        )}
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          paddingRight: 8,
-                        }}
-                      >
-                        <Text style={styles.userC}>{item.comment}</Text>
-                      </View>
-
-                      <View style={{ flexDirection: "row" }}>
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            marginRight: 3,
-                            fontFamily: "Poppins",
-                          }}
-                        >
-                          {item.numOfLike}
-                        </Text>
-                        {item.likeBy.includes(userId) ? (
-                          <Icon
-                            style={{
-                              paddingLeft: 10,
-                            }}
-                            name="heart"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() =>
-                              RemoveLikeToReplyComment(
-                                item.id,
-                                item.numOfLike,
-                                item.likeBy
-                              )
-                            }
-                          />
-                        ) : (
-                          <Icon
-                            style={{
-                              paddingLeft: 10,
-                            }}
-                            name="heart-outline"
-                            type="ionicon"
-                            size={20}
-                            color="#000"
-                            onPress={() =>
-                              AddLikeToReplyComment(
-                                item.id,
-                                item.numOfLike,
-                                item.likeBy
-                              )
-                            }
-                          />
-                        )}
-                        <Icon
-                          name="arrow-redo-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() =>
-                            toggleSubReplyComment(item.id, item.postedBy)
-                          }
-                        />
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              )
-            }
+            renderItem={({ item }) => (
+              <ReplyCommentCard
+                removeVerifyReplyComment={() =>
+                  removeVerifyReplyComment(item.id)
+                }
+                verifyReplyComment={() => verifyReplyComment(item.id)}
+                image={item.image}
+                status={loginCurrentUser.status}
+                verify={item.verify}
+                firstUserId={item.userId}
+                secondUserId={userId}
+                xxx={() => toggleVisibilityV2(item.id)}
+                postedBy={item.postedBy}
+                maincommentIdV1={item.mainCommentId}
+                mainCommentIdV2={mainCommentId}
+                repliedTo={item.repliedTo}
+                currentUserName={currentUserName}
+                creation={item.creation}
+                comment={item.comment}
+                attachedImage={item.attachedImage}
+                attachedDocument={item.attachedDocument}
+                numOfLike={item.numOfLike}
+                likeBy={item.likeBy.includes(userId)}
+                RemoveLikeToReplyComment={() =>
+                  RemoveLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
+                }
+                AddLikeToReplyComment={() =>
+                  AddLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
+                }
+                toggleSubReplyComment={() =>
+                  toggleSubReplyComment(item.id, item.postedBy)
+                }
+              />
+            )}
           />
         </View>
         {/* BottomSheet for main comment */}
@@ -1253,7 +978,7 @@ function Reply(props) {
             setNewComment={(newReply) => setNewReply(newReply)}
             pickDocument={() => pickDocument()}
             pickImage={() => pickImage()}
-            UploadComment={() => ReplyComment()}
+            UploadComment={() => UploadComment()}
             toggleModal={() => toggleReplyComment()}
           />
         </Modal>
@@ -1267,7 +992,7 @@ function Reply(props) {
             }
             pickDocument={() => pickDocument()}
             pickImage={() => pickImage()}
-            UploadComment={() => ReplySubComment()}
+            UploadComment={() => UploadCommentV2()}
             toggleModal={() => toggleSubReplyComment()}
           />
         </Modal>

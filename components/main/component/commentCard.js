@@ -16,9 +16,6 @@ import * as Linking from "expo-linking";
 
 const commentCard = (props) => {
   const a = props.verify;
-  const ccc =
-    "https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/doc%2F1234%2Fconference-template-a4.docx?alt=media&token=384f0e85-edf5-4ecb-9fac-31efbe44cd49";
-
   const [data, setData] = useState(false);
   const [web, setWeb] = useState(false);
 
@@ -48,7 +45,7 @@ const commentCard = (props) => {
 
   const images = [
     {
-      uri: props.picture,
+      uri: props.attachedImage,
     },
   ];
 
@@ -425,7 +422,7 @@ const commentCard = (props) => {
         swipeToCloseEnabled={true}
       />
 
-      {web ? <WebView source={{ uri: ccc }} /> : null}
+      {web ? <WebView source={{ uri: props.attachedDocument }} /> : null}
     </View>
   );
 };

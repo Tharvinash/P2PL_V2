@@ -17,9 +17,9 @@ import {
 import Report from "../../component/report";
 import AddComment from "../../component/addComment";
 import EditCommentCom from "../../component/editComment";
-
 //----------------------------------------------
 import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
@@ -29,7 +29,6 @@ import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
 import CommentCard from "../../component/commentCard";
 import { FAB, ListItem, BottomSheet } from "react-native-elements";
-import * as DocumentPicker from "expo-document-picker";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
@@ -263,7 +262,7 @@ function ViewDiscussion(props) {
 
   const UploadComment = () => {
     if (image == null && Doc == null) {
-      finalCommentUpload();
+      finalCommentUpload(null,null);
     }
 
     if (image != null && Doc != null) {
