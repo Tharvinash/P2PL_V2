@@ -4,11 +4,9 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   FlatList,
   TouchableOpacity,
   Alert,
-  Image,
   Share,
   ScrollView,
   Dimensions,
@@ -17,6 +15,7 @@ import {
 import Report from "../../component/report";
 import AddComment from "../../component/addComment";
 import EditCommentCom from "../../component/editComment";
+import CommentCard from "../../component/commentCard";
 //----------------------------------------------
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
@@ -27,7 +26,6 @@ import firebase from "firebase";
 import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
-import CommentCard from "../../component/commentCard";
 import { FAB, ListItem, BottomSheet } from "react-native-elements";
 require("firebase/firestore");
 
@@ -615,7 +613,7 @@ function ViewDiscussion(props) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View >
       <ScrollView contentContainerStyle={{ margin: 10, marginBottom: 5 }}>
         <View
           style={{

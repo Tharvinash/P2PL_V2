@@ -15,13 +15,15 @@ import {
   LogBox,
   ActivityIndicator,
 } from "react-native";
+import MMCommentCard from "../../component/mmCommentCard";
+import CommentCard from "../../component/commentCard";
 import { Icon } from "react-native-elements";
-import MentionsTextInput from "react-native-mentions";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import firebase from "firebase";
 import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
+import { FAB, ListItem, BottomSheet } from "react-native-elements";
 require("firebase/firestore");
 
 function ViewRoom(props) {
@@ -40,44 +42,31 @@ function ViewRoom(props) {
   const [cu, setCu] = useState(currentUser);
   const [keyword, setKeyword] = useState("");
   const [caption, setCaption] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
   const [datas, setDatas] = useState("");
+  const [temporaryId, setTemporaryId] = useState(null);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
   const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
 
-  //   useLayoutEffect(() => {
-  //     props.navigation.setOptions({
-  //       headerRight: () => (
-  //         <View style={{ flexDirection: "row", paddingRight: 15 }}>
-  //           <TouchableOpacity>
-  //             <Icon
-  //               name="alert-circle-outline"
-  //               type="ionicon"
-  //               size={30}
-  //               color="#000"
-  //               onPress={() => {
-  //                 toggleReport();
-  //               }}
-  //             />
-  //           </TouchableOpacity>
+  const list = [
+    {
+      title: "Edit",
+      onPress: () => EditComment(temporaryId),
+    },
+    {
+      title: "Delete",
+      onPress: () => Delete(temporaryId),
+    },
+    {
+      title: "Cancel",
+      containerStyle: { backgroundColor: "red" },
+      titleStyle: { color: "white" },
+      onPress: () => setIsVisible(false),
+    },
+  ];
 
-  //           <TouchableOpacity>
-  //             <Icon
-  //               name="share-social-outline"
-  //               type="ionicon"
-  //               size={30}
-  //               color="#000"
-  //               onPress={() => {
-  //                 onShare();
-  //               }}
-  //             />
-  //           </TouchableOpacity>
-  //         </View>
-  //       ),
-  //     });
-  //   }, [data]);
-  // props.navigation.setParams({ toggleReport: toggleReport })
   useEffect(() => {
     LogBox.ignoreLogs(["Animated: `useNativeDriver`"]);
     const { currentUser } = props;
@@ -158,6 +147,11 @@ function ViewRoom(props) {
     setModalVisible(!isModalVisible);
   };
 
+  const toggleVisibility = (cid) => {
+    setIsVisible(true);
+    setTemporaryId(cid);
+  };
+
   const renderSuggestionsRow = ({ item }, hidePanel) => {
     return (
       <TouchableOpacity onPress={() => onSuggestionTap(item.name, hidePanel)}>
@@ -186,7 +180,7 @@ function ViewRoom(props) {
   };
 
   const xxx = () => {
-    console.log(caption)
+    console.log(caption);
   };
 
   const callback = (keyword) => {
@@ -208,7 +202,7 @@ function ViewRoom(props) {
   };
 
   const UploadComment = () => {
-    if (!newComment.trim()) {
+    if (!caption.trim()) {
       alert("Please Enter Comment");
       return;
     } else {
@@ -219,7 +213,7 @@ function ViewRoom(props) {
           userId,
           postedBy: cu.name,
           discussionRoomId: discussionId,
-          comment: newComment,
+          comment: caption,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           image: cu.image,
           likeBy: [],
@@ -337,368 +331,162 @@ function ViewRoom(props) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignContent: "space-between",
-          paddingRight: 35,
-        }}
-      >
-        <View>
-          <Text style={styles.title}>{userPosts.title}</Text>
-        </View>
-      </View>
-
-      {userPosts.downloadURL && (
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ margin: 10, marginBottom: 5 }}>
         <View
           style={{
             flexDirection: "row",
-            paddingBottom: 10,
-            justifyContent: "center",
+            alignContent: "space-between",
+            paddingRight: 35,
           }}
         >
-          {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
-          <Images
-            width={Dimensions.get("window").width} // height will be calculated automatically
-            source={{ uri: userPosts.downloadURL }}
-          />
+          <View>
+            <Text style={styles.title}>{userPosts.title}</Text>
+          </View>
         </View>
-      )}
 
-      <View style={styles.desc}>
-        <Text style={styles.descT}>{userPosts.description}</Text>
-      </View>
-      <View style={{ paddingBottom: 10 }}>
-        <Text style={styles.comT}>Comments:</Text>
-      </View>
-      <FlatList
-        horizontal={false}
-        extraData={comment}
-        data={comment}
-        renderItem={({ item }) =>
-          item.discussionRoomId === discussionId ? (
-            <View>
-              <View style={{ flexDirection: "row" }}>
-                <View>
-                  <Image
-                    style={{
-                      marginRight: 15,
-                      width: 35,
-                      height: 35,
-                      borderRadius: 35 / 2,
-                    }}
-                    source={{
-                      uri: item.image,
-                    }}
-                  />
-
-                  <View
-                    style={{
-                      marginRight: 10,
-                      paddingTop: 10,
-                    }}
-                  >
-                    {item.verify ? (
-                      <Icon
-                        name="checkmark-circle"
-                        type="ionicon"
-                        size={25}
-                        color="#140F38"
-                      />
-                    ) : null}
-                  </View>
-                </View>
-                <View style={styles.commentCon}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.userT}>{item.postedBy} </Text>
-                    {item.creation === null ? (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        Now
-                      </Text>
-                    ) : (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
-                    )}
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.userC}>{item.comment}</Text>
-                  </View>
-
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        marginRight: 3,
-                        fontFamily: "Poppins",
-                      }}
-                    >
-                      {item.numOfLike}
-                    </Text>
-                    {item.likeBy.includes(userId) ? (
-                      <Icon
-                        style={{
-                          paddingLeft: 10,
-                        }}
-                        name="heart"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          removeLike(item.id, item.numOfLike, item.likeBy)
-                        }
-                      />
-                    ) : (
-                      <Icon
-                        style={{
-                          paddingLeft: 10,
-                        }}
-                        name="heart-outline"
-                        type="ionicon"
-                        size={20}
-                        color="#000"
-                        onPress={() =>
-                          addLike(item.id, item.numOfLike, item.likeBy)
-                        }
-                      />
-                    )}
-                    {item.userId === userId ? (
-                      <View style={{ flexDirection: "row" }}>
-                        <Icon
-                          style={{
-                            paddingLeft: 10,
-                          }}
-                          name="trash-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() => Delete(item.id)}
-                        />
-                        <Icon
-                          style={{
-                            paddingLeft: 10,
-                          }}
-                          name="create-outline"
-                          type="ionicon"
-                          size={20}
-                          color="#000"
-                          onPress={() => EditComment(item.id)}
-                        />
-                      </View>
-                    ) : null}
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="chatbubble-ellipses-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() =>
-                        props.navigation.navigate("RoomReplyComment", {
-                          cid: item.id,
-                          time: timeDifference(
-                            new Date(),
-                            item.creation.toDate()
-                          ),
-                          xxx: item.likeBy.includes(userId),
-                          mainCommentAuthorName: item.postedBy,
-                        })
-                      }
-                    />
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        marginRight: 3,
-                        fontFamily: "Poppins",
-                      }}
-                    >
-                      ({item.numberOfReply})
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          ) : null
-        }
-      />
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
-          <Text style={styles.Ltext}>Add Comment</Text>
-        </TouchableOpacity>
-
-        <Modal isVisible={isModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <MentionsTextInput
-                textInputStyle={{
-                  borderColor: "#ebebeb",
-                  borderWidth: 1,
-                  padding: 5,
-                  fontSize: 15,
-                  width: "100%",
-                }}
-                suggestionsPanelStyle={{
-                  backgroundColor: "rgba(100,100,100,0.1)",
-                }}
-                loadingComponent={() => (
-                  <View
-                    style={{
-                      flex: 1,
-                      width: 200,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <ActivityIndicator />
-                  </View>
-                )}
-                textInputMinHeight={30}
-                textInputMaxHeight={80}
-                trigger={"@"}
-                triggerLocation={"new-word-only"} // 'new-word-only', 'anywhere'
-                value={caption}
-                onChangeText={setCaption}
-                triggerCallback={callback.bind(this)}
-                renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-                suggestionsData={datas}
-                keyExtractor={(item, index) => item.name}
-                suggestionRowHeight={45}
-                horizontal={false}
-                MaxVisibleRowCount={3}
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => UploadComment()}
-                >
-                  <Text style={styles.Ltext}>Add Comment</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity style={styles.blogout} onPress={toggleModal}>
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-
-        <Modal isVisible={isEditCommentModalVisible}>
-          <View style={{ justifyContent: "center" }}>
-            <View style={{ marginLeft: 8 }}>
-              <TextInput
-                style={styles.input}
-                value={editComment}
-                placeholderTextColor="#000"
-                multiline={true}
-                onChangeText={(editComment) => setEditComment(editComment)}
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={() => uploadUpdatedComment()}
-                >
-                  <Text style={styles.Ltext}>Update Comment</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  paddingHorizontal: 20,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.blogout}
-                  onPress={toggleEditComment}
-                >
-                  <Text style={styles.Ltext}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-      <View
-        style={{ height: 300, justifyContent: "flex-end", paddingTop: 100 }}
-      >
-        <MentionsTextInput
-        textInputStyle={{
-          borderColor: "#ebebeb",
-          borderWidth: 1,
-          padding: 5,
-          fontSize: 15,
-          width: "100%",
-        }}
-        suggestionsPanelStyle={{ backgroundColor: "rgba(100,100,100,0.1)" }}
-        loadingComponent={() => (
+        {userPosts.downloadURL && (
           <View
             style={{
-              flex: 1,
-              width: 200,
+              flexDirection: "row",
+              paddingBottom: 10,
               justifyContent: "center",
-              alignItems: "center",
             }}
           >
-            <ActivityIndicator />
+            {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
+            <Images
+              width={Dimensions.get("window").width} // height will be calculated automatically
+              source={{ uri: userPosts.downloadURL }}
+            />
           </View>
         )}
-        textInputMinHeight={30}
-        textInputMaxHeight={80}
-        trigger={"@"}
-        triggerLocation={"new-word-only"} // 'new-word-only', 'anywhere'
-        value={caption}
-        onChangeText={setCaption}
-        triggerCallback={callback.bind(this)}
-        renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-        suggestionsData={datas}
-        keyExtractor={(item, index) => item.name}
-        suggestionRowHeight={45}
-        horizontal={false}
-        MaxVisibleRowCount={3}
+
+        <View style={styles.desc}>
+          <Text style={styles.descT}>{userPosts.description}</Text>
+        </View>
+        <View style={{ paddingBottom: 10 }}>
+          <Text style={styles.comT}>Comments:</Text>
+        </View>
+        <FlatList
+          horizontal={false}
+          extraData={comment}
+          data={comment}
+          renderItem={({ item }) =>
+            item.discussionRoomId === discussionId ? (
+              <CommentCard
+                picture={item.image}
+                status={0}
+                verify={item.verify}
+                postedBy={item.postedBy}
+                creation={item.creation}
+                comment={item.comment}
+                attachedDocument={item.attachedDocument}
+                attachedImage={item.attachedImage}
+                numOfLike={item.numOfLike}
+                likeBy={item.likeBy.includes(userId)}
+                removeLike={() =>
+                  removeLike(item.id, item.numOfLike, item.likeBy)
+                }
+                xxx={() => toggleVisibility(item.id)}
+                addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
+                firstUserId={item.userId}
+                secondUserId={userId}
+                delete={() => Delete(item.id)}
+                downlaodDoc={() => downlaodDoc()}
+                editComment={() => EditComment(item.id)}
+                numberOfReply={item.numberOfReply}
+                onSelect={() =>
+                  props.navigation.navigate("RoomReplyComment", {
+                    cid: item.id,
+                    time: timeDifference(new Date(), item.creation.toDate()),
+                    xxx: item.likeBy.includes(userId),
+                    mainCommentAuthorName: item.postedBy,
+                  })
+                }
+              />
+            ) : null
+          }
+        />
+
+        <BottomSheet
+          isVisible={isVisible}
+          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+        >
+          {list.map((l, i) => (
+            <ListItem
+              key={i}
+              containerStyle={l.containerStyle}
+              onPress={l.onPress}
+            >
+              <ListItem.Content>
+                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          ))}
+        </BottomSheet>
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <Modal isVisible={isModalVisible}>
+            <MMCommentCard
+              loadingComponent={() => (
+                <View
+                  style={{
+                    flex: 1,
+                    width: 200,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <ActivityIndicator />
+                </View>
+              )}
+              caption={caption}
+              setCaption={setCaption}
+              callback={callback.bind(this)}
+              renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+              datas={datas}
+              keyExtractor={(item, index) => item.name}
+              pickDocument={() => pickDocument()}
+              pickImage={() => pickImage()}
+              UploadComment={() => UploadComment()}
+              toggleModal={() => toggleModal()}
+            />
+          </Modal>
+
+          <Modal isVisible={isEditCommentModalVisible}>
+            <MMCommentCard
+              loadingComponent={() => (
+                <View
+                  style={{
+                    flex: 1,
+                    width: 200,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <ActivityIndicator />
+                </View>
+              )}
+              caption={editComment}
+              setCaption={(editComment) => setEditComment(editComment)}
+              callback={callback.bind(this)}
+              renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+              datas={datas}
+              keyExtractor={(item, index) => item.name}
+              UploadComment={() => uploadUpdatedComment()}
+              toggleModal={() => toggleEditComment()}
+            />
+          </Modal>
+        </View>
+      </ScrollView>
+      <FAB
+        placement="right"
+        title="Add"
+        overlayColor="#000"
+        style={styles.floatButton}
+        onPress={toggleModal}
+        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
-      </View>
-    </ScrollView>
+    </View>
   );
 }
 
