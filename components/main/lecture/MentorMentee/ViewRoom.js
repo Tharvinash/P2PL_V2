@@ -77,6 +77,7 @@ function ViewRoom(props) {
     if (props.route.params.did) {
       setDiscussionId(props.route.params.did);
     }
+    setCaption("")
 
     firebase
       .firestore()
@@ -303,12 +304,13 @@ function ViewRoom(props) {
       .doc(cid)
       .get()
       .then((snapshot) => {
-        setEditComment(snapshot.data().comment);
+        setCaption(snapshot.data().comment);
       });
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
   const uploadUpdatedComment = () => {
+
     if (!editComment.trim()) {
       alert("Please Enter Comment");
       return;
@@ -318,7 +320,7 @@ function ViewRoom(props) {
         .collection("DiscussionRoomComment")
         .doc(commentId)
         .update({
-          comment: editComment,
+          comment: caption,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
@@ -466,8 +468,8 @@ function ViewRoom(props) {
                   <ActivityIndicator />
                 </View>
               )}
-              caption={editComment}
-              setCaption={(editComment) => setEditComment(editComment)}
+              caption={caption}
+              setCaption={setCaption}
               callback={callback.bind(this)}
               renderSuggestionsRow={renderSuggestionsRow.bind(this)}
               datas={datas}

@@ -14,13 +14,6 @@ const mmCommentCard = (props) => {
     <View style={{ justifyContent: "center" }}>
       <View style={styles.searchSection}>
         <MentionsTextInput
-          textInputStyle={{
-            borderColor: "#ebebeb",
-            borderWidth: 1,
-            padding: 5,
-            fontSize: 15,
-            width: "100%",
-          }}
           suggestionsPanelStyle={{
             backgroundColor: "rgba(100,100,100,0.1)",
           }}
