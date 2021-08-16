@@ -613,7 +613,7 @@ function ViewDiscussion(props) {
   };
 
   return (
-    <View >
+    <View style={{flex:1}}>
       <ScrollView contentContainerStyle={{ margin: 10, marginBottom: 5 }}>
         <View
           style={{
