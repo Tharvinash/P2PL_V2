@@ -11,6 +11,8 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import MainCommentCard from "../../component/mainCommentCard";
 import MMCommentCard from "../../component/mmCommentCard";
 import { connect } from "react-redux";
@@ -46,6 +48,8 @@ function RoomReplyComment(props) {
   const [isVisibleV2, setIsVisibleV2] = useState(false);
   const [temporaryId, setTemporaryId] = useState(null);
   const [caption, setCaption] = useState("");
+  const [image, setImage] = useState(null); //save local uri
+  const [Doc, setDoc] = useState(null); //save local uri
   const [mainCommentAuthorName, setMainCommentAuthorName] = useState(
     props.route.params.mainCommentAuthorName
   );
@@ -155,6 +159,283 @@ function RoomReplyComment(props) {
       setData(24);
     }, [data])
   );
+
+  const pickDocument = async () => {
+    let result = await DocumentPicker.getDocumentAsync({});
+    if (!result.cancelled) {
+      setDoc(result.uri);
+      console.log(result.uri);
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      // aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  const UploadComment = () => {
+    if (image == null && Doc == null) {
+      ReplyComment(null, null);
+    }
+
+    if (image != null && Doc != null) {
+      uploadDocV2();
+    }
+
+    if (image == null && Doc != null) {
+      uploadDoc();
+    }
+
+    if (image != null && Doc == null) {
+      uploadImage();
+    }
+  };
+
+  const UploadCommentV2 = () => {
+    if (image == null && Doc == null) {
+      ReplySubComment(null, null);
+    }
+
+    if (image != null && Doc != null) {
+      uploadDocV3();
+    }
+
+    if (image == null && Doc != null) {
+      uploadDocV1();
+    }
+
+    if (image != null && Doc == null) {
+      uploadImageV1();
+    }
+  };
+
+  const uploadDoc = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplyComment(snapshot, null);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImage = async () => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplyComment(null, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV2 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        uploadImageV2(snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV2 = async (docSnapshot) => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplyComment(docSnapshot, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV1 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplySubComment(snapshot, null);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV1 = async () => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplySubComment(null, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV3 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        uploadImageV3(snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV3 = async (docSnapshot) => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        ReplySubComment(docSnapshot, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
 
   const renderSuggestionsRow = ({ item }, hidePanel) => {
     return (
@@ -346,8 +627,8 @@ function RoomReplyComment(props) {
     setReplySubCommentModalVisible(!isReplySubCommentModalVisible);
   };
 
-  const ReplySubComment = () => {
-    if (!replyOfSubComment.trim()) {
+  const ReplySubComment = (doc, img) => {
+    if (!caption.trim()) {
       alert("Please Enter Comment");
       return;
     } else {
@@ -357,7 +638,7 @@ function RoomReplyComment(props) {
         .doc(mainCommentId)
         .collection("Reply")
         .add({
-          comment: replyOfSubComment,
+          comment: caption,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           image: loginCurrentUser.image, //current user
           likeBy: [],
@@ -366,6 +647,8 @@ function RoomReplyComment(props) {
           userId, // current user
           repliedTo: authorOfRepliedSubComment, // author of comment being replied
           mainCommentId: idOfRepliedSubComment, // id of comment being replied
+          attachedDocument: doc,
+          attachedImage: img,
         });
 
       const totalReply = mainComment.numberOfReply + 1;
@@ -378,7 +661,7 @@ function RoomReplyComment(props) {
     setData(55);
   };
 
-  const ReplyComment = () => {
+  const ReplyComment = (doc, img) => {
     if (!caption.trim()) {
       alert("Please Enter Comment");
       return;
@@ -398,6 +681,8 @@ function RoomReplyComment(props) {
           userId,
           repliedTo: mainCommentAuthorName,
           mainCommentId,
+          attachedDocument: doc,
+          attachedImage: img,
         });
 
       const totalReply = mainComment.numberOfReply + 1;
@@ -672,8 +957,10 @@ function RoomReplyComment(props) {
             renderSuggestionsRow={renderSuggestionsRow.bind(this)}
             datas={datas}
             keyExtractor={(item, index) => item.name}
-            UploadComment={() => ReplyComment()}
+            UploadComment={() => UploadComment()}
             toggleModal={() => toggleReplyComment()}
+            pickDocument={() => pickDocument()}
+            pickImage={() => pickImage()}
           />
         </Modal>
 
@@ -699,8 +986,10 @@ function RoomReplyComment(props) {
             renderSuggestionsRow={renderSuggestionsRow.bind(this)}
             datas={datas}
             keyExtractor={(item, index) => item.name}
-            UploadComment={() => ReplySubComment()}
+            UploadComment={() => UploadCommentV2()}
             toggleModal={() => toggleSubReplyComment()}
+            pickDocument={() => pickDocument()}
+            pickImage={() => pickImage()}
           />
         </Modal>
 

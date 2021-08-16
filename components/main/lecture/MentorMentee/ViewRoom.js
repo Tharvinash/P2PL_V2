@@ -23,12 +23,15 @@ import { connect } from "react-redux";
 import firebase from "firebase";
 import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
+import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { FAB, ListItem, BottomSheet } from "react-native-elements";
 require("firebase/firestore");
 
 function ViewRoom(props) {
   const { currentUser } = props;
   const [isModalVisible, setModalVisible] = useState(false);
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
   const [commentId, setCommentId] = useState(null);
@@ -46,6 +49,8 @@ function ViewRoom(props) {
   const [datas, setDatas] = useState("");
   const [temporaryId, setTemporaryId] = useState(null);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
+  const [image, setImage] = useState(null); //save local uri
+  const [Doc, setDoc] = useState(null); //save local uri
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
   const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
@@ -78,7 +83,7 @@ function ViewRoom(props) {
       setDiscussionId(props.route.params.did);
     }
     setCaption("")
-
+    setImage(null)
     firebase
       .firestore()
       .collection("DiscussionRoom")
@@ -153,6 +158,163 @@ function ViewRoom(props) {
     setTemporaryId(cid);
   };
 
+  const UploadComment = () => {
+    if (image == null && Doc == null) {
+      finalCommentUpload(null,null);
+    }
+
+    if (image != null && Doc != null) {
+      uploadDocV2();
+    }
+
+    if (image == null && Doc != null) {
+      uploadDoc();
+    }
+
+    if (image != null && Doc == null) {
+      uploadImage();
+    }
+  };
+
+  const pickDocument = async () => {
+    let result = await DocumentPicker.getDocumentAsync({});
+    if (!result.cancelled) {
+      setDoc(result.uri);
+      setName(result.name);
+      console.log(result.name);
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      // aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  const uploadDoc = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(snapshot, null);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImage = async () => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(null, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV2 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        uploadImageV2(snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV2 = async (docSnapshot) => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(docSnapshot, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on("state_changed", taskProgress, taskError, taskCompleted);
+  };
+
+  if (hasGalleryPermission === false) {
+    return <View />;
+  }
+  if (hasGalleryPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
   const renderSuggestionsRow = ({ item }, hidePanel) => {
     return (
       <TouchableOpacity onPress={() => onSuggestionTap(item.name, hidePanel)}>
@@ -202,7 +364,7 @@ function ViewRoom(props) {
       });
   };
 
-  const UploadComment = () => {
+  const finalCommentUpload = (doc, img) => {
     if (!caption.trim()) {
       alert("Please Enter Comment");
       return;
@@ -220,6 +382,8 @@ function ViewRoom(props) {
           likeBy: [],
           numOfLike: 0,
           numberOfReply: 0,
+          attachedDocument: doc,
+          attachedImage: img,
         })
         .then(function () {
           setModalVisible(!isModalVisible);

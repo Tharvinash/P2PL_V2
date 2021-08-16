@@ -104,22 +104,6 @@ function Reply(props) {
     },
   ];
 
-  const handleUrlPress = (url, matchIndex /*: number*/) => {
-    Linking.openURL(url);
-  };
-
-  const handlePhonePress = (phone, matchIndex /*: number*/) => {
-    Alert.alert(`${phone} has been pressed!`);
-  };
-
-  const handleNamePress = (name, matchIndex /*: number*/) => {
-    Alert.alert(`Hello ${name}`);
-  };
-
-  const handleEmailPress = (email, matchIndex /*: number*/) => {
-    Alert.alert(`send email to ${email}`);
-  };
-
   const toggleVisibility = (cid) => {
     setIsVisible(true);
     setTemporaryId(cid);
@@ -130,13 +114,6 @@ function Reply(props) {
     setTemporaryId(cid);
   };
 
-  const renderText = (matchingString, matches) => {
-    // matches => ["[@michel:5455345]", "@michel", "5455345"]
-    let pattern = /\[(@[^:]+):([^\]]+)\]/i;
-    let match = matchingString.match(pattern);
-    console.log(24);
-    return `^^${match[1]}^^`;
-  };
 
   useEffect(() => {
     firebase
@@ -214,7 +191,6 @@ function Reply(props) {
 
     if (!result.cancelled) {
       setImage(result.uri);
-      console.log(result.uri);
     }
   };
 
