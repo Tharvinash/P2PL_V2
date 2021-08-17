@@ -83,6 +83,7 @@ import ViewRequest from "./components/main/lecture/MentorMentee/ViewRequest";
 import ViewDetailMentor from "./components/main/lecture/MentorMentee/ViewDetailMentor";
 import ViewDetailMentee from "./components/main/lecture/MentorMentee/ViewDetailMentee";
 import AddInGroup from "./components/main/lecture/MentorMentee/AddInGroup";
+import AddInGroupV2 from "./components/main/lecture/MentorMentee/AddInGroupV2";
 
 //Admin
 import AdminMainScreen from "./components/AdminMain";
@@ -239,6 +240,12 @@ export class App extends Component {
               <Stack.Screen
                 name="AddInGroup"
                 component={AddInGroup}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Available Group" }}
+              />
+              <Stack.Screen
+                name="AddInGroupV2"
+                component={AddInGroupV2}
                 navigation={this.props.navigation}
                 options={{ headerTitle: "Available Group" }}
               />

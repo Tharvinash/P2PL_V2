@@ -6,9 +6,10 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { connect } from "react-redux";
+import { Icon } from "react-native-elements";
 import firebase from "firebase";
 import ViewAvailableGroup from "../../component/viewAvailableGroup";
-function AddInGroupV2(props) {
+function AddInGroup(props) {
   const [data, setData] = useState(0);
   const [info, setInfo] = useState([]);
   const { discussionroom } = props;
@@ -55,7 +56,7 @@ function AddInGroupV2(props) {
 
     firebase
       .firestore()
-      .collection("RequestForMentor")
+      .collection("RequestToBeMentor")
       .doc(infoId)
       .get()
       .then((snapshot) => {
@@ -77,7 +78,7 @@ function AddInGroupV2(props) {
       .firestore()
       .collection("DiscussionRoom")
       .doc(gid)
-      .collection("Mentee")
+      .collection("Mentor")
       .add({
         name: info.name,
         userId: info.userId,
@@ -104,16 +105,16 @@ function AddInGroupV2(props) {
       .firestore()
       .collection("DiscussionRoom")
       .doc(gid)
-      .collection("Mentee")
+      .collection("Mentor")
       .get()
       .then((snapshot) => {
-        let mentee = snapshot.docs.map((doc) => {
+        let mentor = snapshot.docs.map((doc) => {
           const data = doc.data();
           const id = doc.id;
           return { id, ...data };
         });
 
-        const newArray2 = mentee.filter((e) => e.userId === info.userId);
+        const newArray2 = mentor.filter((e) => e.userId === info.userId);
         console.log(newArray2);
 
         const secArray2 = newArray2.map((element) => element.id);
@@ -123,7 +124,7 @@ function AddInGroupV2(props) {
           .firestore()
           .collection("DiscussionRoom")
           .doc(gid)
-          .collection("Mentee")
+          .collection("Mentor")
           .doc(secArray2[0])
           .delete();
       });
@@ -207,4 +208,4 @@ const mapStateToProps = (store) => ({
   discussionroom: store.userState.discussionroom,
 });
 
-export default connect(mapStateToProps, null)(AddInGroupV2);
+export default connect(mapStateToProps, null)(AddInGroup);

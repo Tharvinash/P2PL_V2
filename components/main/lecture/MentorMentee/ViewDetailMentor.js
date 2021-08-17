@@ -37,6 +37,12 @@ function ViewDetailMentor(props) {
       });
   }, []);
 
+  const xxx = () => {
+    props.navigation.navigate("AddInGroupV2", {
+      did: infoId,
+    });
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -123,7 +129,7 @@ function ViewDetailMentor(props) {
         title="Add in group"
         overlayColor="#000"
         style={styles.floatButton}
-        //onPress={toggleModal}
+        onPress={() => xxx()}
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
     </View>
