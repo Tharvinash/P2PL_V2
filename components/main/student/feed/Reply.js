@@ -62,6 +62,7 @@ function Reply(props) {
     useState(false);
 
   const userId = firebase.auth().currentUser.uid;
+  const userIdV2 = firebase.auth().currentUser.uid;
   const time = props.route.params.time;
 
   const images = [
@@ -876,7 +877,7 @@ function Reply(props) {
                 status={loginCurrentUser.status}
                 verify={item.verify}
                 firstUserId={item.userId}
-                secondUserId={userId}
+                secondUserId= {userId}
                 xxx={() => toggleVisibilityV2(item.id)}
                 postedBy={item.postedBy}
                 maincommentIdV1={item.mainCommentId}

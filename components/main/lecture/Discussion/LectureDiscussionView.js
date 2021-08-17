@@ -427,6 +427,8 @@ function LectureDiscussionView(props) {
               comment={item.comment}
               numOfLike={item.numOfLike}
               likeBy={item.likeBy.includes(userId)}
+              attachedDocument = {item.attachedDocument}
+              attachedImage ={item.attachedImage}
               removeLike={() =>
                 removeLike(item.id, item.numOfLike, item.likeBy)
               }

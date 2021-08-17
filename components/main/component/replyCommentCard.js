@@ -288,8 +288,8 @@ const replyCommentCard = (props) => {
               }}
             >
               <Text style={styles.userT}>{props.postedBy} </Text>
-              {item.mainCommentId !== mainCommentId &&
-              item.repliedTo !== currentUserName ? (
+              {props.maincommentIdV1 !== props.mainCommentIdV2 &&
+              props.repliedTo !== props.currentUserName ? (
                 <View
                   style={{
                     flexDirection: "row",
@@ -304,17 +304,17 @@ const replyCommentCard = (props) => {
                     size={13}
                     color="#000"
                   />
-                  <Text style={styles.userT}>{item.repliedTo} </Text>
+                  <Text style={styles.userT}>{props.repliedTo} </Text>
                 </View>
               ) : null}
             </View>
-            {item.creation === null ? (
+            {props.creation === null ? (
               <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
             ) : (
               <Text
                 style={(styles.userC, { marginRight: 20, paddingRight: 8 })}
               >
-                {timeDifference(new Date(), item.creation.toDate())}
+                {timeDifference(new Date(), props.creation.toDate())}
               </Text>
             )}
 

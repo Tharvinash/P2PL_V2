@@ -79,6 +79,9 @@ import RequestToBeMentor from "./components/main/student/mentorMentee/RequestToB
 import CreateRoom from "./components/main/lecture/MentorMentee/CreateRoom";
 import ViewRoom from "./components/main/lecture/MentorMentee/ViewRoom";
 import RoomReplyComment from "./components/main/lecture/MentorMentee/RoomReplyComment";
+import ViewRequest from "./components/main/lecture/MentorMentee/ViewRequest";
+import ViewDetailMentor from "./components/main/lecture/MentorMentee/ViewDetailMentor";
+import ViewDetailMentee from "./components/main/lecture/MentorMentee/ViewDetailMentee";
 
 //Admin
 import AdminMainScreen from "./components/AdminMain";
@@ -213,6 +216,24 @@ export class App extends Component {
                 component={RoomReplyComment}
                 navigation={this.props.navigation}
                 options={{ headerTitle: "Reply" }}
+              />
+              <Stack.Screen
+                name="ViewRequest"
+                component={ViewRequest}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "View Request" }}
+              />
+              <Stack.Screen
+                name="ViewDetailMentor"
+                component={ViewDetailMentor}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Details" }}
+              />
+              <Stack.Screen
+                name="ViewDetailMentee"
+                component={ViewDetailMentee}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Details" }}
               />
             </Stack.Navigator>
           </NavigationContainer>

@@ -4,7 +4,9 @@ import {
   USER_COMMENT_STATE_CHANGE,
   USER_OPTION_STATE_CHANGE,
   USER_REPORTEDDISCUSSION_STATE_CHANGE,
-  DISCUSSION_ROOM_STATE_CHANGE
+  DISCUSSION_ROOM_STATE_CHANGE,
+  USER_REQUESTFORAMENTOR_STATE_CHANGE,
+  USER_REQUESTTOBEAMENTOR_STATE_CHANGE
 } from "../constants/index";
 //, USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE, USERS_LIKES_STATE_CHANGE, CLEAR_DATA
 
@@ -121,6 +123,40 @@ export function fetchReportedDiscussion() {
           return { id, ...data };
         });
         dispatch({ type: USER_REPORTEDDISCUSSION_STATE_CHANGE, reportedDiscussion });
+      });
+  };
+}
+
+export function fetchRequestForMentor() {
+  return (dispatch) => {
+    firebase
+      .firestore()
+      .collection("RequestForMentor")
+      .get()
+      .then((snapshot) => {
+        let rfam = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        dispatch({ type: USER_REQUESTFORAMENTOR_STATE_CHANGE, rfam });
+      });
+  };
+}
+
+export function fetchRequestToBeMentor() {
+  return (dispatch) => {
+    firebase
+      .firestore()
+      .collection("RequestToBeMentor")
+      .get()
+      .then((snapshot) => {
+        let rtbam = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        dispatch({ type: USER_REQUESTTOBEAMENTOR_STATE_CHANGE, rtbam });
       });
   };
 }

@@ -4,7 +4,9 @@ import {
   USER_COMMENT_STATE_CHANGE,
   USER_OPTION_STATE_CHANGE,
   USER_REPORTEDDISCUSSION_STATE_CHANGE,
-  DISCUSSION_ROOM_STATE_CHANGE
+  DISCUSSION_ROOM_STATE_CHANGE,
+  USER_REQUESTFORAMENTOR_STATE_CHANGE,
+  USER_REQUESTTOBEAMENTOR_STATE_CHANGE
 } from "../constants";
 // USER_POSTS_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, CLEAR_DATA
 
@@ -47,6 +49,16 @@ export const user = (state = initialState, action) => {
       return {
         ...state,
         discussionroom: action.discussionroom,
+      };
+    case USER_REQUESTFORAMENTOR_STATE_CHANGE:
+      return {
+        ...state,
+        requestForAMentor: action.rfam,
+      };
+    case USER_REQUESTTOBEAMENTOR_STATE_CHANGE:
+      return {
+        ...state,
+        requestToBeAMentor: action.rtbam,
       };
     //     case CLEAR_DATA:
     //         return initialState

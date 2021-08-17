@@ -14,7 +14,9 @@ import {
   fetchUserComment,
   fetchReportedDiscussion,
   fetchDiscussionRoom,
-  fetchOption
+  fetchOption,
+  fetchRequestForMentor,
+  fetchRequestToBeMentor,
 } from "../redux/actions/index";
 
 //lecture main
@@ -88,7 +90,7 @@ function ProfileStackScreen() {
                 />
               </TouchableOpacity>
             </View>
-          )
+          ),
         }}
       />
     </HomeStack.Navigator>
@@ -102,20 +104,22 @@ function RoomStackScreen() {
       <HomeStack.Screen
         name="Room"
         component={Room}
-        options={{ headerTitle: "Discussion Room",
-        headerRight: () => (
-          <View style={{ flexDirection: "row", paddingRight: 15 }}>
-            <TouchableOpacity>
-              <Icon
-                name="add-circle-outline"
-                type="ionicon"
-                size={30}
-                color="#000"
-                onPress={() => navigation.navigate("Create Room")}
-              />
-            </TouchableOpacity>
-          </View>
-        ) }}
+        options={{
+          headerTitle: "Discussion Room",
+          headerRight: () => (
+            <View style={{ flexDirection: "row", paddingRight: 15 }}>
+              <TouchableOpacity>
+                <Icon
+                  name="add-circle-outline"
+                  type="ionicon"
+                  size={30}
+                  color="#000"
+                  onPress={() => navigation.navigate("Create Room")}
+                />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
       />
     </HomeStack.Navigator>
   );
@@ -147,6 +151,8 @@ export class Main extends Component {
     this.props.fetchReportedDiscussion();
     this.props.fetchDiscussionRoom();
     this.props.fetchOption();
+    this.props.fetchRequestForMentor();
+    this.props.fetchRequestToBeMentor();
   }
   render() {
     // const { currentUser } = this.props;
@@ -213,7 +219,16 @@ const mapStateToProps = (store) => ({
 
 const mapDispatchProps = (dispatch) =>
   bindActionCreators(
-    { fetchUser, fetchUserPosts, fetchUserComment, fetchReportedDiscussion, fetchDiscussionRoom, fetchOption},
+    {
+      fetchUser,
+      fetchUserPosts,
+      fetchUserComment,
+      fetchReportedDiscussion,
+      fetchDiscussionRoom,
+      fetchOption,
+      fetchRequestForMentor,
+      fetchRequestToBeMentor,
+    },
     dispatch
   );
 //, fetchUserPosts, fetchUserFollowing, clearData

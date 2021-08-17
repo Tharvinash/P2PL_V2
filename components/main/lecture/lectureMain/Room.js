@@ -35,8 +35,6 @@ function Room(props) {
           });
           const newArray = posts.filter((element) => element.createrId === userId);
           setPost(newArray)
-          console.log(newArray)
-          console.log("focus")
         });
     }, [])
   );
@@ -54,7 +52,6 @@ function Room(props) {
         });
         const newArray = posts.filter((element) => element.createrId === userId);
 				setPost(newArray)
-        console.log(newArray)
         setData(999)
       });
   }, [data]);
@@ -94,10 +91,8 @@ function Room(props) {
         {
           text: "Yes",
           onPress: () => {
-            console.log(data+" before")
            firebase.firestore().collection("DiscussionRoom").doc(x).delete();
            setData(1)
-           console.log(data+" after")
           },
         },
         // The "No" button
