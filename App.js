@@ -82,6 +82,7 @@ import RoomReplyComment from "./components/main/lecture/MentorMentee/RoomReplyCo
 import ViewRequest from "./components/main/lecture/MentorMentee/ViewRequest";
 import ViewDetailMentor from "./components/main/lecture/MentorMentee/ViewDetailMentor";
 import ViewDetailMentee from "./components/main/lecture/MentorMentee/ViewDetailMentee";
+import AddInGroup from "./components/main/lecture/MentorMentee/AddInGroup";
 
 //Admin
 import AdminMainScreen from "./components/AdminMain";
@@ -234,6 +235,12 @@ export class App extends Component {
                 component={ViewDetailMentee}
                 navigation={this.props.navigation}
                 options={{ headerTitle: "Details" }}
+              />
+              <Stack.Screen
+                name="AddInGroup"
+                component={AddInGroup}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Available Group" }}
               />
             </Stack.Navigator>
           </NavigationContainer>

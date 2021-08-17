@@ -3,12 +3,19 @@ import { View, Text, FlatList, StyleSheet, ScrollView } from "react-native";
 import { FAB } from "react-native-elements";
 import { Icon } from "react-native-elements";
 import firebase from "firebase";
+import { TouchableOpacity } from "react-native";
 require("firebase/firestore");
 
 function ViewDetailMentee(props) {
   const [info, setInfo] = useState([]);
-	const [array, setarray] = useState([]);
-  const infoId = props.route.params.did
+  const [array, setarray] = useState([]);
+  const infoId = props.route.params.did;
+
+  const xxx = () => {
+    props.navigation.navigate("AddInGroup", {
+      did: infoId,
+    });
+  };
 
   useEffect(() => {
     firebase
@@ -19,7 +26,7 @@ function ViewDetailMentee(props) {
       .then((snapshot) => {
         if (snapshot.exists) {
           setInfo(snapshot.data());
-          setarray(snapshot.data().problems)
+          setarray(snapshot.data().problems);
         } else {
           console.log("does not exist");
         }
@@ -54,7 +61,10 @@ function ViewDetailMentee(props) {
           <View style={styles.formControl}>
             <Text style={styles.label}>Issue: </Text>
             {array.map((item, key) => (
-              <Text key={key} style={styles.label}> - {item} </Text>
+              <Text key={key} style={styles.label}>
+                {" "}
+                - {item}{" "}
+              </Text>
             ))}
           </View>
         </View>
@@ -64,7 +74,7 @@ function ViewDetailMentee(props) {
         title="Add in group"
         overlayColor="#000"
         style={styles.floatButton}
-        //onPress={toggleModal}
+        onPress={() => xxx()}
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
     </View>
