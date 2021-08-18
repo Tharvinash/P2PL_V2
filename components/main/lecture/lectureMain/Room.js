@@ -77,7 +77,7 @@ function Room(props) {
   );
 
   const closeRow = (rowKey) => {
-    props.navigation.navigate("Edit Discussion", {
+    props.navigation.navigate("GroupDetail", {
       did: rowKey,
     });
   };
@@ -112,7 +112,7 @@ function Room(props) {
         style={[styles.backRightBtn, styles.backRightBtnLeft]}
         onPress={() => closeRow(data.item.id)}
       >
-        <Text style={styles.backTextWhite}>Edit</Text>
+        <Text style={styles.backTextWhite}>Info</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
