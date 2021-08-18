@@ -101,6 +101,7 @@ function requesttobementor(props) {
         description: desc,
         qualification,
         problems: finalValue,
+        image: user.image,
         userId
       })
       .then(function () {

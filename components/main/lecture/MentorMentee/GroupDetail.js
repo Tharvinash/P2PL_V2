@@ -7,15 +7,18 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { connect } from "react-redux";
 import { ListItem, Avatar } from "react-native-elements";
 import { Icon } from "react-native-elements";
 import firebase from "firebase";
 
 function GroupDetail(props) {
+  const { currentUser } = props;
+  const [userStatus, setUserStatus] = useState(currentUser.status);
   const [groupMembers, setGroupMembers] = useState([]);
   const [data, setData] = useState(0);
   const roomId = props.route.params.did;
-	const mid = props.route.params.mid
+  const mid = props.route.params.mid;
 
   useEffect(() => {
     firebase
@@ -54,7 +57,7 @@ function GroupDetail(props) {
               .doc(id)
               .delete();
 
-							removeId(uid);
+            removeId(uid);
           },
         },
         // The "No" button
@@ -66,8 +69,8 @@ function GroupDetail(props) {
     );
   };
 
-	const removeId = (uid) =>{
-		const indexx = mid.indexOf(uid);
+  const removeId = (uid) => {
+    const indexx = mid.indexOf(uid);
     if (indexx > -1) {
       mid.splice(indexx, 1);
     }
@@ -75,8 +78,8 @@ function GroupDetail(props) {
     firebase.firestore().collection("DiscussionRoom").doc(roomId).update({
       memberId: mid,
     });
-		setData(2);
-	}
+    setData(2);
+  };
 
   const deleteGroup = () => {
     return Alert.alert(
@@ -117,7 +120,8 @@ function GroupDetail(props) {
           <ListItem.Subtitle>Admin</ListItem.Subtitle>
         )}
       </ListItem.Content>
-      {item.status == 0 ? null : (
+
+      {item.status == 0 || userStatus == 0 ? null : (
         <TouchableOpacity onPress={() => removeMember(item.id, item.userId)}>
           <Icon
             name="person-remove-outline"
@@ -141,19 +145,20 @@ function GroupDetail(props) {
         data={groupMembers}
         renderItem={renderItem}
       />
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.blogout} onPress={() => deleteGroup()}>
-          <Text style={styles.Ltext}>Delete Group</Text>
-        </TouchableOpacity>
-      </View>
+      {userStatus != 0 ? (
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <TouchableOpacity
+            style={styles.blogout}
+            onPress={() => deleteGroup()}
+          >
+            <Text style={styles.Ltext}>Delete Group</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
     </View>
   );
 }
-// firebase
-// .firestore()
-// .collection("DiscussionRoomComment")
-// .doc(cid)
-// .delete();
+
 const styles = StyleSheet.create({
   descT: {
     fontSize: 20,
@@ -188,4 +193,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GroupDetail;
+const mapStateToProps = (store) => ({
+  currentUser: store.userState.currentUser,
+});
+
+export default connect(mapStateToProps, null)(GroupDetail);

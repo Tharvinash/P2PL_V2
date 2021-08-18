@@ -81,7 +81,8 @@ function AddInGroupV2(props) {
       .add({
         name: info.name,
         userId: info.userId,
-        image: "dp.image",
+        image: info.image,
+        status : 2
       });
 
     firebase.firestore().collection("DiscussionRoom").doc(gid).update({

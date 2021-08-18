@@ -402,6 +402,12 @@ export class App extends Component {
                 navigation={this.props.navigation}
                 options={{ headerTitle: "Reply" }}
               />
+              <Stack.Screen
+                name="GroupDetail"
+                component={GroupDetail}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Group Info" }}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </Provider>

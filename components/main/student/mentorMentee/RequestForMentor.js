@@ -51,6 +51,7 @@ function requestformentor(props) {
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         description: desc,
         problems: finalValue,
+        image: user.image,
         userId
       })
       .then(function () {
