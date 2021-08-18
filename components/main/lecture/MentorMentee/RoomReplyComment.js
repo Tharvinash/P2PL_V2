@@ -30,6 +30,7 @@ function RoomReplyComment(props) {
   const [currentUserName, setCurrentUserName] = useState(currentUser.name);
   const [loginCurrentUser, setLoginCurrentUser] = useState(currentUser);
   const [mainCommentId, setMainCommentId] = useState(props.route.params.cid);
+  const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const [mainComment, setMainComment] = useState([]);
   const [data, setData] = useState(0);
   const [datas, setDatas] = useState("");
@@ -101,7 +102,7 @@ function RoomReplyComment(props) {
   ];
 
   useEffect(() => {
-    setCaption("")
+    setCaption("");
 
     firebase
       .firestore()
@@ -468,7 +469,9 @@ function RoomReplyComment(props) {
     setKeyword(keyword);
     firebase
       .firestore()
-      .collection("users")
+      .collection("DiscussionRoom")
+      .doc(discussionId)
+      .collection("Mentee")
       .where("name", ">=", keyword.substring(1))
       .limit(10)
       .get()
@@ -938,7 +941,7 @@ function RoomReplyComment(props) {
 
         {/* Reply Comment Modal */}
         <Modal isVisible={isReplyCommentModalVisible}>
-        <MMCommentCard
+          <MMCommentCard
             loadingComponent={() => (
               <View
                 style={{
@@ -967,7 +970,7 @@ function RoomReplyComment(props) {
         {/* Reply to Reply Comment Modal */}
 
         <Modal isVisible={isReplySubCommentModalVisible}>
-        <MMCommentCard
+          <MMCommentCard
             loadingComponent={() => (
               <View
                 style={{
@@ -996,7 +999,7 @@ function RoomReplyComment(props) {
         {/* Edit Reply Comment */}
 
         <Modal isVisible={isEditReplyCommentModalVisible}>
-        <MMCommentCard
+          <MMCommentCard
             loadingComponent={() => (
               <View
                 style={{

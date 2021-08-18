@@ -376,7 +376,9 @@ function ViewRoom(props) {
     setKeyword(keyword);
     firebase
       .firestore()
-      .collection("users")
+      .collection("DiscussionRoom")
+      .doc(discussionId)
+      .collection("Mentee")
       .where("name", ">=", keyword.substring(1))
       .limit(10)
       .get()
@@ -592,6 +594,7 @@ function ViewRoom(props) {
                     time: timeDifference(new Date(), item.creation.toDate()),
                     xxx: item.likeBy.includes(userId),
                     mainCommentAuthorName: item.postedBy,
+                    did : discussionId
                   })
                 }
               />
