@@ -47,6 +47,7 @@ function ViewRoom(props) {
   const [caption, setCaption] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [datas, setDatas] = useState("");
+  const [mid, setMid] = useState([]);
   const [temporaryId, setTemporaryId] = useState(null);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const [image, setImage] = useState(null); //save local uri
@@ -72,6 +73,26 @@ function ViewRoom(props) {
     },
   ];
 
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+          <TouchableOpacity>
+            <Icon
+              name="alert-circle-outline"
+              type="ionicon"
+              size={30}
+              color="#000"
+              onPress={() => {
+                navtodetail();
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [data]);
+
   useEffect(() => {
     LogBox.ignoreLogs(["Animated: `useNativeDriver`"]);
     const { currentUser } = props;
@@ -82,8 +103,8 @@ function ViewRoom(props) {
     if (props.route.params.did) {
       setDiscussionId(props.route.params.did);
     }
-    setCaption("")
-    setImage(null)
+    setCaption("");
+    setImage(null);
     firebase
       .firestore()
       .collection("DiscussionRoom")
@@ -91,6 +112,7 @@ function ViewRoom(props) {
       .get()
       .then((snapshot) => {
         setUserPosts(snapshot.data());
+        setMid(snapshot.data().memberId)
       });
 
     firebase
@@ -145,6 +167,10 @@ function ViewRoom(props) {
     return <View />;
   }
 
+  const navtodetail = () => {
+    props.navigation.navigate("GroupDetail", { did: discussionId, mid:mid });
+  };
+
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
@@ -160,7 +186,7 @@ function ViewRoom(props) {
 
   const UploadComment = () => {
     if (image == null && Doc == null) {
-      finalCommentUpload(null,null);
+      finalCommentUpload(null, null);
     }
 
     if (image != null && Doc != null) {
@@ -474,7 +500,6 @@ function ViewRoom(props) {
   };
 
   const uploadUpdatedComment = () => {
-
     if (!editComment.trim()) {
       alert("Please Enter Comment");
       return;

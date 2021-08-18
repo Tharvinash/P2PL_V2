@@ -84,6 +84,7 @@ import ViewDetailMentor from "./components/main/lecture/MentorMentee/ViewDetailM
 import ViewDetailMentee from "./components/main/lecture/MentorMentee/ViewDetailMentee";
 import AddInGroup from "./components/main/lecture/MentorMentee/AddInGroup";
 import AddInGroupV2 from "./components/main/lecture/MentorMentee/AddInGroupV2";
+import GroupDetail from "./components/main/lecture/MentorMentee/GroupDetail";
 
 //Admin
 import AdminMainScreen from "./components/AdminMain";
@@ -248,6 +249,12 @@ export class App extends Component {
                 component={AddInGroupV2}
                 navigation={this.props.navigation}
                 options={{ headerTitle: "Available Group" }}
+              />
+              <Stack.Screen
+                name="GroupDetail"
+                component={GroupDetail}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Group Info" }}
               />
             </Stack.Navigator>
           </NavigationContainer>
