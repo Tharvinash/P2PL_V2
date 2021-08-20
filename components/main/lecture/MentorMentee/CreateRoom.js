@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -12,12 +13,24 @@ import { connect } from "react-redux";
 import firebase from "firebase";
 require("firebase/firestore");
 import { Icon } from "react-native-elements";
+import { ListItem, BottomSheet } from "react-native-elements";
 
 function CreateRoom(props) {
   const { currentUser } = props;
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
-	const userId = firebase.auth().currentUser.uid;
+  const [isVisible, setIsVisible] = useState(false);
+  const userId = firebase.auth().currentUser.uid;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsVisible(false);
+    }, [])
+  );
+
+  const toggleVisibility = () => {
+    props.navigation.navigate("ViewRequestCreateRoom")
+  };
 
   const createRoom = () => {
     firebase
@@ -26,14 +39,14 @@ function CreateRoom(props) {
       .add({
         title: title,
         description: desc,
-				admin:[],
-				members:[],
-				createdBy: currentUser.name,
-				createrId: userId,
-        creation: firebase.firestore.FieldValue.serverTimestamp()
+        admin: [],
+        members: [],
+        createdBy: currentUser.name,
+        createrId: userId,
+        creation: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(function () {
-        props.navigation.navigate("Room")
+        props.navigation.navigate("Room");
       });
   };
 
@@ -66,22 +79,19 @@ function CreateRoom(props) {
         </View>
       </View>
       <View style={styles.form}>
-        <TouchableOpacity style={styles.logout} onPress={() => addMember()}>
+        <TouchableOpacity
+          style={styles.logout}
+          onPress={() => toggleVisibility()}
+        >
           <View style={{ flexDirection: "row" }}>
             <Icon
               name="person-add-outline"
               type="ionicon"
               size={20}
               color="#fff"
-              onPress={() => navigation.navigate("Create Room")}
             />
             <Text style={styles.Ltext}>Add Members</Text>
           </View>
-        </TouchableOpacity>
-      </View>
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.logout} onPress={() => createRoom()}>
-          <Text style={styles.Ltext}>Create Room </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

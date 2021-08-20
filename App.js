@@ -85,6 +85,7 @@ import ViewDetailMentee from "./components/main/lecture/MentorMentee/ViewDetailM
 import AddInGroup from "./components/main/lecture/MentorMentee/AddInGroup";
 import AddInGroupV2 from "./components/main/lecture/MentorMentee/AddInGroupV2";
 import GroupDetail from "./components/main/lecture/MentorMentee/GroupDetail";
+import ViewRequestCreateRoom from "./components/main/lecture/MentorMentee/ViewRequestCreateRoom";
 
 //Admin
 import AdminMainScreen from "./components/AdminMain";
@@ -255,6 +256,12 @@ export class App extends Component {
                 component={GroupDetail}
                 navigation={this.props.navigation}
                 options={{ headerTitle: "Group Info" }}
+              />
+              <Stack.Screen
+                name="ViewRequestCreateRoom"
+                component={ViewRequestCreateRoom}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Member List" }}
               />
             </Stack.Navigator>
           </NavigationContainer>
