@@ -21,21 +21,19 @@ function GroupDetail(props) {
   const mid = props.route.params.mid;
 
   useEffect(() => {
+
     firebase
       .firestore()
       .collection("DiscussionRoom")
       .doc(roomId)
-      .collection("Mentee")
-      .orderBy("status", "asc")
       .get()
       .then((snapshot) => {
-        let groupmembers = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data };
-        });
-        setGroupMembers(groupmembers);
-      });
+        if (snapshot.exists) {
+          setGroupMembers(snapshot.data().groupMember)
+        } else {
+          console.log("does not exist");
+        }
+      })
 
     setData(1);
   }, [data]);

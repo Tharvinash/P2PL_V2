@@ -23,6 +23,8 @@ function ViewRequestCreateRoom(props) {
   const [studentId, setStudentId] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const userId = firebase.auth().currentUser.uid;
+  const title = props.route.params.title;
+  const desc = props.route.params.desc;
 
   const list = [
     {
@@ -95,14 +97,23 @@ function ViewRequestCreateRoom(props) {
   }, [filter, update]);
 
   const createRoom = () => {
+    let a = mentee;
+    a.push({
+      userId: userId,
+      name: currentUser.name,
+      mc: "mc",
+      image: "image",
+      status: 0
+    });
+
+
     firebase
       .firestore()
       .collection("DiscussionRoom")
       .add({
         title: title,
         description: desc,
-        mentor,
-        mentee,
+        groupMember: a,
         createdBy: currentUser.name,
         createrId: userId,
         creation: firebase.firestore.FieldValue.serverTimestamp(),
@@ -128,18 +139,16 @@ function ViewRequestCreateRoom(props) {
   };
 
   const addAsMentor = () => {
-    let a = mentor;
-    a.push(studentId);
-    setMentor(a);
-    console.log(a);
+    let a = mentee;
+    a.push({ ...studentId, status: 1 });
+    setMentee(a);
     setIsModalVisible(!isModalVisible);
   };
 
   const addAsMentee = () => {
     let b = mentee;
-    b.push(studentId);
+    b.push({ ...studentId, status: 2 });
     setMentee(b);
-    console.log(b);
     setIsModalVisible(!isModalVisible);
   };
 
@@ -338,7 +347,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
   requestForAMentor: store.userState.requestForAMentor,
   requestToBeAMentor: store.userState.requestToBeAMentor,
-  currentUser: store.userState.currentUser
+  currentUser: store.userState.currentUser,
 });
 
 export default connect(mapStateToProps, null)(ViewRequestCreateRoom);

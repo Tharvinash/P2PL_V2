@@ -29,7 +29,7 @@ function CreateRoom(props) {
   );
 
   const toggleVisibility = () => {
-    props.navigation.navigate("ViewRequestCreateRoom")
+    props.navigation.navigate("ViewRequestCreateRoom",{title, desc})
   };
 
   const createRoom = () => {

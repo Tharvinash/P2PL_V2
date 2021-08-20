@@ -34,10 +34,24 @@ function AddInGroup(props) {
           );
           setPost(newArray);
         });
+
+        firebase
+        .firestore()
+        .collection("RequestToBeMentor")
+        .doc(infoId)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setInfo(snapshot.data());
+          } else {
+            console.log("does not exist");
+          }
+        });
     }, [])
   );
 
   useEffect(() => {
+    setData(3)
     firebase
       .firestore()
       .collection("DiscussionRoom")
@@ -53,85 +67,40 @@ function AddInGroup(props) {
         );
         setPost(newArray);
       });
-
-    firebase
-      .firestore()
-      .collection("RequestToBeMentor")
-      .doc(infoId)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setInfo(snapshot.data());
-        } else {
-          console.log("does not exist");
-        }
-      });
   }, [data]);
 
-  const AddInGroup = (gid, mid) => {
-    if (mid.includes(info.userId)) {
-    } else {
-      mid.push(info.userId);
-    }
-
-    firebase
-      .firestore()
-      .collection("DiscussionRoom")
-      .doc(gid)
-      .collection("Mentor")
-      .add({
-        name: info.name,
-        userId: info.userId,
-        image: info.image,
-        status : 1
-      });
+  const AddInGroup = (gid, gm) => {
+    gm.push({
+      userId: info.userId,
+      name: info.name,
+      mc: "mc",
+      image: "image",
+      status: 1,
+    });
 
     firebase.firestore().collection("DiscussionRoom").doc(gid).update({
-      memberId: mid,
+      groupMember: gm,
     });
     setData(2);
   };
 
-  const RemoveInGroup = (gid, mid) => {
-    const indexx = mid.indexOf(info.userId);
-    if (indexx > -1) {
-      mid.splice(indexx, 1);
-    }
+  const RemoveInGroup = (gid, gm) => {
+    gm.splice(
+      gm.findIndex((v) => v.userId === info.id),
+      1
+    );
 
     firebase.firestore().collection("DiscussionRoom").doc(gid).update({
-      memberId: mid,
+      groupMember: gm,
     });
-
-    firebase
-      .firestore()
-      .collection("DiscussionRoom")
-      .doc(gid)
-      .collection("Mentor")
-      .get()
-      .then((snapshot) => {
-        let mentor = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data };
-        });
-
-        const newArray2 = mentor.filter((e) => e.userId === info.userId);
-        console.log(newArray2);
-
-        const secArray2 = newArray2.map((element) => element.id);
-        console.log(secArray2[0]);
-
-        firebase
-          .firestore()
-          .collection("DiscussionRoom")
-          .doc(gid)
-          .collection("Mentor")
-          .doc(secArray2[0])
-          .delete();
-      });
 
     setData(1);
   };
+
+  function yyy(member) {
+    let x = member.some((el) => el.userId === info.userId);
+    return x;
+  }
 
   return (
     <View>
@@ -145,9 +114,9 @@ function AddInGroup(props) {
             <ViewAvailableGroup
               title={item.title}
               description={item.description}
-              added={item.memberId.includes(info.userId)}
-              RemoveInGroup={() => RemoveInGroup(item.id, item.memberId)}
-              AddInGroup={() => AddInGroup(item.id, item.memberId)}
+              added={yyy(item.groupMember)}
+              RemoveInGroup={() => RemoveInGroup(item.id, item.groupMember)}
+              AddInGroup={() => AddInGroup(item.id, item.groupMember)}
             />
           )}
         />
