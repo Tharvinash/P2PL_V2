@@ -21,7 +21,6 @@ function GroupDetail(props) {
   const mid = props.route.params.mid;
 
   useEffect(() => {
-
     firebase
       .firestore()
       .collection("DiscussionRoom")
@@ -29,16 +28,34 @@ function GroupDetail(props) {
       .get()
       .then((snapshot) => {
         if (snapshot.exists) {
-          setGroupMembers(snapshot.data().groupMember)
+          setGroupMembers(snapshot.data().groupMember.sort(compare));
         } else {
           console.log("does not exist");
         }
-      })
+      });
 
     setData(1);
   }, [data]);
 
-  const removeMember = (id, uid) => {
+  function compare(a, b) {
+    const bandA = a.status;
+    const bandB = b.status;
+
+    let comparison = 0;
+    if (bandA > bandB) {
+      comparison = 1;
+    } else if (bandA < bandB) {
+      comparison = -1;
+    }
+    return comparison;
+  }
+
+  const removeMember = (uid) => {
+    groupMembers.splice(
+      groupMembers.findIndex((v) => v.userId === uid),
+      1
+    );
+
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this group ?",
@@ -47,15 +64,10 @@ function GroupDetail(props) {
         {
           text: "Yes",
           onPress: () => {
-            firebase
-              .firestore()
-              .collection("DiscussionRoom")
-              .doc(roomId)
-              .collection("Mentee")
-              .doc(id)
-              .delete();
-
-            removeId(uid);
+            firebase.firestore().collection("DiscussionRoom").doc(roomId).update({
+              groupMember: groupMembers,
+            });
+            setData(8)
           },
         },
         // The "No" button
@@ -65,18 +77,6 @@ function GroupDetail(props) {
         },
       ]
     );
-  };
-
-  const removeId = (uid) => {
-    const indexx = mid.indexOf(uid);
-    if (indexx > -1) {
-      mid.splice(indexx, 1);
-    }
-
-    firebase.firestore().collection("DiscussionRoom").doc(roomId).update({
-      memberId: mid,
-    });
-    setData(2);
   };
 
   const deleteGroup = () => {
@@ -120,7 +120,7 @@ function GroupDetail(props) {
       </ListItem.Content>
 
       {item.status == 0 || userStatus == 0 ? null : (
-        <TouchableOpacity onPress={() => removeMember(item.id, item.userId)}>
+        <TouchableOpacity onPress={() => removeMember(item.userId)}>
           <Icon
             name="person-remove-outline"
             type="ionicon"
