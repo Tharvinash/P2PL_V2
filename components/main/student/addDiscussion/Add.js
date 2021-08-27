@@ -18,6 +18,7 @@ require("firebase/firebase-storage");
 import { connect } from "react-redux";
 import Modal from "react-native-modal";
 import Images from "react-native-scalable-image";
+import SelectPicker from "react-native-form-select-picker";
 
 function Add(props) {
   const { currentUser } = props;
@@ -29,6 +30,9 @@ function Add(props) {
   const [description, setDescription] = useState("");
   const [faculty, setFaculty] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
+  const [selected, setSelected] = useState();
+
+  const options = ["Apple", "Banana", "Orange"];
 
   useEffect(() => {
     (async () => {
@@ -39,6 +43,19 @@ function Add(props) {
         await ImagePicker.requestCameraRollPermissionsAsync();
       setHasGalleryPermission(galleryStatus.status === "granted");
     })();
+
+    firebase
+      .firestore()
+      .collection("Faculty")
+      .get()
+      .then((snapshot) => {
+        let faculty = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setFaculty(faculty);
+      });
   }, [isLoading]);
 
   const pickImage = async () => {
@@ -67,7 +84,7 @@ function Add(props) {
       return;
     }
 
-    if (!faculty.trim()) {
+    if (!selected.trim()) {
       alert("Please Enter Faculty");
       return;
     }
@@ -109,7 +126,7 @@ function Add(props) {
         .add({
           userId,
           title,
-          faculty,
+          faculty: selected,
           description,
           postedBy: currentUser.name,
           image: currentUser.image,
@@ -166,75 +183,18 @@ function Add(props) {
       <View style={{ margin: 20 }}>
         <View style={{ flexDirection: "row" }}>
           <Text style={styles.fac}>Add Faculty: </Text>
-          <Picker
-            // style={{c: "grey", color: "blue", fontSize:17}}
-            selectedValue={faculty}
-            style={{ height: 50, width: 300, color: "#fff", marginTop: -10 }}
-            onValueChange={(faculty, itemIndex) => setFaculty(faculty)}
-            itemStyle={{ fontFamily: "Poppins" }}
+          <SelectPicker
+          titleText="Faculty"
+          style={styles.ui}
+            onValueChange={(value) => {
+              setSelected(value);
+            }}
+            selected={selected}
           >
-            <Picker.Item
-              label="FACULTY OF EDUCATION"
-              value="FACULTY OF EDUCATION"
-            />
-            <Picker.Item
-              label="FACULTY OF DENTISTRY"
-              value="FACULTY OF DENTISTRY"
-            />
-            <Picker.Item
-              label="FACULTY OF ENGINEERING"
-              value="FACULTY OF ENGINEERING"
-            />
-            <Picker.Item
-              label="FACULTY OF SCIENCE"
-              value="FACULTY OF SCIENCE"
-            />
-            <Picker.Item label="FACULTY OF LAW" value="FACULTY OF LAW" />
-            <Picker.Item
-              label="FACULTY OF MEDICINE"
-              value="FACULTY OF MEDICINE"
-            />
-            <Picker.Item
-              label="FACULTY OF ARTS AND SOCIAL SCIENCE"
-              value="FACULTY OF ARTS AND SOCIAL SCIENCE"
-            />
-            <Picker.Item
-              label="FACULTY OF BUSINESS AND ACCOUNTANCY"
-              value="FACULTY OF BUSINESS AND ACCOUNTANCY"
-            />
-            <Picker.Item
-              label="FACULTY OF ECONOMICS AND ADMINISTRATION"
-              value="FACULTY OF ECONOMICS AND ADMINISTRATION"
-            />
-            <Picker.Item
-              label="FACULTY OF LANGUAGE AND LINGUISTICS"
-              value="FACULTY OF LANGUAGE AND LINGUISTICS"
-            />
-            <Picker.Item
-              label="FACULTY OF BUILT ENVIRONMENT"
-              value="FACULTY OF BUILT ENVIRONMENT"
-            />
-            <Picker.Item
-              label="FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY"
-              value="FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY"
-            />
-            <Picker.Item
-              label="FACULTY OF PHARMACY"
-              value="FACULTY OF PHARMACY"
-            />
-            <Picker.Item
-              label="FACULTY OF CREATIVE ARTS"
-              value="FACULTY OF CREATIVE ARTS"
-            />
-            <Picker.Item
-              label="ACADEMY OF ISLAMIC STUDIES"
-              value="ACADEMY OF ISLAMIC STUDIES"
-            />
-            <Picker.Item
-              label="ACADEMY OF MALAY STUDIES"
-              value="ACADEMY OF MALAY STUDIES"
-            />
-          </Picker>
+            {Object.values(faculty).map((val) => (
+              <SelectPicker.Item label={val.faculty} value={val.faculty} key={val.id} />
+            ))}
+          </SelectPicker>
         </View>
 
         <View style={{ flexDirection: "row" }}>
@@ -331,11 +291,12 @@ const styles = StyleSheet.create({
   },
 
   ui: {
-    width: 120,
-    height: 25,
+    width: 200,
+    height: 30,
     backgroundColor: "#E3562A",
     borderRadius: 16,
     marginRight: 20,
+    textAlign:'center'
   },
 
   uit: {
@@ -344,6 +305,7 @@ const styles = StyleSheet.create({
     left: 10,
     top: 2,
     fontFamily: "Poppins",
+    textAlign:'center'
   },
 
   desc: {
