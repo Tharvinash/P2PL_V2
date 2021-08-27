@@ -17,6 +17,7 @@ import { connect } from "react-redux";
 import { Icon } from "react-native-elements";
 require("firebase/firestore");
 import { useFocusEffect } from "@react-navigation/native";
+import { FAB } from "react-native-elements";
 import Modal from "react-native-modal";
 
 function FilterFeed(props) {
@@ -105,7 +106,6 @@ function FilterFeed(props) {
   const ff = [];
 
   const Save = async () => {
-     
     //setModalVisible(!isModalVisible);
     if (fs === true) {
       ff.push("FACULTY OF SCIENCE");
@@ -148,7 +148,7 @@ function FilterFeed(props) {
     }
     if (fcsit === true) {
       ff.push("FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY");
-      console.log("fcsit")
+      console.log("fcsit");
     }
     if (aois === true) {
       ff.push("ACADEMY OF ISLAMIC STUDIES");
@@ -156,7 +156,7 @@ function FilterFeed(props) {
     if (aoms === true) {
       ff.push("ACADEMY OF MALAY STUDIES");
     }
-console.log(ff)
+    console.log(ff);
     firebase
       .firestore()
       .collection("users")
@@ -181,30 +181,18 @@ console.log(ff)
         aoms,
       })
       .then(() => {
-        props.navigation.navigate("Feed")
+        props.navigation.navigate("Feed");
       });
-     setModalVisible(!isModalVisible);
+    setModalVisible(!isModalVisible);
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ paddingBottom: 70 }}>
         <View style={styles.container}>
-          <View style={{ alignItems: "center", flexDirection: "row" }}>
-            <Text style={styles.title}>
-              You may filter your feed according to your need
-            </Text>
-            <View style={{ marginLeft: -60 }}>
-              <Icon
-                name="save-outline"
-                type="ionicon"
-                size={30}
-                color="#FFF"
-                onPress={() => Save()}
-              />
-            </View>
-          </View>
-
+          <Text style={styles.title}>
+            You may filter your feed according to your need
+          </Text>
           <View style={styles.filterContainer}>
             <Text style={styles.faculty}>FACULTY OF SCIENCE</Text>
             <Switch
@@ -387,12 +375,21 @@ console.log(ff)
           </View>
         </View>
       </ScrollView>
+      <FAB
+        placement="right"
+        color="#E3562A"
+        style={styles.floatButton}
+        onPress={() => Save()}
+        size="large"
+        icon={
+          <Icon name="save-outline" type="ionicon" size={25} color="#FFF" />
+        }
+      />
       <Modal isVisible={isModalVisible}>
-          <View style={{ justifyContent: "center",flex:1 }}>
-          
+        <View style={{ justifyContent: "center", flex: 1 }}>
           <ActivityIndicator size="large" color="#E3562A" />
-          </View>
-        </Modal>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -401,9 +398,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#140F38",
-    // justifyContent: "center",
+    justifyContent: "center",
     alignItems: "center",
   },
+
 
   filterContainer: {
     flexDirection: "row",
@@ -417,6 +415,14 @@ const styles = StyleSheet.create({
     width: 350,
   },
 
+  floatButton: {
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   faculty: {
     color: "#000",
     fontFamily: "Poppins",
@@ -426,31 +432,13 @@ const styles = StyleSheet.create({
   },
 
   title: {
+    textAlign: 'center',
     fontFamily: "Poppins",
     fontSize: 22,
-    margin: 20,
     color: "#fff",
+    margin:20
   },
 
-  logout: {
-    width: 160,
-    height: 40,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
-    borderRadius: 16,
-    marginTop: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
-    fontSize: 18,
-    justifyContent: "space-between",
-  },
 });
 
 const mapStateToProps = (store) => ({

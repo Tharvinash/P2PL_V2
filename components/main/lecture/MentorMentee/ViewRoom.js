@@ -52,6 +52,7 @@ function ViewRoom(props) {
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const [image, setImage] = useState(null); //save local uri
   const [Doc, setDoc] = useState(null); //save local uri
+  const [member, setMember] = useState([]);
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
   const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
@@ -79,7 +80,7 @@ function ViewRoom(props) {
         <View style={{ flexDirection: "row", paddingRight: 15 }}>
           <TouchableOpacity>
             <Icon
-              name="alert-circle-outline"
+              name="information-circle-outline"
               type="ionicon"
               size={30}
               color="#000"
@@ -112,7 +113,8 @@ function ViewRoom(props) {
       .get()
       .then((snapshot) => {
         setUserPosts(snapshot.data());
-        setMid(snapshot.data().memberId)
+        setMember(snapshot.data().groupMember);
+        setMid(snapshot.data().memberId);
       });
 
     firebase
@@ -168,7 +170,7 @@ function ViewRoom(props) {
   }
 
   const navtodetail = () => {
-    props.navigation.navigate("GroupDetail", { did: discussionId, mid:mid });
+    props.navigation.navigate("GroupDetail", { did: discussionId, mid: mid });
   };
 
   const toggleEditComment = () => {
@@ -374,22 +376,9 @@ function ViewRoom(props) {
 
   const callback = (keyword) => {
     setKeyword(keyword);
-    firebase
-      .firestore()
-      .collection("DiscussionRoom")
-      .doc(discussionId)
-      .collection("Mentee")
-      .where("name", ">=", keyword.substring(1))
-      .limit(10)
-      .get()
-      .then((snapshot) => {
-        let result = snapshot.docs.map((doc) => {
-          const datas = doc.data();
-          const id = doc.id;
-          return { id, ...datas };
-        });
-        setDatas(result);
-      });
+    let x = keyword.substring(1);
+    const newArray2 = member.filter((e) => e.name >= x);
+    setDatas(newArray2);
   };
 
   const finalCommentUpload = (doc, img) => {
@@ -594,7 +583,7 @@ function ViewRoom(props) {
                     time: timeDifference(new Date(), item.creation.toDate()),
                     xxx: item.likeBy.includes(userId),
                     mainCommentAuthorName: item.postedBy,
-                    did : discussionId
+                    did: discussionId,
                   })
                 }
               />
