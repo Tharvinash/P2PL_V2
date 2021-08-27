@@ -346,6 +346,8 @@ function EditDeleteDiscussion(props) {
                 postedBy={item.postedBy}
                 creation={item.creation}
                 comment={item.comment}
+                attachedDocument={item.attachedDocument}
+                attachedImage={item.attachedImage}
                 numOfLike={item.numOfLike}
                 likeBy={item.likeBy.includes(userId)}
                 removeLike={() =>
@@ -390,8 +392,7 @@ function EditDeleteDiscussion(props) {
 
         <FAB
         placement="right"
-        title="Add"
-        overlayColor="#000"
+        color="#E3562A"
         style={styles.floatButton}
         onPress={toggleModal}
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}

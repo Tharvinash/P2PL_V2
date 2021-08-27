@@ -655,18 +655,16 @@ function ViewDiscussion(props) {
         }
         ListHeaderComponent={
           <View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignContent: "space-between",
-                paddingRight: 35,
-              }}
-            >
-              <View>
-                <Text style={styles.title}>{userPosts.title}</Text>
+            <View style={{ flexDirection: "row", marginTop: 10 }}>
+              <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                <View style={{ width: "100%" }}>
+                  <Text style={styles.title}>{userPosts.title}</Text>
+                </View>
               </View>
 
-              <View>
+              <View
+                style={{ flexDirection: "row", justifyContent: "flex-end" }}
+              >
                 {user.FavDiscussion.includes(discussionId) ? (
                   <Icon
                     name="bookmark"
@@ -874,7 +872,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontFamily: "Poppins",
-    lineHeight: 20,
     fontWeight: "700",
     marginBottom: 5,
   },

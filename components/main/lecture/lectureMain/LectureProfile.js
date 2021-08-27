@@ -18,7 +18,7 @@ require("firebase/firestore");
 import defaultImage from "../../../../assets/default.jpg";
 import DropDownPicker from "react-native-dropdown-picker";
 
-function Profile(props) {
+function LectureProfile(props) {
   const userId = firebase.auth().currentUser.uid;
   const { currentUser, posts } = props;
   const [refreshing, setRefreshing] = useState(false);
@@ -309,4 +309,4 @@ const mapStateToProps = (store) => ({
   posts: store.userState.posts,
 });
 
-export default connect(mapStateToProps, null)(Profile);
+export default connect(mapStateToProps, null)(LectureProfile);

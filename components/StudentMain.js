@@ -1,5 +1,6 @@
+
 import React, { Component } from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -17,7 +18,7 @@ import {
 import { Icon } from "react-native-elements";
 import firebase from "firebase";
 require("firebase/firestore");
-//, fetchUserPosts, fetchUserFollowing, clearData
+
 import FeedScreen from "./main/student/feed/Feed";
 import ProfileScreen from "./main/student/profile/Profile";
 import InventoryScreen from "./main/student/inventory/Inventory";

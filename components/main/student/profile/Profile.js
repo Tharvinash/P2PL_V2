@@ -14,7 +14,7 @@ import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 import firebase from "firebase";
 require("firebase/firestore");
-import DropDownPicker from "react-native-dropdown-picker";
+import { ListItem, BottomSheet } from "react-native-elements";
 
 function Profile(props) {
   const userId = firebase.auth().currentUser.uid;
@@ -23,10 +23,28 @@ function Profile(props) {
   const [user, setUser] = useState(currentUser);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [items, setItems] = useState([
     { label: "Edit Personal Info", value: "pi" },
     { label: "Edit Password", value: "ep" },
   ]);
+
+  const list = [
+    {
+      title: "Edit Personal Info",
+      onPress: () => props.navigation.navigate("EditProfile", { uid: userId }),
+    },
+    {
+      title: "Edit Password",
+      onPress: () => props.navigation.navigate("Change Password"),
+    },
+    {
+      title: "Cancel",
+      containerStyle: { backgroundColor: "red" },
+      titleStyle: { color: "white" },
+      onPress: () => setIsVisible(false),
+    },
+  ];
 
   const onLogout = () => {
     firebase.auth().signOut();
@@ -34,6 +52,7 @@ function Profile(props) {
 
   useFocusEffect(
     React.useCallback(() => {
+      setIsVisible(false);
       firebase
         .firestore()
         .collection("users")
@@ -50,26 +69,6 @@ function Profile(props) {
     }, [])
   );
 
-  // const onRefresh = useCallback(() => {
-  //   setRefreshing(true);
-
-  //   firebase
-  //     .firestore()
-  //     .collection("users")
-  //     .doc(firebase.auth().currentUser.uid)
-  //     .get()
-  //     .then((snapshot) => {
-  //       if (snapshot.exists) {
-  //         setUser(snapshot.data());
-  //         //console.log(snapshot.data())
-  //       } else {
-  //         console.log("does not exist");
-  //       }
-  //     });
-  //   setRefreshing(false);
-
-  // }, [refreshing]);
-
   if (currentUser === null) {
     return <View />;
   }
@@ -81,6 +80,10 @@ function Profile(props) {
     if (x === "ep") {
       props.navigation.navigate("Change Password");
     }
+  };
+
+  const toggleVisibility = () => {
+    setIsVisible(true);
   };
 
   return (
@@ -103,45 +106,20 @@ function Profile(props) {
         <Text style={styles.us}>{user.name}</Text>
       </View>
       <View style={styles.bb}>
-        <TouchableOpacity style={styles.title}>
-          <Text style={styles.Ltext} resizeMode="cover">
-            Beginner
-          </Text>
-          <Icon
-            style={styles.arrow}
-            name="chevron-forward-outline"
-            type="ionicon"
-            size={20}
-            color="#3C3A36"
-          />
-        </TouchableOpacity>
+        <View style={{ marginHorizontal: 10 }}>
+          <TouchableOpacity style={styles.title}>
+            <Text style={styles.Ltext}>Beginner</Text>
+          </TouchableOpacity>
+        </View>
 
-        <DropDownPicker
-          placeholder="Edit"
-          dropDownContainerStyle={{
-            width: 160,
-            right: 103,
-            paddingTop: 5,
-          }}
-          style={styles.dropdown}
-          placeholderStyle={{
-            color: "#000000",
-            textAlign: "center",
-            fontFamily: "Poppins",
-            fontWeight: "700",
-            fontSize: 15,
-            justifyContent: "space-between",
-          }}
-          open={open}
-          value={value}
-          items={items}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-          onChangeValue={(value) => {
-            xxx(value);
-          }}
-        />
+        <View style={{ marginHorizontal: 10 }}>
+          <TouchableOpacity
+            style={styles.title}
+            onPress={() => toggleVisibility()}
+          >
+            <Text style={styles.Ltext}>Edit Profile</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity
         style={styles.button}
@@ -200,6 +178,22 @@ function Profile(props) {
           color="#3C3A36"
         />
       </TouchableOpacity>
+      <BottomSheet
+        isVisible={isVisible}
+        containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+      >
+        {list.map((l, i) => (
+          <ListItem
+            key={i}
+            containerStyle={l.containerStyle}
+            onPress={l.onPress}
+          >
+            <ListItem.Content>
+              <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+        ))}
+      </BottomSheet>
     </ScrollView>
   );
 }
@@ -250,19 +244,23 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
     fontWeight: "700",
     fontSize: 15,
-    justifyContent: "space-between",
+    //justifyContent: "space-between",
     paddingTop: 8,
   },
 
   title: {
-    width: 160,
-    height: 40,
+    width: Dimensions.get("window").width * 0.4,
+    height: Dimensions.get("window").width * 0.1,
     backgroundColor: "#FFFFFF",
     borderColor: "#E3562A",
     borderRadius: 16,
-    marginTop: 10,
-    left: 100,
-    marginBottom: 10,
+    marginVertical: 10,
+  },
+
+  bb: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
   },
 
   edit: {
@@ -283,12 +281,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
 
     marginHorizontal: 110,
-  },
-
-  bb: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignContent: "space-around",
   },
 
   image: {

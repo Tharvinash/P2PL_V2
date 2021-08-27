@@ -92,15 +92,27 @@ import AdminMainScreen from "./components/AdminMain";
 import ViewDiscussion from "./components/main/admin/ReportDiscussion/ViewDiscussion";
 import ViewReply from "./components/main/admin/ReportDiscussion/ViewReply";
 
+let customFonts = {
+  'Poppins': require("./assets/fonts/Poppins.ttf"),
+  'Poppins-MediumItalic': require("./assets/fonts/Poppins-MediumItalic.ttf"),
+};
+
 export class App extends Component {
   constructor(props) {
     super();
     this.state = {
       loaded: false,
+      fontsLoaded: false,
     };
   }
 
+  async _loadFontsAsync() {
+    await Font.loadAsync(customFonts);
+    this.setState({ fontsLoaded: true });
+  }
+
   async componentDidMount() {
+    this._loadFontsAsync();
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
         this.setState({
@@ -129,15 +141,11 @@ export class App extends Component {
       }
     });
 
-    await Font.loadAsync({
-      Poppins: require("./assets/fonts/Poppins.ttf"),
-      "Poppins-MediumItalic": require("./assets/fonts/Poppins-MediumItalic.ttf"),
-    });
     this.setState({ loading: false });
   }
   render() {
-    const { loggedIn, loaded, status } = this.state;
-    if (!loaded) {
+    const { loggedIn, loaded, status, fontsLoaded } = this.state;
+    if (!loaded || !fontsLoaded ) {
       return (
         <View style={{ flex: 1, justifyContent: "center" }}>
           <AppLoading />
