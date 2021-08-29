@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Picker,
+  Dimensions,
 } from "react-native";
 import { Icon } from "react-native-elements";
 
@@ -35,11 +36,12 @@ export default function Search(props) {
       });
   };
 
-  const searchByCategory = () => {
+  const searchByCategory = (xxx) => {
+    setFaculty(xxx)
     firebase
       .firestore()
       .collection("Discussion")
-      .where("faculty", "==", faculty)
+      .where("faculty", "==", xxx)
       .get()
       .then((snapshot) => {
         let users = snapshot.docs.map((doc) => {
@@ -55,10 +57,9 @@ export default function Search(props) {
     <View style={styles.container}>
       <View style={styles.input}>
         <Icon
-          style={styles.search}
           name="ios-search"
           type="ionicon"
-          size={20}
+          size={25}
           color="#3C3A36"
           onPress={searchByCategory}
         />
@@ -68,6 +69,7 @@ export default function Search(props) {
           placeholderTextColor="#000"
           autoCapitalize="none"
           onChangeText={(search) => fetchUsers(search)}
+          style={{ flex: 1, paddingLeft: 10, fontSize: 18 }}
         />
       </View>
       <View style={styles.dropdown}>
@@ -76,11 +78,12 @@ export default function Search(props) {
           style={{
             height: 50,
             width: 300,
+            alignItems:'center',
+            justifyContent:'center',
             color: "#fff",
-            marginTop: -10,
             fontFamily: "Poppins",
           }}
-          onValueChange={(faculty) => setFaculty(faculty)}
+          onValueChange={(faculty) => searchByCategory(faculty)}
         >
           <Picker.Item
             label="FACULTY OF EDUCATION"
@@ -147,7 +150,7 @@ export default function Search(props) {
         horizontal={false}
         extraData={users}
         data={users}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) =>
           item === " " ? null : (
             <View style={styles.card}>
@@ -216,60 +219,35 @@ const styles = StyleSheet.create({
     marginHorizontal: 18,
   },
 
-  container2: {
-    padding: 15,
-    justifyContent: "space-around",
-    alignItems: "flex-start",
-  },
-
   dropdown: {
-    marginTop: 60,
-    marginLeft: 70,
+    marginTop: 10,
     borderWidth: 1,
-    borderColor: "red",
-    borderRadius: 4,
+    borderRadius: 16,
     backgroundColor: "#E3562A",
-    height: 35,
-    marginRight: 60,
+    height: Dimensions.get("window").height / 15,
+    justifyContent:'center',
+    alignItems:'center',
   },
 
   input: {
     margin: 10,
     borderColor: "#E3562A",
     borderWidth: 1,
-    height: 37,
+    height: Dimensions.get("window").height / 15,
     backgroundColor: "#FFF",
     width: 370,
     borderRadius: 12,
-    padding: 8,
     fontFamily: "Poppins",
-    position: "absolute",
     flexDirection: "row",
-  },
-
-  bell: {
-    position: "absolute",
-    width: 30,
-    height: 30,
-    left: 330,
-    top: 59,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingLeft:10
   },
 
   search: {
     padding: 10,
-    alignItems: "flex-end",
-  },
-
-  gridItem: {
-    flex: 1,
-    margin: 15,
-    width: 340,
-    height: 114,
-    borderRadius: 16,
-    // overflow: Platform.OS ==='android' && Platform.Version>=21 ? "hidden" : 'visible',
-    elevation: 5,
-    backgroundColor: "#003565",
-    marginBottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   faculty: {
@@ -288,10 +266,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
     lineHeight: 25,
-  },
-
-  flat: {
-    marginTop: 0,
-    //justifyContent:,
   },
 });
