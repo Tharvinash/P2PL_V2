@@ -92,21 +92,6 @@ function MentorMenteeStackScreen() {
         component={MainScreen}
         options={{
           headerTitle: "Mentor Mentee Rooms",
-          headerRight: () => (
-            <View style={{  padding:10}}>
-              <View style={{flexDirection: "row", justifyContent:"space-around"}} >
-              <TouchableOpacity style={{  paddingRight:10}} onPress={() => navigation.navigate("RequestForMentor")}>
-                <Text>Mentor</Text>
-                
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => navigation.navigate("RequestToBeMentor")}>
-                <Text>Mentee</Text>
-              </TouchableOpacity>
-              </View>
-
-            </View>
-          ),
         }}
       />
     </HomeStack.Navigator>
