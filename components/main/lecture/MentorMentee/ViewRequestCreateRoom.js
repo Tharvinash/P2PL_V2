@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import firebase from "firebase";
 import { connect } from "react-redux";
@@ -103,9 +104,8 @@ function ViewRequestCreateRoom(props) {
       name: currentUser.name,
       mc: "mc",
       image: "image",
-      status: 0
+      status: 0,
     });
-
 
     firebase
       .firestore()
@@ -165,12 +165,21 @@ function ViewRequestCreateRoom(props) {
         keyExtractor={(list) => list.id}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={{ height: 30, marginVertical: 10 }}>
+          <View style={{ flex: 1, marginVertical:10 }}>
             <TouchableOpacity
               onPress={() => chageList(item.id)}
-              style={{ backgroundColor: "blue", marginHorizontal: 10 }}
+              style={{
+                backgroundColor: item.id == filter ? "#003565": '#140F38',
+                marginHorizontal: 5,
+                width: Dimensions.get("window").width * 0.5,
+                height: 50,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 16
+
+              }}
             >
-              <Text>{item.title}</Text>
+              <Text style={{ color: "#fff" }}>{item.title}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -181,100 +190,102 @@ function ViewRequestCreateRoom(props) {
         data={data}
         keyExtractor={(data) => data.id}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={styles.cardContent}>
-              <View style={{ flex: 1 }}>
-                <Text numberOfLines={2} style={styles.title}>
-                  {item.name}
-                </Text>
-                <Text style={styles.faculty}>mc</Text>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <View style={styles.card}>
+              <View style={styles.cardContent}>
+                <View style={{ flex: 1 }}>
+                  <Text numberOfLines={2} style={styles.title}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.faculty}>mc</Text>
+                </View>
               </View>
+              {filter == 5 || filter == 6 ? (
+                <View>
+                  {mentor.some((el) => el.userId === item.userId) ||
+                  mentee.some((el) => el.userId === item.userId) ? (
+                    <TouchableOpacity
+                      onPress={() =>
+                        addInGroup({
+                          userId: item.userId,
+                          name: item.name,
+                          mc: "mc",
+                          image: "image",
+                        })
+                      }
+                    >
+                      <Icon
+                        name="remove-outline"
+                        type="ionicon"
+                        size={30}
+                        color="#fff"
+                        onPress={() => removeMember(item.userId)}
+                      />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() =>
+                        addInGroup({
+                          userId: item.userId,
+                          name: item.name,
+                          mc: "mc",
+                          image: "image",
+                        })
+                      }
+                    >
+                      <Icon
+                        name="add-outline"
+                        type="ionicon"
+                        size={30}
+                        color="#fff"
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ) : (
+                <View>
+                  {mentor.some((el) => el.userId === item.id) ||
+                  mentee.some((el) => el.userId === item.id) ? (
+                    <TouchableOpacity
+                      onPress={() =>
+                        addInGroup({
+                          userId: item.id,
+                          name: item.name,
+                          mc: "mc",
+                          image: "image",
+                        })
+                      }
+                    >
+                      <Icon
+                        name="remove-outline"
+                        type="ionicon"
+                        size={30}
+                        color="#fff"
+                        onPress={() => removeMember(item.id)}
+                      />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() =>
+                        addInGroup({
+                          userId: item.id,
+                          name: item.name,
+                          mc: "mc",
+                          image: "image",
+                        })
+                      }
+                    >
+                      <Icon
+                        name="add-outline"
+                        type="ionicon"
+                        size={30}
+                        color="#fff"
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
             </View>
-            {filter == 5 || filter == 6 ? (
-              <View>
-                {mentor.some((el) => el.userId === item.userId) ||
-                mentee.some((el) => el.userId === item.userId) ? (
-                  <TouchableOpacity
-                    onPress={() =>
-                      addInGroup({
-                        userId: item.userId,
-                        name: item.name,
-                        mc: "mc",
-                        image: "image",
-                      })
-                    }
-                  >
-                    <Icon
-                      name="remove-outline"
-                      type="ionicon"
-                      size={30}
-                      color="#fff"
-                      onPress={() => removeMember(item.userId)}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() =>
-                      addInGroup({
-                        userId: item.userId,
-                        name: item.name,
-                        mc: "mc",
-                        image: "image",
-                      })
-                    }
-                  >
-                    <Icon
-                      name="add-outline"
-                      type="ionicon"
-                      size={30}
-                      color="#fff"
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-            ) : (
-              <View>
-                {mentor.some((el) => el.userId === item.id) ||
-                mentee.some((el) => el.userId === item.id) ? (
-                  <TouchableOpacity
-                    onPress={() =>
-                      addInGroup({
-                        userId: item.id,
-                        name: item.name,
-                        mc: "mc",
-                        image: "image",
-                      })
-                    }
-                  >
-                    <Icon
-                      name="remove-outline"
-                      type="ionicon"
-                      size={30}
-                      color="#fff"
-                      onPress={() => removeMember(item.id)}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() =>
-                      addInGroup({
-                        userId: item.id,
-                        name: item.name,
-                        mc: "mc",
-                        image: "image",
-                      })
-                    }
-                  >
-                    <Icon
-                      name="add-outline"
-                      type="ionicon"
-                      size={30}
-                      color="#fff"
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
           </View>
         )}
       />
@@ -311,13 +322,13 @@ const styles = StyleSheet.create({
     shadowColor: "#333",
     shadowOpacity: 0.3,
     shadowRadius: 2,
-    marginHorizontal: 4,
-    marginVertical: 6,
-    width: 340,
+    marginHorizontal: 5,
+    marginVertical: 5,
+    width: Dimensions.get("window").width * 0.95,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingRight: 6,
+    paddingRight: 10,
   },
 
   cardContent: {
