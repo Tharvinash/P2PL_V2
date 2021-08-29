@@ -10,9 +10,7 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { ListItem, BottomSheet } from "react-native-elements";
-import Modal from "react-native-modal";
 export default function Landing({ navigation }) {
-  const [isModalVisible, setModalVisible] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useFocusEffect(
@@ -38,9 +36,6 @@ export default function Landing({ navigation }) {
     },
   ];
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
 
   return (
     <View style={styles.container}>
@@ -79,35 +74,6 @@ export default function Landing({ navigation }) {
           </ListItem>
         ))}
       </BottomSheet>
-
-      <Modal isVisible={isModalVisible}>
-        <View style={styles.container}>
-          <View style={{ justifyContent: "center", alignItems:'center' }}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate("Register")}
-            >
-              <Text style={styles.text}>Register as Student</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{ justifyContent: "center", alignItems:'center' }}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate("LectureRegister")}
-            >
-              <Text style={styles.text}>Register as Lecture</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{ justifyContent: "center" }}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => toggleModal()}
-            >
-              <Text style={styles.text}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }

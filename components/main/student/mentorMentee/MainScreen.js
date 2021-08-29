@@ -8,7 +8,7 @@ import {
   Dimensions,
   RefreshControl,
 } from "react-native";
-
+import { SpeedDial } from "react-native-elements";
 import { connect } from "react-redux";
 import { timeDifference } from "../../../utils";
 import firebase from "firebase";
@@ -22,6 +22,7 @@ function MainScreen(props) {
   }
 
   const [post, setPost] = useState(discussionroom);
+  const [open, setOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {
@@ -99,6 +100,24 @@ function MainScreen(props) {
             </View>
           )}
         />
+        <SpeedDial
+          isOpen={open}
+          icon={{ name: "edit", color: "#fff" }}
+          openIcon={{ name: "close", color: "#fff" }}
+          onOpen={() => setOpen(!open)}
+          onClose={() => setOpen(!open)}
+        >
+          <SpeedDial.Action
+            icon={{ name: "add", color: "#fff" }}
+            title="Request To Be Mentor"
+            onPress={() => props.navigation.navigate("RequestToBeMentor")}
+          />
+          <SpeedDial.Action
+            icon={{ name: "add", color: "#fff" }}
+            title="Request For Mentor"
+            onPress={() => props.navigation.navigate("RequestForMentor")}
+          />
+        </SpeedDial>
       </View>
     </View>
   );
