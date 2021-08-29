@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   card: {
-    borderRadius: 16,
+    borderRadius: Dimensions.get("window").width / 24.5,
     elevation: 5,
     backgroundColor: "#003565",
     shadowOffset: { width: 1, height: 1 },
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
+    width: Dimensions.get("window").width * 0.95,
   },
 
   cardContent: {
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    marginTop: 10,
+    marginVertical: 10,
     borderWidth: 1,
     borderRadius: 16,
     backgroundColor: "#E3562A",
