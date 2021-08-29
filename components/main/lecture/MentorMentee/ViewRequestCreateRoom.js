@@ -21,6 +21,7 @@ function ViewRequestCreateRoom(props) {
   const [mentee, setMentee] = useState([]);
   const [mentor, setMentor] = useState([]);
   const [update, setUpdate] = useState(0);
+  const [addedId, setAddedId] = useState([]);
   const [studentId, setStudentId] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const userId = firebase.auth().currentUser.uid;
@@ -75,7 +76,6 @@ function ViewRequestCreateRoom(props) {
   }, [data]);
 
   useEffect(() => {
-    setUpdate(3);
     if (filter == 5) {
       setData(requestToBeAMentor);
     } else if (filter == 6) {
@@ -106,6 +106,24 @@ function ViewRequestCreateRoom(props) {
       image: "image",
       status: 0,
     });
+
+    const newArray = mentee.filter((element) => element.reqId != null);
+
+    for (var i = 0; i < newArray.length; i++) {
+      if (newArray[i].status == 1) {
+        firebase
+          .firestore()
+          .collection("RequestToBeMentor")
+          .doc(newArray[i].reqId)
+          .delete();
+      } else {
+        firebase
+          .firestore()
+          .collection("RequestForMentor")
+          .doc(newArray[i].reqId)
+          .delete();
+      }
+    }
 
     firebase
       .firestore()
@@ -165,18 +183,17 @@ function ViewRequestCreateRoom(props) {
         keyExtractor={(list) => list.id}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={{ flex: 1, marginVertical:10 }}>
+          <View style={{ flex: 1, marginVertical: 10 }}>
             <TouchableOpacity
               onPress={() => chageList(item.id)}
               style={{
-                backgroundColor: item.id == filter ? "#003565": '#140F38',
+                backgroundColor: item.id == filter ? "#003565" : "#140F38",
                 marginHorizontal: 5,
                 width: Dimensions.get("window").width * 0.5,
                 height: 50,
                 justifyContent: "center",
                 alignItems: "center",
-                borderRadius: 16
-
+                borderRadius: 16,
               }}
             >
               <Text style={{ color: "#fff" }}>{item.title}</Text>
@@ -211,6 +228,7 @@ function ViewRequestCreateRoom(props) {
                           name: item.name,
                           mc: "mc",
                           image: "image",
+                          reqId: item.id,
                         })
                       }
                     >
@@ -230,6 +248,7 @@ function ViewRequestCreateRoom(props) {
                           name: item.name,
                           mc: "mc",
                           image: "image",
+                          reqId: item.id,
                         })
                       }
                     >
@@ -290,15 +309,44 @@ function ViewRequestCreateRoom(props) {
         )}
       />
       <Modal isVisible={isModalVisible}>
-        <View>
-          <TouchableOpacity onPress={() => addAsMentor()}>
-            <Text style={{ color: "white" }}>add as mentor</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => addAsMentee()}>
-            <Text style={{ color: "white" }}>add as mentee</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => addInGroup()}>
-            <Text style={{ color: "white" }}>cancle</Text>
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          {filter == 5 ? (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => addAsMentor()}
+            >
+              <Text style={styles.text}>Add As Mentor</Text>
+            </TouchableOpacity>
+          ) : null}
+
+          {filter == 6 ? (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => addAsMentee()}
+            >
+              <Text style={styles.text}>Add As Mentee</Text>
+            </TouchableOpacity>
+          ) : null}
+
+          {filter != 6 && filter != 5 ? (
+            <View>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => addAsMentor()}
+              >
+                <Text style={styles.text}>Add As Mentor</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => addAsMentee()}
+              >
+                <Text style={styles.text}>Add As Mentee</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+
+          <TouchableOpacity style={styles.button} onPress={() => addInGroup()}>
+            <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -352,6 +400,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
     lineHeight: 25,
+  },
+
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E3562A",
+    padding: 14,
+    borderRadius: 20,
+    width: 275,
+    height: 56,
+    margin: 10,
+  },
+
+  text: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
+    fontFamily: "Poppins",
+    fontWeight: "700",
+    alignItems: "flex-end",
   },
 });
 

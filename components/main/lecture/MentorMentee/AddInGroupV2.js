@@ -1,21 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   View,
   StyleSheet,
   FlatList,
+  Dimensions,
+  TouchableOpacity,
+  Alert
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { connect } from "react-redux";
 import { Icon } from "react-native-elements";
 import firebase from "firebase";
 import ViewAvailableGroup from "../../component/viewAvailableGroup";
+
 function AddInGroup(props) {
   const [data, setData] = useState(0);
   const [info, setInfo] = useState([]);
   const { discussionroom } = props;
   const [post, setPost] = useState(discussionroom);
+  const [added, setAdded] = useState(false);
   const userId = firebase.auth().currentUser.uid;
   const infoId = props.route.params.did;
+
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+
+          <TouchableOpacity>
+            <Icon
+              name="save-outline"
+              type="ionicon"
+              size={30}
+              color="#000"
+              onPress={() => {
+                checkOut();
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [data]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -69,7 +95,34 @@ function AddInGroup(props) {
       });
   }, [data]);
 
+  const checkOut = () =>{
+    if(added){
+      return Alert.alert(
+        "Save changes",
+        "Changes are saved !",
+        [
+          // The "Yes" button
+          {
+            text: "Yes",
+            onPress: () => {
+              firebase.firestore().collection("RequestToBeMentor").doc(infoId).delete();
+              props.navigation.navigate("ViewRequest")
+            },
+          },
+          // The "No" button
+          // Does nothing but dismiss the dialog when tapped
+          {
+            text: "No",
+          },
+        ]
+      );
+    }else{
+      props.navigation.navigate("ViewRequest")
+    }
+  }
+
   const AddInGroup = (gid, gm) => {
+    setAdded(true)
     gm.push({
       userId: info.userId,
       name: info.name,
@@ -85,6 +138,7 @@ function AddInGroup(props) {
   };
 
   const RemoveInGroup = (gid, gm) => {
+    setAdded(false)
     gm.splice(
       gm.findIndex((v) => v.userId === info.id),
       1
@@ -143,7 +197,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
+    width: Dimensions.get("window").width * 0.95,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

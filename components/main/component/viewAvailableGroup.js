@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
+  Dimensions,
 } from "react-native";
 import { Icon } from "react-native-elements";
 
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
+    width: Dimensions.get("window").width * 0.95,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
