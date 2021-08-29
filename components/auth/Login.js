@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 18,
+    fontSize: 20,
     textAlign: "center",
     fontFamily: "Poppins",
     fontWeight: "700",

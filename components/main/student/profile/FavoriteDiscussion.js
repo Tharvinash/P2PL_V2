@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
 } from "react-native";
 import { connect } from "react-redux";
@@ -78,51 +76,6 @@ function FavDiscussion(props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  card: {
-    borderRadius: 16,
-    elevation: 5,
-    backgroundColor: "#003565",
-    shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    marginHorizontal: 4,
-    marginVertical: 6,
-    width: 340,
-  },
-
-  cardContent: {
-    marginVertical: 10,
-    marginHorizontal: 18,
-  },
-
-  faculty: {
-    color: "#fff",
-    fontSize: 15,
-    fontFamily: "Poppins",
-  },
-
-  title: {
-    color: "#fff",
-    fontSize: 20,
-    fontFamily: "Poppins",
-    paddingVertical: 0,
-    //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    lineHeight: 25,
-  },
-});
 
 const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,

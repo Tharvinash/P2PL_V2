@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Dimensions
 } from "react-native";
 
 
@@ -34,7 +35,8 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    borderRadius: 16,
+    //16
+    borderRadius: Dimensions.get("window").width / 24.5,
     elevation: 5,
     backgroundColor: "#003565",
     shadowOffset: { width: 1, height: 1 },
@@ -43,7 +45,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
+    width: Dimensions.get("window").width * 0.95,
   },
 
   cardContent: {

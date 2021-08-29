@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Dimensions,
 } from "react-native";
 import { connect } from "react-redux";
 import firebase from "firebase";
@@ -13,7 +14,6 @@ import { SwipeListView } from "react-native-swipe-list-view";
 import DiscussinCard from "../../component/discussionCard";
 
 function Cd(props) {
- 
   const [data, setData] = useState(0);
   const { posts } = props;
   const [post, setPost] = useState([]);
@@ -50,20 +50,20 @@ function Cd(props) {
         });
         const newArray = posts.filter((element) => element.userId === userId);
         setPost(newArray);
-        setData(999)
+        setData(999);
       });
   }, [data]);
 
   const renderItem = (data) => (
     <DiscussinCard
-    title={data.item.title}
-    faculty={data.item.faculty}
-    onSelect={() =>
-      props.navigation.navigate("Created Discussion", {
-        did: data.item.id,
-      })
-    }
-  />
+      title={data.item.title}
+      faculty={data.item.faculty}
+      onSelect={() =>
+        props.navigation.navigate("Created Discussion", {
+          did: data.item.id,
+        })
+      }
+    />
   );
 
   const closeRow = (rowKey) => {
@@ -129,26 +129,6 @@ function Cd(props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  card: {
-    borderRadius: 16,
-    elevation: 5,
-    backgroundColor: "#003565",
-    shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    marginHorizontal: 4,
-    marginVertical: 6,
-    width: 340,
-  },
-
   backRightBtnLeft: {
     backgroundColor: "blue",
     right: 75,
@@ -179,29 +159,6 @@ const styles = StyleSheet.create({
   backRightBtnRight: {
     backgroundColor: "red",
     right: 0,
-  },
-
-  cardContent: {
-    marginVertical: 10,
-    marginHorizontal: 18,
-  },
-
-  faculty: {
-    color: "#fff",
-    fontSize: 15,
-    fontFamily: "Poppins",
-  },
-
-  title: {
-    color: "#fff",
-    fontSize: 20,
-    fontFamily: "Poppins",
-    paddingVertical: 0,
-    //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    lineHeight: 25,
   },
 });
 

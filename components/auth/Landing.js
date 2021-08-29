@@ -2,7 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   Text,
   View,
-  Button,
+  Dimensions,
   StyleSheet,
   TouchableOpacity,
   Image,
@@ -82,7 +82,7 @@ export default function Landing({ navigation }) {
 
       <Modal isVisible={isModalVisible}>
         <View style={styles.container}>
-          <View style={{ justifyContent: "center", marginBottom: 5 }}>
+          <View style={{ justifyContent: "center", alignItems:'center' }}>
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigation.navigate("Register")}
@@ -90,7 +90,7 @@ export default function Landing({ navigation }) {
               <Text style={styles.text}>Register as Student</Text>
             </TouchableOpacity>
           </View>
-          <View style={{ justifyContent: "center", marginBottom: 5 }}>
+          <View style={{ justifyContent: "center", alignItems:'center' }}>
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigation.navigate("LectureRegister")}
@@ -132,11 +132,12 @@ const styles = StyleSheet.create({
 
   button: {
     alignItems: "center",
+    justifyContent:'center',
     backgroundColor: "#E3562A",
     padding: 14,
     borderRadius: 20,
-    width: 275,
-    height: 56,
+    width: Dimensions.get("window").width * 0.7,
+    height: Dimensions.get("window").width * 0.15,
   },
   text: {
     color: "white",
