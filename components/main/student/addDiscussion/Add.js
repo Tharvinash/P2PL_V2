@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   Text,
   View,
@@ -16,6 +16,7 @@ import firebase from "firebase";
 require("firebase/firestore");
 require("firebase/firebase-storage");
 import { connect } from "react-redux";
+import { Icon } from "react-native-elements";
 import Modal from "react-native-modal";
 import Images from "react-native-scalable-image";
 import SelectPicker from "react-native-form-select-picker";
@@ -32,7 +33,23 @@ function Add(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selected, setSelected] = useState();
 
-  const options = ["Apple", "Banana", "Orange"];
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+          <TouchableOpacity>
+            <Icon
+              name="arrow-up-circle-outline"
+              type="ionicon"
+              size={35}
+              color="#000"
+              onPress={() => uploadImage()}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [title]);
 
   useEffect(() => {
     (async () => {
@@ -171,8 +188,16 @@ function Add(props) {
           margin: 20,
         }}
       >
+        <View>
+          <Text style={styles.title}>Title : </Text>
+        </View>
         <TextInput
-          style={styles.title}
+          style={{
+            fontFamily: "Poppins",
+            fontSize: 20,
+            color: "#fff",
+            marginTop: 5,
+          }}
           placeholder="Place your title here"
           placeholderTextColor="#fff"
           multiline={true}
@@ -180,27 +205,53 @@ function Add(props) {
         />
       </View>
 
-      <View style={{ margin: 20 }}>
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.fac}>Add Faculty: </Text>
+      <View style={{ marginLeft: 20 }}>
+        <View style={{ justifyContent: "center" }}>
+          <Text style={styles.title}>Add Faculty: </Text>
           <SelectPicker
-          titleText="Faculty"
-          style={styles.ui}
+            placeholder="Faculty"
+            placeholderStyle={{
+              fontFamily: "Poppins",
+              fontSize: 20,
+              color: "#fff",
+            }}
+            onSelectedStyle={{
+              fontFamily: "Poppins",
+              fontSize: 15,
+              color: "#fff",
+            }}
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              ...styles.ui,
+            }}
             onValueChange={(value) => {
               setSelected(value);
             }}
             selected={selected}
           >
             {Object.values(faculty).map((val) => (
-              <SelectPicker.Item label={val.faculty} value={val.faculty} key={val.id} />
+              <SelectPicker.Item
+                label={val.faculty}
+                value={val.faculty}
+                key={val.id}
+              />
             ))}
           </SelectPicker>
         </View>
 
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.image}>Add Image:</Text>
+        <View>
+          <Text style={styles.title}>Add Image:</Text>
           <TouchableOpacity style={styles.ui} onPress={pickImage}>
-            <Text style={styles.uit}>Upload Image</Text>
+            <Text
+              style={{
+                color: "#fff",
+                fontFamily: "Poppins",
+                fontSize: 20,
+              }}
+            >
+              Upload Image
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -230,12 +281,6 @@ function Add(props) {
           multiline={true}
           onChangeText={(description) => setDescription(description)}
         />
-      </View>
-
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.blogout} onPress={() => uploadImage()}>
-          <Text style={styles.Ltext}>Upload</Text>
-        </TouchableOpacity>
       </View>
 
       <Modal isVisible={isModalVisible}>
@@ -275,7 +320,7 @@ const styles = StyleSheet.create({
   fac: {
     fontFamily: "Poppins",
     fontWeight: "700",
-    fontSize: 20,
+    fontSize: 25,
     color: "#fff",
     alignContent: "space-around",
     paddingBottom: 20,
@@ -284,19 +329,20 @@ const styles = StyleSheet.create({
   image: {
     fontFamily: "Poppins",
     fontWeight: "700",
-    fontSize: 20,
+    fontSize: 25,
     color: "#fff",
     alignContent: "space-around",
     paddingRight: 20,
   },
 
   ui: {
-    width: 200,
-    height: 30,
+    marginVertical: 10,
+    width: Dimensions.get("window").width * 0.5,
+    height: Dimensions.get("window").width * 0.1,
     backgroundColor: "#E3562A",
     borderRadius: 16,
-    marginRight: 20,
-    textAlign:'center'
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   uit: {
@@ -305,7 +351,7 @@ const styles = StyleSheet.create({
     left: 10,
     top: 2,
     fontFamily: "Poppins",
-    textAlign:'center'
+    textAlign: "center",
   },
 
   desc: {

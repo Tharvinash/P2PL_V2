@@ -176,8 +176,6 @@ export class Main extends Component {
         labeled={false}
         barStyle={{
           backgroundColor: "#694fad",
-          borderTopLeftRadius: 50,
-          borderTopRightRadius: 50,
         }}
       >
         <Tab.Screen
