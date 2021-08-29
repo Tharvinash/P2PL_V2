@@ -5,7 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,
+  Dimensions,
   RefreshControl,
 } from "react-native";
 
@@ -77,13 +77,23 @@ function MainScreen(props) {
                     })
                   }
                 >
-                  <Text numberOfLines={2} style={styles.title}>
-                    {item.title}
-                  </Text>
+                  <View style={{ flexDirection: "row" }}>
+                    <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                      <View style={{ flexDirection: "row", width: "100%" }}>
+                        <View style={{ flex: 1 }}>
+                          <Text numberOfLines={2} style={styles.title}>
+                            {item.title}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    <Text style={styles.postedTime}>
+                      {timeDifference(new Date(), item.creation.toDate())}
+                    </Text>
+                  </View>
+
                   <Text style={styles.faculty}>{item.description}</Text>
-                  <Text style={styles.postedTime}>
-                    Posted: {timeDifference(new Date(), item.creation.toDate())}
-                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -102,38 +112,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  button: {
-    alignItems: "center",
-    backgroundColor: "#E3562A",
-    padding: 14,
-    borderRadius: 20,
-  },
-  text: {
-    color: "white",
-    fontSize: 15,
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
-  },
-
   image: {
     flex: 1,
     aspectRatio: 3 / 1,
   },
   postedTime: {
     color: "#fff",
-    fontSize: 11,
+    fontSize: 15,
     fontFamily: "Poppins",
   },
 
   userName: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: "Poppins",
   },
 
   card: {
-    borderRadius: 16,
+    //16
+    borderRadius: Dimensions.get("window").width / 24.5,
     elevation: 5,
     backgroundColor: "#003565",
     shadowOffset: { width: 1, height: 1 },
@@ -142,69 +139,12 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
-  },
-
-  gridItem: {
-    flex: 1,
-    margin: 15,
-    width: 340,
-    height: 114,
-    borderRadius: 16,
-    // overflow: Platform.OS ==='android' && Platform.Version>=21 ? "hidden" : 'visible',
-    elevation: 5,
-    backgroundColor: "#003565",
+    width: Dimensions.get("window").width * 0.95,
   },
 
   cardContent: {
     marginVertical: 10,
     marginHorizontal: 18,
-  },
-
-  appLayout: {
-    borderBottomColor: "#fff",
-    //  height: 37,
-    left: -35,
-    // right: 80,
-    top: 75,
-    borderBottomColor: "white",
-    borderBottomWidth: 1,
-    marginBottom: 5,
-  },
-
-  app: {
-    fontFamily: "Poppins-MediumItalic",
-    fontSize: 20,
-    color: "#fff",
-    justifyContent: "flex-start",
-  },
-
-  line: {
-    borderBottomColor: "#fff",
-    borderBottomWidth: 1,
-  },
-
-  container2: {
-    padding: 15,
-    justifyContent: "space-around",
-    alignItems: "flex-start",
-  },
-
-  bell: {
-    position: "absolute",
-    width: 30,
-    height: 30,
-    left: 325,
-    top: 59,
-    // paddingLeft:10
-  },
-
-  search: {
-    position: "absolute",
-    width: 30,
-    height: 30,
-    left: 290,
-    top: 59,
   },
 
   faculty: {
@@ -217,7 +157,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 25,
     fontFamily: "Poppins",
-    lineHeight: 32,
+    lineHeight: 35,
   },
 });
 

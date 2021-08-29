@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
+  Dimensions,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
@@ -16,23 +17,20 @@ require("firebase/firestore");
 
 function Feed(props) {
   const { posts, currentUser } = props;
-  
+
   if (currentUser === null || currentUser.filteredFeed === null) {
     return <View />;
   }
-  
+
   const [post, setPost] = useState(posts);
   const [refreshing, setRefreshing] = useState(false);
 
   const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
 
-
-
-
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-  
-      firebase
+
+    firebase
       .firestore()
       .collection("Discussion")
       .orderBy("creation", "desc")
@@ -47,7 +45,7 @@ function Feed(props) {
         setRefreshing(false);
       });
 
-      firebase
+    firebase
       .firestore()
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -58,25 +56,23 @@ function Feed(props) {
         } else {
           console.log("does not exist");
         }
-      })
+      });
     setRefreshing(false);
-
   }, [refreshing]);
 
-
-  if(post.length == 0){
-    return(
-    <View style={styles.container}>
-      <View style={{marginTop: 8}} >
-        <FlatList
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          horizontal={false}
-          data={posts}
-          renderItem={({ item }) =>
-            FilterFeed.indexOf(item.faculty) !== -1 ? (
-              <View style={styles.card}>
+  if (post.length == 0) {
+    return (
+      <View style={styles.container}>
+        <View style={{ marginTop: 8 }}>
+          <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            horizontal={false}
+            data={posts}
+            renderItem={({ item }) =>
+              FilterFeed.indexOf(item.faculty) !== -1 ? (
+                <View style={styles.card}>
                 <View style={styles.cardContent}>
                   <TouchableOpacity
                     style={{ flex: 1 }}
@@ -87,50 +83,55 @@ function Feed(props) {
                     }
                   >
                     <View style={{ flexDirection: "row" }}>
-                      
-                        <Image
-                          style={{
-                            width: 35,
-                            height: 35,
-                            borderRadius: 35 / 2,
-                            marginBottom: 10,
-                          }}
-                          source={{ uri: item.image }}
-                        />
-                      
-                      <View
-                        style={{
-                          marginLeft: 10,
-                          marginTop: 8,
-                          flexDirection: "row",
-                        }}
-                      >
-                        <Text style={styles.userName}>{item.postedBy}</Text>
+                      <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                        <View style={{ flexDirection: "row", width: "100%" }}>
+                          <Image
+                            style={{
+                              width: 35,
+                              height: 35,
+                              borderRadius: 35 / 2,
+                              marginBottom: 10,
+                            }}
+                            source={{ uri: item.image }}
+                          />
+                          <View style={{ flex: 1, paddingLeft: 10 }}>
+                            <Text style={styles.userName}>{item.postedBy}</Text>
+                          </View>
+                        </View>
                       </View>
+
+                      <Text style={styles.postedTime}>
+                        {timeDifference(new Date(), item.creation.toDate())}
+                      </Text>
                     </View>
 
                     <Text numberOfLines={2} style={styles.title}>
                       {item.title}
                     </Text>
-                    <Text style={styles.faculty}>{item.faculty}</Text>
-                    <Text style={styles.postedTime}>
-                      Posted:{" "}
-                      {timeDifference(new Date(), item.creation.toDate())}
-                    </Text>
+
+                    <View
+                      style={{
+                        backgroundColor: "#003565",
+                        borderRadius: 16,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#fff" }}>{item.faculty}</Text>
+                    </View>
                   </TouchableOpacity>
                 </View>
               </View>
-            ) : null
-          }
-        />
+              ) : null
+            }
+          />
+        </View>
       </View>
-    </View>)
+    );
   }
-
 
   return (
     <View style={styles.container}>
-      <View style={{margin: 8}}>
+      <View style={{ marginTop: 8 }}>
         <FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -150,36 +151,41 @@ function Feed(props) {
                     }
                   >
                     <View style={{ flexDirection: "row" }}>
-                      
-                        <Image
-                          style={{
-                            width: 35,
-                            height: 35,
-                            borderRadius: 35 / 2,
-                            marginBottom: 10,
-                          }}
-                          source={{ uri: item.image }}
-                        />
-                     
-                      <View
-                        style={{
-                          marginLeft: 10,
-                          marginTop: 8,
-                          flexDirection: "row",
-                        }}
-                      >
-                        <Text style={styles.userName}>{item.postedBy}</Text>
+                      <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                        <View style={{ flexDirection: "row", width: "100%" }}>
+                          <Image
+                            style={{
+                              width: 35,
+                              height: 35,
+                              borderRadius: 35 / 2,
+                              marginBottom: 10,
+                            }}
+                            source={{ uri: item.image }}
+                          />
+                          <View style={{ flex: 1, paddingLeft: 10 }}>
+                            <Text style={styles.userName}>{item.postedBy}</Text>
+                          </View>
+                        </View>
                       </View>
+
+                      <Text style={styles.postedTime}>
+                        {timeDifference(new Date(), item.creation.toDate())}
+                      </Text>
                     </View>
 
                     <Text numberOfLines={2} style={styles.title}>
                       {item.title}
                     </Text>
-                    <Text style={styles.faculty}>{item.faculty}</Text>
-                    <Text style={styles.postedTime}>
-                      Posted:{" "}
-                      {timeDifference(new Date(), item.creation.toDate())}
-                    </Text>
+
+                    <View
+                      style={{
+                        backgroundColor: "#003565",
+                        borderRadius: 16,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#fff" }}>{item.faculty}</Text>
+                    </View>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -205,18 +211,19 @@ const styles = StyleSheet.create({
   },
   postedTime: {
     color: "#fff",
-    fontSize: 11,
+    fontSize: 15,
     fontFamily: "Poppins",
   },
 
   userName: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: "Poppins",
   },
 
   card: {
-    borderRadius: 16,
+    //16
+    borderRadius: Dimensions.get("window").width / 24.5,
     elevation: 5,
     backgroundColor: "#003565",
     shadowOffset: { width: 1, height: 1 },
@@ -225,69 +232,12 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
-  },
-
-  gridItem: {
-    flex: 1,
-    margin: 15,
-    width: 340,
-    height: 114,
-    borderRadius: 16,
-    // overflow: Platform.OS ==='android' && Platform.Version>=21 ? "hidden" : 'visible',
-    elevation: 5,
-    backgroundColor: "#003565",
+    width: Dimensions.get("window").width * 0.95,
   },
 
   cardContent: {
     marginVertical: 10,
     marginHorizontal: 18,
-  },
-
-  appLayout: {
-    borderBottomColor: "#fff",
-    //  height: 37,
-    left: -35,
-    // right: 80,
-    top: 75,
-    borderBottomColor: "white",
-    borderBottomWidth: 1,
-    marginBottom: 5,
-  },
-
-  app: {
-    fontFamily: "Poppins-MediumItalic",
-    fontSize: 20,
-    color: "#fff",
-    justifyContent: "flex-start",
-  },
-
-  line: {
-    borderBottomColor: "#fff",
-    borderBottomWidth: 1,
-  },
-
-  container2: {
-    padding: 15,
-    justifyContent: "space-around",
-    alignItems: "flex-start",
-  },
-
-  bell: {
-    position: "absolute",
-    width: 30,
-    height: 30,
-    left: 325,
-    top: 59,
-    // paddingLeft:10
-  },
-
-  search: {
-    position: "absolute",
-    width: 30,
-    height: 30,
-    left: 290,
-    top: 59,
   },
 
   faculty: {
@@ -300,7 +250,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 25,
     fontFamily: "Poppins",
-    lineHeight: 32,
+    lineHeight: 35,
   },
 });
 
