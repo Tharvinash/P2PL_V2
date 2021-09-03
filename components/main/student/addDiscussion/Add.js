@@ -57,7 +57,7 @@ function Add(props) {
       // setHasCameraPermission(cameraStatus.status === 'granted');
 
       const galleryStatus =
-        await ImagePicker.requestCameraRollPermissionsAsync();
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       setHasGalleryPermission(galleryStatus.status === "granted");
     })();
 

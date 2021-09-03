@@ -825,49 +825,13 @@ function Reply(props) {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ alignItems: "center", justifyContent: "center" }}
-    >
-      <View style={styles.container}>
-        <MainCommentCard
-          picture={mainComment.image}
-          time={time}
-          status={loginCurrentUser.status}
-          verify={mainComment.verify}
-          postedBy={mainComment.postedBy}
-          creation={mainComment.creation}
-          comment={mainComment.comment}
-          attachedDocument={mainComment.attachedDocument}
-          attachedImage={mainComment.attachedImage}
-          numOfLike={mainComment.numOfLike}
-          likeBy={likeBy}
-          removeVerifyComment={() => removeVerifyComment()}
-          verifyComment={() => verifyComment()}
-          removeLike={() =>
-            removeLike(
-              mainComment.id,
-              mainComment.numOfLike,
-              mainComment.likeBy
-            )
-          }
-          xxx={() => toggleVisibility(mainComment.id)}
-          addLike={() =>
-            addLike(mainComment.id, mainComment.numOfLike, mainComment.likeBy)
-          }
-          firstUserId={mainComment.userId}
-          secondUserId={userId}
-          delete={() => Delete(mainComment.id)}
-          editComment={() => EditComment(mainComment.id)}
-          toggleReplyComment={() => toggleReplyComment()}
-        />
-
-        {/* ------------------------------------  reply comment  ------------------------- */}
-        <View style={{ marginLeft: 30, marginTop: 5 }}>
-          <FlatList
-            horizontal={false}
-            extraData={replyComment}
-            data={replyComment}
-            renderItem={({ item }) => (
+    <View style={styles.container}>
+      <FlatList
+        horizontal={false}
+        extraData={replyComment}
+        data={replyComment}
+        renderItem={({ item }) => (
+          <View style={{ marginLeft: 30, marginTop: 5 }}>
               <ReplyCommentCard
                 removeVerifyReplyComment={() =>
                   removeVerifyReplyComment(item.id)
@@ -900,94 +864,133 @@ function Reply(props) {
                   toggleSubReplyComment(item.id, item.postedBy)
                 }
               />
-            )}
-          />
-        </View>
-        {/* BottomSheet for main comment */}
-        <BottomSheet
-          isVisible={isVisible}
-          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-        >
-          {list.map((l, i) => (
-            <ListItem
-              key={i}
-              containerStyle={l.containerStyle}
-              onPress={l.onPress}
+          </View>
+        )}
+
+        ListHeaderComponent={
+          <View>
+        <MainCommentCard
+          picture={mainComment.image}
+          time={time}
+          status={loginCurrentUser.status}
+          verify={mainComment.verify}
+          postedBy={mainComment.postedBy}
+          creation={mainComment.creation}
+          comment={mainComment.comment}
+          attachedDocument={mainComment.attachedDocument}
+          attachedImage={mainComment.attachedImage}
+          numOfLike={mainComment.numOfLike}
+          likeBy={likeBy}
+          removeVerifyComment={() => removeVerifyComment()}
+          verifyComment={() => verifyComment()}
+          removeLike={() =>
+            removeLike(
+              mainComment.id,
+              mainComment.numOfLike,
+              mainComment.likeBy
+            )
+          }
+          xxx={() => toggleVisibility(mainComment.id)}
+          addLike={() =>
+            addLike(mainComment.id, mainComment.numOfLike, mainComment.likeBy)
+          }
+          firstUserId={mainComment.userId}
+          secondUserId={userId}
+          delete={() => Delete(mainComment.id)}
+          editComment={() => EditComment(mainComment.id)}
+          toggleReplyComment={() => toggleReplyComment()}
+        />
+          </View>
+        }
+
+
+        ListFooterComponent={
+          <View>
+            {/* BottomSheet for main comment */}
+            <BottomSheet
+              isVisible={isVisible}
+              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
             >
-              <ListItem.Content>
-                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </BottomSheet>
+              {list.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
+                >
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
 
-        {/* BottomSheet for sub comment */}
-        <BottomSheet
-          isVisible={isVisibleV2}
-          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-        >
-          {listV2.map((l, i) => (
-            <ListItem
-              key={i}
-              containerStyle={l.containerStyle}
-              onPress={l.onPress}
+            {/* BottomSheet for sub comment */}
+            <BottomSheet
+              isVisible={isVisibleV2}
+              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
             >
-              <ListItem.Content>
-                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </BottomSheet>
+              {listV2.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
+                >
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
 
-        {/* Edit Reply Modal */}
-        <Modal isVisible={isEditCommentModalVisible}>
-          <EditCommentCom
-            editComment={editComment}
-            setEditComment={(editComment) => setEditComment(editComment)}
-            uploadUpdatedComment={() => uploadUpdatedComment()}
-            toggleEditComment={() => toggleEditComment()}
-          />
-        </Modal>
+            {/* Edit Reply Modal */}
+            <Modal isVisible={isEditCommentModalVisible}>
+              <EditCommentCom
+                editComment={editComment}
+                setEditComment={(editComment) => setEditComment(editComment)}
+                uploadUpdatedComment={() => uploadUpdatedComment()}
+                toggleEditComment={() => toggleEditComment()}
+              />
+            </Modal>
 
-        {/* Reply Comment Modal */}
-        <Modal isVisible={isReplyCommentModalVisible}>
-          <AddComment
-            setNewComment={(newReply) => setNewReply(newReply)}
-            pickDocument={() => pickDocument()}
-            pickImage={() => pickImage()}
-            UploadComment={() => UploadComment()}
-            toggleModal={() => toggleReplyComment()}
-          />
-        </Modal>
+            {/* Reply Comment Modal */}
+            <Modal isVisible={isReplyCommentModalVisible}>
+              <AddComment
+                setNewComment={(newReply) => setNewReply(newReply)}
+                pickDocument={() => pickDocument()}
+                pickImage={() => pickImage()}
+                UploadComment={() => UploadComment()}
+                toggleModal={() => toggleReplyComment()}
+              />
+            </Modal>
 
-        {/* Reply to Reply Comment Modal */}
+            {/* Reply to Reply Comment Modal */}
+            <Modal isVisible={isReplySubCommentModalVisible}>
+              <AddComment
+                setNewComment={(replyOfSubComment) =>
+                  setReplyOfSubComment(replyOfSubComment)
+                }
+                pickDocument={() => pickDocument()}
+                pickImage={() => pickImage()}
+                UploadComment={() => UploadCommentV2()}
+                toggleModal={() => toggleSubReplyComment()}
+              />
+            </Modal>
 
-        <Modal isVisible={isReplySubCommentModalVisible}>
-          <AddComment
-            setNewComment={(replyOfSubComment) =>
-              setReplyOfSubComment(replyOfSubComment)
-            }
-            pickDocument={() => pickDocument()}
-            pickImage={() => pickImage()}
-            UploadComment={() => UploadCommentV2()}
-            toggleModal={() => toggleSubReplyComment()}
-          />
-        </Modal>
-
-        {/* Edit Reply Comment */}
-
-        <Modal isVisible={isEditReplyCommentModalVisible}>
-          <EditCommentCom
-            editComment={editReplyComment}
-            setEditComment={(editReplyComment) =>
-              setEditReplyComment(editReplyComment)
-            }
-            uploadUpdatedComment={() => UploadEditSubComment()}
-            toggleEditComment={() => toggleReplyEditComment()}
-          />
-        </Modal>
-      </View>
-    </ScrollView>
+            {/* Edit Reply Comment */}
+            <Modal isVisible={isEditReplyCommentModalVisible}>
+              <EditCommentCom
+                editComment={editReplyComment}
+                setEditComment={(editReplyComment) =>
+                  setEditReplyComment(editReplyComment)
+                }
+                uploadUpdatedComment={() => UploadEditSubComment()}
+                toggleEditComment={() => toggleReplyEditComment()}
+              />
+            </Modal>
+          </View>
+        }
+      />
+    </View>
   );
 }
 

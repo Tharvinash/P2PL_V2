@@ -60,7 +60,7 @@ function EditDeleteDiscussion(props) {
     },
     {
       title: "Delete",
-      onPress: () => Delete(temporaryId),
+      onPress: () => DeleteComment(temporaryId),
     },
     {
       title: "Cancel",
@@ -154,7 +154,7 @@ function EditDeleteDiscussion(props) {
       setEditCommentModalVisible(!isEditCommentModalVisible);
     }
 
-    setData(88);
+    setData(1);
   };
 
   if (user === null) {
@@ -305,164 +305,169 @@ function EditDeleteDiscussion(props) {
   };
 
   return (
-    <ScrollView
-    contentContainerStyle={{ flex: 1}}
-    >
-      <View style={styles.container}>
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.title}>{userPosts.title}</Text>
-        </View>
-        {userPosts.downloadURL && (
-          <View
-            style={{
-              flexDirection: "row",
-              paddingBottom: 10,
-              justifyContent: "center",
-            }}
-          >
-            <Images
-              width={Dimensions.get("window").width} // height will be calculated automatically
-              source={{ uri: userPosts.downloadURL }}
+    <View style={styles.container}>
+      <FlatList
+        horizontal={false}
+        extraData={comment}
+        data={comment}
+        renderItem={({ item }) =>
+          item.discussionId === discussionId ? (
+            <CommentCard
+              picture={item.image}
+              status={0}
+              verify={item.verify}
+              postedBy={item.postedBy}
+              creation={item.creation}
+              comment={item.comment}
+              attachedDocument={item.attachedDocument}
+              attachedImage={item.attachedImage}
+              numOfLike={item.numOfLike}
+              likeBy={item.likeBy.includes(userId)}
+              removeLike={() =>
+                removeLike(item.id, item.numOfLike, item.likeBy)
+              }
+              xxx={() => toggleVisibility(item.id)}
+              addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
+              firstUserId={item.userId}
+              secondUserId={userId}
+              delete={() => DeleteComment(item.id)}
+              editComment={() => EditComment(item.id)}
+              numberOfReply={item.numberOfReply}
+              onSelect={() =>
+                props.navigation.navigate("Reply Discussion", {
+                  cid: item.id,
+                  time: timeDifference(new Date(), item.creation.toDate()),
+                  xxx: item.likeBy.includes(userId),
+                  mainCommentAuthorName: item.postedBy,
+                })
+              }
             />
+          ) : null
+        }
+        ListHeaderComponent={
+          <View>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.title}>{userPosts.title}</Text>
+            </View>
+            {userPosts.downloadURL && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  paddingBottom: 10,
+                  justifyContent: "center",
+                }}
+              >
+                <Images
+                  width={Dimensions.get("window").width * 0.9} // height will be calculated automatically
+                  source={{ uri: userPosts.downloadURL }}
+                />
+              </View>
+            )}
+
+            <View style={styles.desc}>
+              <Text style={styles.descT}>{userPosts.description}</Text>
+            </View>
+
+            <View style={{ paddingBottom: 10 }}>
+              <Text style={styles.comT}>Comments:</Text>
+            </View>
           </View>
-        )}
-
-        <View style={styles.desc}>
-          <Text style={styles.descT}>{userPosts.description}</Text>
-        </View>
-        <View style={{ paddingBottom: 10 }}>
-          <Text style={styles.comT}>Comments:</Text>
-        </View>
-        <FlatList
-          horizontal={false}
-          extraData={comment}
-          data={comment}
-          renderItem={({ item }) =>
-            item.discussionId === discussionId ? (
-              <CommentCard
-                picture={item.image}
-                status={0}
-                verify={item.verify}
-                postedBy={item.postedBy}
-                creation={item.creation}
-                comment={item.comment}
-                attachedDocument={item.attachedDocument}
-                attachedImage={item.attachedImage}
-                numOfLike={item.numOfLike}
-                likeBy={item.likeBy.includes(userId)}
-                removeLike={() =>
-                  removeLike(item.id, item.numOfLike, item.likeBy)
-                }
-                xxx={() => toggleVisibility(item.id)}
-                addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
-                firstUserId={item.userId}
-                secondUserId={userId}
-                delete={() => DeleteComment(item.id)}
-                editComment={() => EditComment(item.id)}
-                numberOfReply={item.numberOfReply}
-                onSelect={() =>
-                  props.navigation.navigate("Reply Discussion", {
-                    cid: item.id,
-                    time: timeDifference(new Date(), item.creation.toDate()),
-                    xxx: item.likeBy.includes(userId),
-                    mainCommentAuthorName: item.postedBy,
-                  })
-                }
-              />
-            ) : null
-          }
-        />
-
-        <BottomSheet
-          isVisible={isVisible}
-          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-        >
-          {list.map((l, i) => (
-            <ListItem
-              key={i}
-              containerStyle={l.containerStyle}
-              onPress={l.onPress}
+        }
+        ListFooterComponent={
+          <View>
+            <BottomSheet
+              isVisible={isVisible}
+              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
             >
-              <ListItem.Content>
-                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </BottomSheet>
+              {list.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
+                >
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>
+                      {l.title}
+                    </ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
 
-        <FAB
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <Modal isVisible={isModalVisible}>
+                <View style={{ justifyContent: "center" }}>
+                  <View style={{ marginLeft: 8 }}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Add comments here"
+                      placeholderTextColor="#000"
+                      multiline={true}
+                      onChangeText={(newComment) => setNewComment(newComment)}
+                    />
+                  </View>
+
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignContent: "space-between",
+                    }}
+                  >
+                    <View
+                      style={{
+                        paddingHorizontal: 20,
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={styles.blogout}
+                        onPress={() => UploadComment()}
+                      >
+                        <Text style={styles.Ltext}>Add Comment</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View
+                      style={{
+                        paddingHorizontal: 20,
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={styles.blogout}
+                        onPress={toggleModal}
+                      >
+                        <Text style={styles.Ltext}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+              <Modal isVisible={isEditCommentModalVisible}>
+                <EditCommentCom
+                  editComment={editComment}
+                  setEditComment={(editComment) => setEditComment(editComment)}
+                  uploadUpdatedComment={() => uploadUpdatedComment()}
+                  toggleEditComment={() => toggleEditComment()}
+                />
+              </Modal>
+            </View>
+          </View>
+        }
+      />
+      <FAB
         placement="right"
         color="#E3562A"
         style={styles.floatButton}
         onPress={toggleModal}
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
-
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
-          <Modal isVisible={isModalVisible}>
-            <View style={{ justifyContent: "center" }}>
-              <View style={{ marginLeft: 8 }}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Add comments here"
-                  placeholderTextColor="#000"
-                  multiline={true}
-                  onChangeText={(newComment) => setNewComment(newComment)}
-                />
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignContent: "space-between",
-                }}
-              >
-                <View
-                  style={{
-                    paddingHorizontal: 20,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={styles.blogout}
-                    onPress={() => UploadComment()}
-                  >
-                    <Text style={styles.Ltext}>Add Comment</Text>
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    paddingHorizontal: 20,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={styles.blogout}
-                    onPress={toggleModal}
-                  >
-                    <Text style={styles.Ltext}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </Modal>
-          <Modal isVisible={isEditCommentModalVisible}>
-            <EditCommentCom
-              editComment={editComment}
-              setEditComment={(editComment) => setEditComment(editComment)}
-              uploadUpdatedComment={() => uploadUpdatedComment()}
-              toggleEditComment={() => toggleEditComment()}
-            />
-          </Modal>
-        </View>
-      </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
+    margin: 10,
   },
   input: {
     height: 60,

@@ -115,7 +115,7 @@ function ViewDiscussion(props) {
       // setHasCameraPermission(cameraStatus.status === 'granted');
 
       const galleryStatus =
-        await ImagePicker.requestCameraRollPermissionsAsync();
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       setHasGalleryPermission(galleryStatus.status === "granted");
     })();
 
@@ -435,7 +435,7 @@ function ViewDiscussion(props) {
         console.log("done");
       });
 
-    const FB = [];
+    const FB = userPosts.favBy;
     FB.push(userId);
     firebase
       .firestore()

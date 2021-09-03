@@ -15,15 +15,13 @@ import Images from "react-native-scalable-image";
 
 import Modal from "react-native-modal";
 function EditDiscussion(props) {
-
-
   const [userPosts, setUserPosts] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [imageChanged, setImageChanged] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [di, setDi] = useState(null)
+  const [di, setDi] = useState(null);
 
   useEffect(() => {
     firebase
@@ -62,6 +60,9 @@ function EditDiscussion(props) {
             .doc(props.route.params.did)
             .update({
               downloadURL: snapshot,
+              title,
+              description,
+              creation: firebase.firestore.FieldValue.serverTimestamp(),
             })
             .then(() => {
               props.navigation.goBack();
@@ -109,21 +110,20 @@ function EditDiscussion(props) {
     }
   };
 
-  const removeImage = () =>{
+  const removeImage = () => {
     setModalVisible(!isModalVisible);
     firebase
-    .firestore()
-    .collection("Discussion")
-    .doc(props.route.params.did)
-    .update({
-      downloadURL: null,
-    })
-    .then(() => {
-      props.navigation.goBack();
-      setModalVisible(!isModalVisible);
-    });
-  }
-
+      .firestore()
+      .collection("Discussion")
+      .doc(props.route.params.did)
+      .update({
+        downloadURL: null,
+      })
+      .then(() => {
+        props.navigation.goBack();
+        setModalVisible(!isModalVisible);
+      });
+  };
 
   return (
     <ScrollView style={styles.container}>
