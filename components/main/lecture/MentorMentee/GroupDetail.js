@@ -58,7 +58,7 @@ function GroupDetail(props) {
 
     return Alert.alert(
       "Are your sure?",
-      "Are you sure you want to delete this group ?",
+      "Are you sure you want to remove this member ?",
       [
         // The "Yes" button
         {
@@ -90,7 +90,7 @@ function GroupDetail(props) {
           onPress: () => {
             firebase
               .firestore()
-              .collection("DiscussionRoomComment")
+              .collection("DiscussionRoom")
               .doc(roomId)
               .delete();
             props.navigation.navigate("Room");

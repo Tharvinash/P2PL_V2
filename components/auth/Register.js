@@ -22,6 +22,7 @@ export class Register extends Component {
       name: "",
       faculty: null,
       year: null,
+      mc: null,
       data: [],
     };
 
@@ -35,7 +36,6 @@ export class Register extends Component {
   updateFaculty = (faculty) => {
     this.setState({ faculty: faculty });
   };
-
 
   getData() {
     setTimeout(() => {
@@ -60,7 +60,7 @@ export class Register extends Component {
   }
 
   validate() {
-    const { email, password, name, faculty, year, data } = this.state;
+    const { email, password, name, faculty, year, data, mc } = this.state;
     const found = data.some((el) => el.email === email);
     const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     // ------------------------------------------------------------------------ //
@@ -119,12 +119,17 @@ export class Register extends Component {
           },
         ]
       );
-    }else{
-      if (validator.isStrongPassword(password, {
-        minLength: 8, minLowercase: 1,
-        minUppercase: 1, minNumbers: 1, minSymbols: 1
-      })) {
-        console.log('Is Strong Password')
+    } else {
+      if (
+        validator.isStrongPassword(password, {
+          minLength: 8,
+          minLowercase: 1,
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 1,
+        })
+      ) {
+        console.log("Is Strong Password");
       } else {
         return Alert.alert(
           "Invalid password",
@@ -138,19 +143,15 @@ export class Register extends Component {
       }
     }
 
-    if(faculty == null){
-      return Alert.alert(
-        "Invalid faculty input",
-        "Please choose a faculty",
-        [
-          {
-            text: "Retry",
-          },
-        ]
-      );
+    if (faculty == null) {
+      return Alert.alert("Invalid faculty input", "Please choose a faculty", [
+        {
+          text: "Retry",
+        },
+      ]);
     }
 
-    if(year == null){
+    if (year == null) {
       return Alert.alert(
         "Invalid year input",
         "Please choose your current year of study",
@@ -163,11 +164,10 @@ export class Register extends Component {
     }
 
     this.onSignUp();
-
   }
 
   onSignUp() {
-    const { email, password, name, faculty, year } = this.state;
+    const { email, password, name, faculty, year, mc } = this.state;
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
@@ -179,10 +179,11 @@ export class Register extends Component {
           .set({
             name,
             email,
+            matricNumber: mc,
             FavDiscussion: [],
             faculty,
             status: 0,
-            year,
+            year: parseInt(year),
             fca: true,
             fp: true,
             fs: true,
@@ -251,6 +252,15 @@ export class Register extends Component {
           placeholderTextColor="#000"
           autoCapitalize="none"
           onChangeText={(email) => this.setState({ email })}
+        />
+
+        <TextInput
+          style={styles.input}
+          underlineColorAndroid="transparent"
+          placeholder="Matric Number"
+          placeholderTextColor="#000"
+          autoCapitalize="none"
+          onChangeText={(mc) => this.setState({ mc })}
         />
 
         <TextInput

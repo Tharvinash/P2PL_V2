@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  CheckBox,
+  Alert,
 } from "react-native";
 import { connect } from "react-redux";
 import firebase from "firebase";
@@ -29,6 +29,21 @@ function CreateRoom(props) {
   );
 
   const toggleVisibility = () => {
+    if (!title.trim()) {
+      return Alert.alert("Invalid title input", "Title input cannot be empty", [
+        {
+          text: "Retry",
+        },
+      ]);
+    }
+    if (!desc.trim()) {
+      return Alert.alert("Invalid description input", "Description input cannot be empty", [
+        {
+          text: "Retry",
+        },
+      ]);
+    }
+
     props.navigation.navigate("ViewRequestCreateRoom",{title, desc})
   };
 

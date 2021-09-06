@@ -997,11 +997,7 @@ function Reply(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
-    // marginTop: 20,
-    marginBottom: 5,
-    // marginLeft: 20,
-    // marginLeft:20
+    margin: 10,
   },
 
   mainBubble: {

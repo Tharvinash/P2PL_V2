@@ -120,7 +120,7 @@ const mainCommentCard = (props) => {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={styles.userT}>{props.postedBy} </Text>
+              <Text style={styles.userName}>{props.postedBy} </Text>
               {props.creation === null ? (
                 <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
               ) : (
@@ -259,17 +259,18 @@ const mainCommentCard = (props) => {
           </TouchableOpacity>
         ) : (
           <View style={styles.mainBubble}>
+            <View style={{ marginHorizontal: 5 }}>
             <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
               }}
             >
-              <Text style={styles.userT}>{props.postedBy} </Text>
+              <Text style={styles.userName}>{props.postedBy} </Text>
               {props.creation === null ? (
-                <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
+                <Text style={(styles.userC, { marginRight: 5 })}>Now</Text>
               ) : (
-                <Text style={(styles.userC, { marginRight: 20 })}>
+                <Text style={(styles.userC, { marginRight: 5 })}>
                   {props.time}
                 </Text>
               )}
@@ -401,6 +402,7 @@ const mainCommentCard = (props) => {
                 onPress={props.toggleReplyComment}
               />
             </View>
+            </View>
           </View>
         )}
       </View>
@@ -422,7 +424,7 @@ const styles = StyleSheet.create({
     borderColor: "#E3562A",
     borderBottomWidth: 5,
     width: "85 %",
-    padding: 5,
+    paddingVertical: 3,
     backgroundColor: "#D3D3D3",
     borderRadius: 10,
     marginBottom: 5,
@@ -495,5 +497,4 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
 });
-
 export default mainCommentCard;

@@ -102,6 +102,7 @@ function requesttobementor(props) {
         qualification,
         problems: finalValue,
         image: user.image,
+        matricNumber: user.matricNumber,
         userId
       })
       .then(function () {
@@ -114,6 +115,11 @@ function requesttobementor(props) {
       <View style={styles.form}>
         <View style={styles.formControl}>
           <Text style={styles.label}>Name: {user.name}</Text>
+        </View>
+      </View>
+      <View style={styles.form}>
+        <View style={styles.formControl}>
+          <Text style={styles.label}>Matric NUmber: {user.matricNumber}</Text>
         </View>
       </View>
       <View style={styles.form}>

@@ -22,6 +22,7 @@ function requestformentor(props) {
 	const [finalValue, setFinalValue] = useState([]);
   const [user, setUser] = useState(currentUser);
   const [desc, setDesc] = useState("");
+  const userId = firebase.auth().currentUser.uid;
 
   const UploadReq = () => {
     
@@ -52,6 +53,7 @@ function requestformentor(props) {
         description: desc,
         problems: finalValue,
         image: user.image,
+        matricNumber: user.matricNumber,
         userId
       })
       .then(function () {
@@ -64,6 +66,11 @@ function requestformentor(props) {
       <View style={styles.form}>
         <View style={styles.formControl}>
           <Text style={styles.label}>Name: {user.name} </Text>
+        </View>
+      </View>
+      <View style={styles.form}>
+        <View style={styles.formControl}>
+          <Text style={styles.label}>Matric NUmber: {user.matricNumber}</Text>
         </View>
       </View>
       <View style={styles.form}>

@@ -117,10 +117,10 @@ const replyCommentCard = (props) => {
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
+                //justifyContent: "space-between",
               }}
             >
-              <Text style={styles.userT}>{props.postedBy} </Text>
+              <Text style={styles.userName}>{props.postedBy} </Text>
               {props.mainCommentIdV1 !== props.mainCommentIdV2 &&
               props.repliedTo !== props.currentUserName ? (
                 <View
@@ -137,19 +137,19 @@ const replyCommentCard = (props) => {
                     size={13}
                     color="#000"
                   />
-                  <Text style={styles.userT}>{props.repliedTo} </Text>
+                  <Text style={styles.userName}>{props.repliedTo} </Text>
                 </View>
               ) : null}
+              <View style={{ alignItems: "flex-end", flex: 1 }}>
+                {props.creation === null ? (
+                  <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
+                ) : (
+                  <Text style={(styles.userC, { marginRight: 5 })}>
+                    {timeDifference(new Date(), props.creation.toDate())}
+                  </Text>
+                )}
+              </View>
             </View>
-            {props.creation === null ? (
-              <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
-            ) : (
-              <Text
-                style={(styles.userC, { marginRight: 20, paddingRight: 8 })}
-              >
-                {timeDifference(new Date(), props.creation.toDate())}
-              </Text>
-            )}
 
             <View
               style={{
@@ -284,10 +284,10 @@ const replyCommentCard = (props) => {
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
+                //justifyContent: "space-between",
               }}
             >
-              <Text style={styles.userT}>{props.postedBy} </Text>
+              <Text style={styles.userName}>{props.postedBy} </Text>
               {props.maincommentIdV1 !== props.mainCommentIdV2 &&
               props.repliedTo !== props.currentUserName ? (
                 <View
@@ -304,19 +304,19 @@ const replyCommentCard = (props) => {
                     size={13}
                     color="#000"
                   />
-                  <Text style={styles.userT}>{props.repliedTo} </Text>
+                  <Text style={styles.userName}>{props.repliedTo} </Text>
                 </View>
               ) : null}
+              <View style={{ alignItems: "flex-end", flex: 1 }}>
+                {props.creation === null ? (
+                  <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
+                ) : (
+                  <Text style={(styles.userC, { marginRight: 5 })}>
+                    {timeDifference(new Date(), props.creation.toDate())}
+                  </Text>
+                )}
+              </View>
             </View>
-            {props.creation === null ? (
-              <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
-            ) : (
-              <Text
-                style={(styles.userC, { marginRight: 20, paddingRight: 8 })}
-              >
-                {timeDifference(new Date(), props.creation.toDate())}
-              </Text>
-            )}
 
             <View
               style={{

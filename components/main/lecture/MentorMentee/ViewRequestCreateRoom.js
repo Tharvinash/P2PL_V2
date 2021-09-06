@@ -77,14 +77,38 @@ function ViewRequestCreateRoom(props) {
 
   useEffect(() => {
     if (filter == 5) {
-      setData(requestToBeAMentor);
+      firebase
+        .firestore()
+        .collection("RequestToBeMentor")
+        .where("faculty", "==", currentUser.faculty)
+        .get()
+        .then((snapshot) => {
+          let rtbam = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setData(rtbam);
+        });
     } else if (filter == 6) {
-      setData(requestForAMentor);
+      firebase
+        .firestore()
+        .collection("RequestForMentor")
+        .where("faculty", "==", currentUser.faculty)
+        .get()
+        .then((snapshot) => {
+          let rfam = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setData(rfam);
+        });
     } else {
       firebase
         .firestore()
         .collection("users")
-        .where("year", "==", filter)
+        .where("year", "==", filter, "&&", "faculty", "==", currentUser.faculty)
         .get()
         .then((snapshot) => {
           let user = snapshot.docs.map((doc) => {
@@ -92,7 +116,11 @@ function ViewRequestCreateRoom(props) {
             const id = doc.id;
             return { id, ...data };
           });
-          setData(user);
+
+          const updatedUser = user.filter(
+            (e) => e.faculty === currentUser.faculty
+          );
+          setData(updatedUser);
         });
     }
   }, [filter, update]);
@@ -102,7 +130,6 @@ function ViewRequestCreateRoom(props) {
     a.push({
       userId: userId,
       name: currentUser.name,
-      mc: "mc",
       image: "image",
       status: 0,
     });
@@ -214,7 +241,7 @@ function ViewRequestCreateRoom(props) {
                   <Text numberOfLines={2} style={styles.title}>
                     {item.name}
                   </Text>
-                  <Text style={styles.faculty}>mc</Text>
+                  <Text style={styles.faculty}>{item.matricNumber}</Text>
                 </View>
               </View>
               {filter == 5 || filter == 6 ? (
@@ -226,7 +253,7 @@ function ViewRequestCreateRoom(props) {
                         addInGroup({
                           userId: item.userId,
                           name: item.name,
-                          mc: "mc",
+                          mc: item.matricNumber,
                           image: "image",
                           reqId: item.id,
                         })
@@ -246,7 +273,7 @@ function ViewRequestCreateRoom(props) {
                         addInGroup({
                           userId: item.userId,
                           name: item.name,
-                          mc: "mc",
+                          mc: item.matricNumber,
                           image: "image",
                           reqId: item.id,
                         })
@@ -270,7 +297,7 @@ function ViewRequestCreateRoom(props) {
                         addInGroup({
                           userId: item.id,
                           name: item.name,
-                          mc: "mc",
+                          mc: item.matricNumber,
                           image: "image",
                         })
                       }
@@ -289,7 +316,7 @@ function ViewRequestCreateRoom(props) {
                         addInGroup({
                           userId: item.id,
                           name: item.name,
-                          mc: "mc",
+                          mc: item.matricNumber,
                           image: "image",
                         })
                       }
