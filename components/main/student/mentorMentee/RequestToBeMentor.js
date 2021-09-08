@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  FlatList,
+  Dimensions,
   TouchableOpacity,
   ScrollView,
   CheckBox,
@@ -13,6 +13,8 @@ import { connect } from "react-redux";
 import firebase from "firebase";
 require("firebase/firestore");
 import * as DocumentPicker from "expo-document-picker";
+import { FAB } from "react-native-elements";
+import { Icon } from "react-native-elements";
 
 function requesttobementor(props) {
   const { currentUser } = props;
@@ -34,21 +36,20 @@ function requesttobementor(props) {
 
     if (!result.cancelled) {
       setDoc(result.uri);
-      setName(result.name)
+      setName(result.name);
     }
-    console.log(result)
+    console.log(result);
   };
 
   const uploadDoc = async () => {
+    if (name.contains(".docx")) {
+      const childPath = `doc/${1234}/${name}`;
+      console.log(childPath);
+    } else {
+      const childPath = `doc/${1234}/${Math.random().toString(36)}`;
+      console.log(childPath);
+    }
 
-   if(name.contains(".docx")){
-    const childPath = `doc/${1234}/${name}`;
-    console.log(childPath);
-   }else{
-    const childPath = `doc/${1234}/${Math.random().toString(36)}`;
-    console.log(childPath);
-   }
-    
     const response = await fetch(Doc);
     const blob = await response.blob();
 
@@ -72,7 +73,6 @@ function requesttobementor(props) {
   };
 
   const savePostDoc = (downloadURL) => {
-    
     if (problem1 === true) {
       finalValue.push("Problem 1");
     }
@@ -103,7 +103,7 @@ function requesttobementor(props) {
         problems: finalValue,
         image: user.image,
         matricNumber: user.matricNumber,
-        userId
+        userId,
       })
       .then(function () {
         console.log("Done");
@@ -111,113 +111,123 @@ function requesttobementor(props) {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Name: {user.name}</Text>
-        </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Matric NUmber: {user.matricNumber}</Text>
-        </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Faculty: {user.faculty}</Text>
-        </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Year: {user.year}</Text>
-        </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Issue can handle: </Text>
-          <View style={styles.row}>
-            <CheckBox
-              value={problem1}
-              onValueChange={setProblem1}
-              //onChange={() => xxx()}
-            />
-            <Text style={styles.label2}>Problem 1</Text>
-          </View>
-          <View style={styles.row}>
-            <CheckBox
-              value={problem2}
-              onValueChange={setProblem2}
-              // onChange={() => xxx()}
-            />
-            <Text style={styles.label2}>Problem 2</Text>
-          </View>
-          <View style={styles.row}>
-            <CheckBox
-              value={problem3}
-              onValueChange={setProblem3}
-              // onChange={() => xxx()}
-            />
-            <Text style={styles.label2}>Problem 3</Text>
-          </View>
-          <View style={styles.row}>
-            <CheckBox
-              value={problem4}
-              onValueChange={setProblem4}
-              //onChange={() => xxx()}
-            />
-            <Text style={styles.label2}>Problem 4</Text>
-          </View>
-          <View style={styles.row}>
-            <CheckBox
-              value={problem5}
-              onValueChange={setProblem5}
-              //onChange={() => xxx()}
-            />
-            <Text style={styles.label2}>Problem 5</Text>
+    <View>
+      <ScrollView>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Name: {user.name}</Text>
           </View>
         </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Description: </Text>
-          <TextInput
-            placeholder="Description"
-            autoCapitalize="sentences"
-            style={styles.input}
-            multiline={true}
-            value={desc}
-            onChangeText={(desc) => setDesc(desc)}
-          />
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Matric NUmber: {user.matricNumber}</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Qualification: </Text>
-          <TextInput
-            placeholder="Description"
-            autoCapitalize="sentences"
-            style={styles.input}
-            multiline={true}
-            value={qualification}
-            onChangeText={(qualification) => setQualification(qualification)}
-          />
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Faculty: {user.faculty}</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Proves: </Text>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Year: {user.year}</Text>
+          </View>
         </View>
-      </View>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Issue can handle: </Text>
+            <View style={styles.row}>
+              <CheckBox
+                value={problem1}
+                onValueChange={setProblem1}
+                //onChange={() => xxx()}
+              />
+              <Text style={styles.label2}>Problem 1</Text>
+            </View>
+            <View style={styles.row}>
+              <CheckBox
+                value={problem2}
+                onValueChange={setProblem2}
+                // onChange={() => xxx()}
+              />
+              <Text style={styles.label2}>Problem 2</Text>
+            </View>
+            <View style={styles.row}>
+              <CheckBox
+                value={problem3}
+                onValueChange={setProblem3}
+                // onChange={() => xxx()}
+              />
+              <Text style={styles.label2}>Problem 3</Text>
+            </View>
+            <View style={styles.row}>
+              <CheckBox
+                value={problem4}
+                onValueChange={setProblem4}
+                //onChange={() => xxx()}
+              />
+              <Text style={styles.label2}>Problem 4</Text>
+            </View>
+            <View style={styles.row}>
+              <CheckBox
+                value={problem5}
+                onValueChange={setProblem5}
+                //onChange={() => xxx()}
+              />
+              <Text style={styles.label2}>Problem 5</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Description: </Text>
+            <TextInput
+              placeholder="Description"
+              autoCapitalize="sentences"
+              style={styles.input}
+              multiline={true}
+              value={desc}
+              onChangeText={(desc) => setDesc(desc)}
+            />
+          </View>
+        </View>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Qualification: </Text>
+            <TextInput
+              placeholder="Description"
+              autoCapitalize="sentences"
+              style={styles.input}
+              multiline={true}
+              value={qualification}
+              onChangeText={(qualification) => setQualification(qualification)}
+            />
+          </View>
+        </View>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Proves: </Text>
+          </View>
+        </View>
 
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.logout} onPress={() => pickDocument()}>
-          <Text style={styles.Ltext}>Upload Document </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.logout} onPress={() => uploadDoc()}>
-          <Text style={styles.Ltext}>Send Request </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <View style={{ justifyContent: "center", marginLeft: 20, marginBottom:10 }}>
+          <TouchableOpacity
+            style={styles.logout}
+            onPress={() => pickDocument()}
+          >
+            <Text style={styles.Ltext}>Upload Document </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      <FAB
+        placement="right"
+        color="#E3562A"
+        onPress={() => uploadDoc()}
+        icon={
+          <Icon name="send-outline" type="ionicon" size={25} color="#fff" />
+        }
+      />
+    </View>
   );
 }
 
@@ -253,8 +263,8 @@ const styles = StyleSheet.create({
   },
 
   logout: {
-    width: 160,
-    height: 40,
+    width: Dimensions.get("window").width * 0.4,
+    height: Dimensions.get("window").width * 0.1,
     backgroundColor: "#E3562A",
     borderColor: "#E3562A",
     borderRadius: 16,

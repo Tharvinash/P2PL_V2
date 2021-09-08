@@ -12,20 +12,22 @@ import {
 import { connect } from "react-redux";
 import firebase from "firebase";
 require("firebase/firestore");
+import { FAB } from "react-native-elements";
+import { Icon } from "react-native-elements";
+
 function requestformentor(props) {
   const { currentUser } = props;
   const [problem1, setProblem1] = useState(false);
-	const [problem2, setProblem2] = useState(false);
-	const [problem3, setProblem3] = useState(false);
-	const [problem4, setProblem4] = useState(false);
-	const [problem5, setProblem5] = useState(false);
-	const [finalValue, setFinalValue] = useState([]);
+  const [problem2, setProblem2] = useState(false);
+  const [problem3, setProblem3] = useState(false);
+  const [problem4, setProblem4] = useState(false);
+  const [problem5, setProblem5] = useState(false);
+  const [finalValue, setFinalValue] = useState([]);
   const [user, setUser] = useState(currentUser);
   const [desc, setDesc] = useState("");
   const userId = firebase.auth().currentUser.uid;
 
   const UploadReq = () => {
-    
     if (problem1 === true) {
       finalValue.push("Problem 1");
     }
@@ -54,7 +56,7 @@ function requestformentor(props) {
         problems: finalValue,
         image: user.image,
         matricNumber: user.matricNumber,
-        userId
+        userId,
       })
       .then(function () {
         console.log("Done");
@@ -62,87 +64,76 @@ function requestformentor(props) {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Name: {user.name} </Text>
-        </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Matric NUmber: {user.matricNumber}</Text>
-        </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Faculty: {user.faculty}</Text>
-        </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Year: {user.year} </Text>
-        </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Issue: </Text>
-          <View style={styles.row}>
-            <CheckBox
-              value={problem1}
-              onValueChange={setProblem1}
-            />
-            <Text style={styles.label2}>Problem 1</Text>
+    <View style={{flex: 1}}>
+      <ScrollView>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Name: {user.name} </Text>
           </View>
-					<View style={styles.row}>
-            <CheckBox
-              value={problem2}
-              onValueChange={setProblem2}
-            />
-            <Text style={styles.label2}>Problem 2</Text>
-          </View>
-					<View style={styles.row}>
-            <CheckBox
-              value={problem3}
-              onValueChange={setProblem3}
-            />
-            <Text style={styles.label2}>Problem 3</Text>
-          </View>
-					<View style={styles.row}>
-            <CheckBox
-              value={problem4}
-              onValueChange={setProblem4}
-            />
-            <Text style={styles.label2}>Problem 4</Text>
-          </View>
-					<View style={styles.row}>
-            <CheckBox
-              value={problem5}
-              onValueChange={setProblem5}
-            />
-            <Text style={styles.label2}>Problem 5</Text>
-          </View>
-
         </View>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Description: </Text>
-          <TextInput
-            placeholder="Description"
-            autoCapitalize="sentences"
-            style={styles.input}
-            multiline={true}
-            value={desc}
-            onChangeText={(desc) => setDesc(desc)}
-          />
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Matric Number: {user.matricNumber}</Text>
+          </View>
         </View>
-      </View>
-			<View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.logout} onPress={() => UploadReq()}>
-          <Text style={styles.Ltext}>Send Request </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Faculty: {user.faculty}</Text>
+          </View>
+        </View>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Year: {user.year} </Text>
+          </View>
+        </View>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Issue: </Text>
+            <View style={styles.row}>
+              <CheckBox value={problem1} onValueChange={setProblem1} />
+              <Text style={styles.label2}>Problem 1</Text>
+            </View>
+            <View style={styles.row}>
+              <CheckBox value={problem2} onValueChange={setProblem2} />
+              <Text style={styles.label2}>Problem 2</Text>
+            </View>
+            <View style={styles.row}>
+              <CheckBox value={problem3} onValueChange={setProblem3} />
+              <Text style={styles.label2}>Problem 3</Text>
+            </View>
+            <View style={styles.row}>
+              <CheckBox value={problem4} onValueChange={setProblem4} />
+              <Text style={styles.label2}>Problem 4</Text>
+            </View>
+            <View style={styles.row}>
+              <CheckBox value={problem5} onValueChange={setProblem5} />
+              <Text style={styles.label2}>Problem 5</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Description: </Text>
+            <TextInput
+              placeholder="Description"
+              autoCapitalize="sentences"
+              style={styles.input}
+              multiline={true}
+              value={desc}
+              onChangeText={(desc) => setDesc(desc)}
+            />
+          </View>
+        </View>
+      </ScrollView>
+      <FAB
+        placement="right"
+        color="#E3562A"
+        onPress={() => UploadReq()}
+        icon={
+          <Icon name="send-outline" type="ionicon" size={25} color="#fff" />
+        }
+      />
+    </View>
   );
 }
 
@@ -197,7 +188,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 });
-
 
 const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,

@@ -86,6 +86,7 @@ import AddInGroup from "./components/main/lecture/MentorMentee/AddInGroup";
 import AddInGroupV2 from "./components/main/lecture/MentorMentee/AddInGroupV2";
 import GroupDetail from "./components/main/lecture/MentorMentee/GroupDetail";
 import ViewRequestCreateRoom from "./components/main/lecture/MentorMentee/ViewRequestCreateRoom";
+import GroupStats from "./components/main/lecture/MentorMentee/GroupStats";
 
 //Admin
 import AdminMainScreen from "./components/AdminMain";
@@ -93,8 +94,8 @@ import ViewDiscussion from "./components/main/admin/ReportDiscussion/ViewDiscuss
 import ViewReply from "./components/main/admin/ReportDiscussion/ViewReply";
 
 let customFonts = {
-  'Poppins': require("./assets/fonts/Poppins.ttf"),
-  'Poppins-MediumItalic': require("./assets/fonts/Poppins-MediumItalic.ttf"),
+  Poppins: require("./assets/fonts/Poppins.ttf"),
+  "Poppins-MediumItalic": require("./assets/fonts/Poppins-MediumItalic.ttf"),
 };
 
 export class App extends Component {
@@ -145,7 +146,7 @@ export class App extends Component {
   }
   render() {
     const { loggedIn, loaded, status, fontsLoaded } = this.state;
-    if (!loaded || !fontsLoaded ) {
+    if (!loaded || !fontsLoaded) {
       return (
         <View style={{ flex: 1, justifyContent: "center" }}>
           <AppLoading />
@@ -270,6 +271,12 @@ export class App extends Component {
                 component={ViewRequestCreateRoom}
                 navigation={this.props.navigation}
                 options={{ headerTitle: "Member List" }}
+              />
+              <Stack.Screen
+                name="GroupStats"
+                component={GroupStats}
+                navigation={this.props.navigation}
+                options={{ headerTitle: "Group Statistics" }}
               />
             </Stack.Navigator>
           </NavigationContainer>

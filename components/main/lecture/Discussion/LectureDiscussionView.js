@@ -385,33 +385,7 @@ function LectureDiscussionView(props) {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flex: 1, margin: 10, marginBottom: 5 }}
-    >
-      <Text style={styles.title}>{userPosts.title}</Text>
-
-      {userPosts.downloadURL && (
-        <View
-          style={{
-            flexDirection: "row",
-            paddingBottom: 10,
-            justifyContent: "center",
-          }}
-        >
-          {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
-          <Images
-            width={Dimensions.get("window").width} // height will be calculated automatically
-            source={{ uri: userPosts.downloadURL }}
-          />
-        </View>
-      )}
-
-      <View style={styles.desc}>
-        <Text style={styles.descT}>{userPosts.description}</Text>
-      </View>
-      <View style={{ paddingBottom: 10 }}>
-        <Text style={styles.comT}>Comments:</Text>
-      </View>
+    <View style={{ flex: 1, margin: 10, marginBottom: 5 }}>
       <FlatList
         horizontal={false}
         extraData={comment}
@@ -425,10 +399,10 @@ function LectureDiscussionView(props) {
               postedBy={item.postedBy}
               creation={item.creation}
               comment={item.comment}
+              attachedDocument={item.attachedDocument}
+              attachedImage={item.attachedImage}
               numOfLike={item.numOfLike}
               likeBy={item.likeBy.includes(userId)}
-              attachedDocument = {item.attachedDocument}
-              attachedImage ={item.attachedImage}
               removeLike={() =>
                 removeLike(item.id, item.numOfLike, item.likeBy)
               }
@@ -437,6 +411,7 @@ function LectureDiscussionView(props) {
               firstUserId={item.userId}
               secondUserId={userId}
               delete={() => Delete(item.id)}
+              downlaodDoc={() => downlaodDoc()}
               editComment={() => EditComment(item.id)}
               numberOfReply={item.numberOfReply}
               removeVerifyComment={() => removeVerifyComment(item.id)}
@@ -452,8 +427,42 @@ function LectureDiscussionView(props) {
             />
           ) : null
         }
-      />
+        ListHeaderComponent={
+          <View>
+            <View style={{ flexDirection: "row", marginTop: 10 }}>
+              <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                <View style={{ width: "100%" }}>
+                  <Text style={styles.title}>{userPosts.title}</Text>
+                </View>
+              </View>
+            </View>
 
+            {userPosts.downloadURL && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  paddingBottom: 10,
+                  justifyContent: "center",
+                }}
+              >
+                {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
+                <Images
+                  width={Dimensions.get("window").width} // height will be calculated automatically
+                  source={{ uri: userPosts.downloadURL }}
+                />
+              </View>
+            )}
+
+            <View style={styles.desc}>
+              <Text style={styles.descT}>{userPosts.description}</Text>
+            </View>
+            <View style={{ paddingBottom: 10 }}>
+              <Text style={styles.comT}>Comments:</Text>
+            </View>
+          </View>
+        }
+        ListFooterComponent={
+          <View>
       <BottomSheet
         isVisible={isVisible}
         containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
@@ -470,14 +479,6 @@ function LectureDiscussionView(props) {
           </ListItem>
         ))}
       </BottomSheet>
-
-      <FAB
-        placement="right"
-        color="#E3562A"
-        style={styles.floatButton}
-        onPress={toggleModal}
-        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
-      />
 
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <Modal isVisible={isEditCommentModalVisible}>
@@ -521,7 +522,17 @@ function LectureDiscussionView(props) {
           />
         </Modal>
       </View>
-    </ScrollView>
+          </View>
+        }
+      />
+      <FAB
+        placement="right"
+        color="#E3562A"
+        style={styles.floatButton}
+        onPress={toggleModal}
+        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
+      />
+    </View>
   );
 }
 

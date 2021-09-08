@@ -10,7 +10,6 @@ import {
   Alert,
   Image,
   Animated,
-  ScrollView,
   Dimensions,
   LogBox,
   ActivityIndicator,
@@ -77,12 +76,23 @@ function ViewRoom(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", paddingRight: 15 }}>
-          <TouchableOpacity>
+        <View style={{ flexDirection: "row", alignItems:'flex-end'}}>
+          <TouchableOpacity style={{marginHorizontal: 5}}>
+            <Icon
+              name="stats-chart-outline"
+              type="ionicon"
+              size={30}
+              color="#000"
+              onPress={() => {
+                navtostats();
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={{marginHorizontal: 5, marginBottom: -5}}>
             <Icon
               name="information-circle-outline"
               type="ionicon"
-              size={30}
+              size={33}
               color="#000"
               onPress={() => {
                 navtodetail();
@@ -169,8 +179,14 @@ function ViewRoom(props) {
     return <View />;
   }
 
+
+
   const navtodetail = () => {
     props.navigation.navigate("GroupDetail", { did: discussionId, mid: mid });
+  };
+
+  const navtostats = () => {
+    props.navigation.navigate("GroupStats", { did: discussionId });
   };
 
   const toggleEditComment = () => {
@@ -513,154 +529,156 @@ function ViewRoom(props) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ margin: 10, marginBottom: 5 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignContent: "space-between",
-            paddingRight: 35,
-          }}
-        >
+    <View style={{ flex: 1, margin: 10, marginBottom: 5 }}>
+      <FlatList
+        horizontal={false}
+        extraData={comment}
+        data={comment}
+        renderItem={({ item }) =>
+          item.discussionId === discussionId ? (
+            <CommentCard
+              picture={item.image}
+              status={0}
+              verify={item.verify}
+              postedBy={item.postedBy}
+              creation={item.creation}
+              comment={item.comment}
+              attachedDocument={item.attachedDocument}
+              attachedImage={item.attachedImage}
+              numOfLike={item.numOfLike}
+              likeBy={item.likeBy.includes(userId)}
+              removeLike={() => removeLike(item.id, item.numOfLike, item.likeBy)}
+              xxx={() => toggleVisibility(item.id)}
+              addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
+              firstUserId={item.userId}
+              secondUserId={userId}
+              delete={() => Delete(item.id)}
+              downlaodDoc={() => downlaodDoc()}
+              editComment={() => EditComment(item.id)}
+              numberOfReply={item.numberOfReply}
+              onSelect={() =>
+                props.navigation.navigate("RoomReplyComment", {
+                  cid: item.id,
+                  time: timeDifference(new Date(), item.creation.toDate()),
+                  xxx: item.likeBy.includes(userId),
+                  mainCommentAuthorName: item.postedBy,
+                  did: discussionId,
+                })
+              }
+            />
+          ) : null
+        }
+        ListHeaderComponent={
           <View>
-            <Text style={styles.title}>{userPosts.title}</Text>
+            <View style={{ flexDirection: "row", marginTop: 10 }}>
+              <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                <View style={{ width: "100%" }}>
+                  <Text style={styles.title}>{userPosts.title}</Text>
+                </View>
+              </View>
+            </View>
+  
+            {userPosts.downloadURL && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  paddingBottom: 10,
+                  justifyContent: "center",
+                }}
+              >
+                {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
+                <Images
+                  width={Dimensions.get("window").width} // height will be calculated automatically
+                  source={{ uri: userPosts.downloadURL }}
+                />
+              </View>
+            )}
+  
+            <View style={styles.desc}>
+              <Text style={styles.descT}>{userPosts.description}</Text>
+            </View>
+            <View style={{ paddingBottom: 10 }}>
+              <Text style={styles.comT}>Comments:</Text>
+            </View>
           </View>
-        </View>
-
-        {userPosts.downloadURL && (
-          <View
-            style={{
-              flexDirection: "row",
-              paddingBottom: 10,
-              justifyContent: "center",
-            }}
-          >
-            {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
-            <Images
-              width={Dimensions.get("window").width} // height will be calculated automatically
-              source={{ uri: userPosts.downloadURL }}
-            />
-          </View>
-        )}
-
-        <View style={styles.desc}>
-          <Text style={styles.descT}>{userPosts.description}</Text>
-        </View>
-        <View style={{ paddingBottom: 10 }}>
-          <Text style={styles.comT}>Comments:</Text>
-        </View>
-        <FlatList
-          horizontal={false}
-          extraData={comment}
-          data={comment}
-          renderItem={({ item }) =>
-            item.discussionRoomId === discussionId ? (
-              <CommentCard
-                picture={item.image}
-                status={0}
-                verify={item.verify}
-                postedBy={item.postedBy}
-                creation={item.creation}
-                comment={item.comment}
-                attachedDocument={item.attachedDocument}
-                attachedImage={item.attachedImage}
-                numOfLike={item.numOfLike}
-                likeBy={item.likeBy.includes(userId)}
-                removeLike={() =>
-                  removeLike(item.id, item.numOfLike, item.likeBy)
-                }
-                xxx={() => toggleVisibility(item.id)}
-                addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
-                firstUserId={item.userId}
-                secondUserId={userId}
-                delete={() => Delete(item.id)}
-                downlaodDoc={() => downlaodDoc()}
-                editComment={() => EditComment(item.id)}
-                numberOfReply={item.numberOfReply}
-                onSelect={() =>
-                  props.navigation.navigate("RoomReplyComment", {
-                    cid: item.id,
-                    time: timeDifference(new Date(), item.creation.toDate()),
-                    xxx: item.likeBy.includes(userId),
-                    mainCommentAuthorName: item.postedBy,
-                    did: discussionId,
-                  })
-                }
-              />
-            ) : null
-          }
-        />
-
-        <BottomSheet
-          isVisible={isVisible}
-          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-        >
-          {list.map((l, i) => (
-            <ListItem
-              key={i}
-              containerStyle={l.containerStyle}
-              onPress={l.onPress}
+        }
+        ListFooterComponent={
+          <View>
+            <BottomSheet
+              isVisible={isVisible}
+              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
             >
-              <ListItem.Content>
-                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </BottomSheet>
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
-          <Modal isVisible={isModalVisible}>
-            <MMCommentCard
-              loadingComponent={() => (
-                <View
-                  style={{
-                    flex: 1,
-                    width: 200,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+              {list.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
                 >
-                  <ActivityIndicator />
-                </View>
-              )}
-              caption={caption}
-              setCaption={setCaption}
-              callback={callback.bind(this)}
-              renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-              datas={datas}
-              keyExtractor={(item, index) => item.name}
-              pickDocument={() => pickDocument()}
-              pickImage={() => pickImage()}
-              UploadComment={() => UploadComment()}
-              toggleModal={() => toggleModal()}
-            />
-          </Modal>
-
-          <Modal isVisible={isEditCommentModalVisible}>
-            <MMCommentCard
-              loadingComponent={() => (
-                <View
-                  style={{
-                    flex: 1,
-                    width: 200,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <ActivityIndicator />
-                </View>
-              )}
-              caption={caption}
-              setCaption={setCaption}
-              callback={callback.bind(this)}
-              renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-              datas={datas}
-              keyExtractor={(item, index) => item.name}
-              UploadComment={() => uploadUpdatedComment()}
-              toggleModal={() => toggleEditComment()}
-            />
-          </Modal>
-        </View>
-      </ScrollView>
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>
+                      {l.title}
+                    </ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
+  
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <Modal isVisible={isModalVisible}>
+                <MMCommentCard
+                  loadingComponent={() => (
+                    <View
+                      style={{
+                        flex: 1,
+                        width: 200,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ActivityIndicator />
+                    </View>
+                  )}
+                  caption={caption}
+                  setCaption={setCaption}
+                  callback={callback.bind(this)}
+                  renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+                  datas={datas}
+                  keyExtractor={(item, index) => item.name}
+                  pickDocument={() => pickDocument()}
+                  pickImage={() => pickImage()}
+                  UploadComment={() => UploadComment()}
+                  toggleModal={() => toggleModal()}
+                />
+              </Modal>
+  
+              <Modal isVisible={isEditCommentModalVisible}>
+                <MMCommentCard
+                  loadingComponent={() => (
+                    <View
+                      style={{
+                        flex: 1,
+                        width: 200,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ActivityIndicator />
+                    </View>
+                  )}
+                  caption={caption}
+                  setCaption={setCaption}
+                  callback={callback.bind(this)}
+                  renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+                  datas={datas}
+                  keyExtractor={(item, index) => item.name}
+                  UploadComment={() => uploadUpdatedComment()}
+                  toggleModal={() => toggleEditComment()}
+                />
+              </Modal>
+            </View>
+          </View>
+        }
+      />
       <FAB
         placement="right"
         color="#E3562A"
@@ -669,7 +687,7 @@ function ViewRoom(props) {
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
     </View>
-  );
+  );  
 }
 
 const styles = StyleSheet.create({

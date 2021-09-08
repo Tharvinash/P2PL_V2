@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   FlatList,
   TouchableOpacity,
@@ -108,12 +109,12 @@ function MainScreen(props) {
           onClose={() => setOpen(!open)}
         >
           <SpeedDial.Action
-            icon={{ name: "add", color: "#fff" }}
+            icon={(<Image source={require('../../../../assets/rtmb.png')} style={{height: 30, width:30}}/>)}
             title="Request To Be Mentor"
             onPress={() => props.navigation.navigate("RequestToBeMentor")}
           />
           <SpeedDial.Action
-            icon={{ name: "add", color: "#fff" }}
+            icon={(<Image source={require('../../../../assets/rfm.png')} style={{height: 30, width:30, color:"#fff"}}/>)}
             title="Request For Mentor"
             onPress={() => props.navigation.navigate("RequestForMentor")}
           />
@@ -122,7 +123,7 @@ function MainScreen(props) {
     </View>
   );
 }
-
+//icon={{ name: "add", color: "#fff" }}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
