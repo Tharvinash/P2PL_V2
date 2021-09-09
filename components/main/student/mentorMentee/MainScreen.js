@@ -114,7 +114,7 @@ function MainScreen(props) {
             onPress={() => props.navigation.navigate("RequestToBeMentor")}
           />
           <SpeedDial.Action
-            icon={(<Image source={require('../../../../assets/rfm.png')} style={{height: 30, width:30, color:"#fff"}}/>)}
+            icon={(<Image source={require('../../../../assets/rfm.png')} style={{height: 30, width:30}}/>)}
             title="Request For Mentor"
             onPress={() => props.navigation.navigate("RequestForMentor")}
           />

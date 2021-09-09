@@ -1,26 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Dimensions, StyleSheet } from "react-native";
 import { LineChart, PieChart } from "react-native-chart-kit";
+import firebase from "firebase";
 
-export default function GroupStats() {
+
+export default function GroupStats(props) {
+  const [groupData, setGroupData] = useState([]);
+  const [date, setDate] = useState([0]);
+  const [interaction, setInteraction] = useState([0]);
   const screenWidth = Dimensions.get("window").width;
+  const roomId = props.route.params.did;
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .collection("DiscussionRoom")
+      .doc(roomId)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          setGroupData(snapshot.data());
+          setDate(snapshot.data().date);
+          setInteraction(snapshot.data().interaction);
+        } else {
+          console.log("does not exist");
+        }
+      });
+  }, []);
+
   //Line graph
   const data = {
-    labels: ["January", "February", "March", "April", "May", "June"],
+    labels: date,
     datasets: [
       {
-        data: [20, 45, 28, 80, 99, 43],
+        data: interaction,
         color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
         strokeWidth: 2, // optional
       },
     ],
-    legend: ["Rainy Days"], // optional
+    legend: ["Number of Interactions"], // optional
   };
   const chartConfig = {
     backgroundColor: "#140F38",
     backgroundGradientFrom: "#140F38",
     backgroundGradientTo: "#140F38",
-    decimalPlaces: 2, // optional, defaults to 2dp
+    decimalPlaces: 0, // optional, defaults to 2dp
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     style: {
@@ -91,7 +115,7 @@ export default function GroupStats() {
   ];
   return (
     <View style={styles.container}>
-      <View style={{marginBottom:50}}>
+      <View style={{ marginBottom: 50 }}>
         <LineChart
           data={data}
           width={screenWidth}

@@ -21,7 +21,7 @@ function ViewRequestCreateRoom(props) {
   const [mentee, setMentee] = useState([]);
   const [mentor, setMentor] = useState([]);
   const [update, setUpdate] = useState(0);
-  const [addedId, setAddedId] = useState([]);
+  const [date, setDate] = useState([]);
   const [studentId, setStudentId] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const userId = firebase.auth().currentUser.uid;
@@ -54,6 +54,16 @@ function ViewRequestCreateRoom(props) {
       id: 4,
     },
   ];
+
+  const today = new Date();
+  const n = today.getMonth() + 1;
+  const tomorrow = new Date(today);
+  const createdDay = tomorrow.getDate();
+  const first = today.getDate() + 1;
+  const second = today.getDate() + 2;
+  const third = today.getDate() + 3;
+  const fourth = today.getDate() + 4;
+  const fifth = today.getDate() + 5;
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -162,6 +172,15 @@ function ViewRequestCreateRoom(props) {
         createdBy: currentUser.name,
         createrId: userId,
         creation: firebase.firestore.FieldValue.serverTimestamp(),
+        date: [
+          createdDay + "/" + n,
+          first + "/" + n,
+          second + "/" + n,
+          third + "/" + n,
+          fourth + "/" + n,
+          fifth + "/" + n
+        ],
+        interaction: [0, 0, 0, 0, 0, 0],
       })
       .then(function () {
         props.navigation.navigate("Room");

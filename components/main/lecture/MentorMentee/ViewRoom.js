@@ -52,6 +52,8 @@ function ViewRoom(props) {
   const [image, setImage] = useState(null); //save local uri
   const [Doc, setDoc] = useState(null); //save local uri
   const [member, setMember] = useState([]);
+  const [interactionPoint, setInteractionPoint] = useState([]);
+  const [date, setDate] = useState([]);
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
   const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
@@ -76,8 +78,8 @@ function ViewRoom(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", alignItems:'flex-end'}}>
-          <TouchableOpacity style={{marginHorizontal: 5}}>
+        <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+          <TouchableOpacity style={{ marginHorizontal: 5 }}>
             <Icon
               name="stats-chart-outline"
               type="ionicon"
@@ -88,7 +90,7 @@ function ViewRoom(props) {
               }}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={{marginHorizontal: 5, marginBottom: -5}}>
+          <TouchableOpacity style={{ marginHorizontal: 5, marginBottom: -5 }}>
             <Icon
               name="information-circle-outline"
               type="ionicon"
@@ -125,6 +127,8 @@ function ViewRoom(props) {
         setUserPosts(snapshot.data());
         setMember(snapshot.data().groupMember);
         setMid(snapshot.data().memberId);
+        setDate(snapshot.data().date);
+        setInteractionPoint(snapshot.data().interaction);
       });
 
     firebase
@@ -179,7 +183,51 @@ function ViewRoom(props) {
     return <View />;
   }
 
+  const addInteraction = () => {
+    console.log(date);
+    console.log(interactionPoint);
 
+    const today = new Date();
+    const n = today.getMonth() + 1;
+    const tomorrow = new Date(today);
+    const createdDay = tomorrow.getDate();
+    const finalDate = createdDay + "/" + n;
+
+    if (date.includes(finalDate)) {
+      const index = date.indexOf(finalDate);
+
+      interactionPoint[index] = interactionPoint[index] + 1;
+      console.log(interactionPoint);
+
+      firebase
+        .firestore()
+        .collection("DiscussionRoom")
+        .doc(discussionId)
+        .update({
+          interaction: interactionPoint,
+        })
+        .then(() => {
+          console.log("done");
+        });
+    } else {
+      date.shift();
+      interactionPoint.shift();
+      date.push(finalDate);
+      interactionPoint.push(0);
+      const index = date.indexOf(finalDate);
+      interactionPoint[index] = interactionPoint[index] + 1;
+      firebase
+        .firestore()
+        .collection("DiscussionRoom")
+        .doc(discussionId)
+        .update({
+          interaction: interactionPoint,
+        })
+        .then(() => {
+          console.log("done");
+        });
+    }
+  };
 
   const navtodetail = () => {
     props.navigation.navigate("GroupDetail", { did: discussionId, mid: mid });
@@ -535,7 +583,7 @@ function ViewRoom(props) {
         extraData={comment}
         data={comment}
         renderItem={({ item }) =>
-          item.discussionId === discussionId ? (
+          item.discussionRoomId === discussionId ? (
             <CommentCard
               picture={item.image}
               status={0}
@@ -547,7 +595,9 @@ function ViewRoom(props) {
               attachedImage={item.attachedImage}
               numOfLike={item.numOfLike}
               likeBy={item.likeBy.includes(userId)}
-              removeLike={() => removeLike(item.id, item.numOfLike, item.likeBy)}
+              removeLike={() =>
+                removeLike(item.id, item.numOfLike, item.likeBy)
+              }
               xxx={() => toggleVisibility(item.id)}
               addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
               firstUserId={item.userId}
@@ -577,7 +627,7 @@ function ViewRoom(props) {
                 </View>
               </View>
             </View>
-  
+
             {userPosts.downloadURL && (
               <View
                 style={{
@@ -593,7 +643,7 @@ function ViewRoom(props) {
                 />
               </View>
             )}
-  
+
             <View style={styles.desc}>
               <Text style={styles.descT}>{userPosts.description}</Text>
             </View>
@@ -622,7 +672,7 @@ function ViewRoom(props) {
                 </ListItem>
               ))}
             </BottomSheet>
-  
+
             <View style={{ justifyContent: "center", alignItems: "center" }}>
               <Modal isVisible={isModalVisible}>
                 <MMCommentCard
@@ -650,7 +700,7 @@ function ViewRoom(props) {
                   toggleModal={() => toggleModal()}
                 />
               </Modal>
-  
+
               <Modal isVisible={isEditCommentModalVisible}>
                 <MMCommentCard
                   loadingComponent={() => (
@@ -683,11 +733,12 @@ function ViewRoom(props) {
         placement="right"
         color="#E3562A"
         style={styles.floatButton}
-        onPress={toggleModal}
+        //onPress={toggleModal} addInteraction
+        onPress={addInteraction}
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
     </View>
-  );  
+  );
 }
 
 const styles = StyleSheet.create({
