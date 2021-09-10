@@ -45,7 +45,7 @@ function ViewRoom(props) {
   const [keyword, setKeyword] = useState("");
   const [caption, setCaption] = useState("");
   const [isVisible, setIsVisible] = useState(false);
-  const [datas, setDatas] = useState("");
+  const [datas, setDatas] = useState([]);
   const [mid, setMid] = useState([]);
   const [temporaryId, setTemporaryId] = useState(null);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
@@ -188,9 +188,6 @@ function ViewRoom(props) {
   }
 
   const addInteraction = () => {
-    console.log(date);
-    console.log(interactionPoint);
-
     const today = new Date();
     const n = today.getMonth() + 1;
     const tomorrow = new Date(today);
@@ -255,6 +252,8 @@ function ViewRoom(props) {
   };
 
   const UploadComment = () => {
+    addInteraction()
+
     if (image == null && Doc == null) {
       finalCommentUpload(null, null);
     }
@@ -478,6 +477,7 @@ function ViewRoom(props) {
   };
 
   const Delete = (cid) => {
+    setIsVisible(false)
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
@@ -521,6 +521,7 @@ function ViewRoom(props) {
       .then(() => {
         console.log("done");
       });
+      addInteraction();
     setData(2);
   };
 
@@ -546,6 +547,7 @@ function ViewRoom(props) {
   };
 
   const EditComment = (cid) => {
+    setIsVisible(false)
     setCommentId(cid);
     firebase
       .firestore()
@@ -736,9 +738,7 @@ function ViewRoom(props) {
       <FAB
         placement="right"
         color="#E3562A"
-        style={styles.floatButton}
-        //onPress={toggleModal} addInteraction
-        onPress={addInteraction}
+        onPress={toggleModal} 
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />
     </View>

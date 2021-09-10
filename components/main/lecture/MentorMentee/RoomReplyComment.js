@@ -564,6 +564,7 @@ function RoomReplyComment(props) {
   };
 
   const EditReplyComment = (rcid) => {
+    setIsVisibleV2(false)
     setEditReplyCommentId(rcid);
     firebase
       .firestore()
@@ -699,6 +700,7 @@ function RoomReplyComment(props) {
   };
 
   const DeleteReplyComment = (rcid) => {
+    setIsVisibleV2(false)
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",

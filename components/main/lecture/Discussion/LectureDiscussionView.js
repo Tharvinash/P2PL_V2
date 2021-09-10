@@ -290,6 +290,7 @@ function LectureDiscussionView(props) {
   };
 
   const EditComment = (cid) => {
+    setIsVisible(false)
     setCommentId(cid);
     firebase
       .firestore()
@@ -320,7 +321,7 @@ function LectureDiscussionView(props) {
     // firebase.firestore().collection("Comment").doc(cid).delete();
     // console.log("delete");
     // props.navigation.goBack();
-
+    setIsVisible(false)
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
