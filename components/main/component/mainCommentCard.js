@@ -122,9 +122,9 @@ const mainCommentCard = (props) => {
             >
               <Text style={styles.userName}>{props.postedBy} </Text>
               {props.creation === null ? (
-                <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
+                <Text style={(styles.userC, { marginRight: 10 })}>Now</Text>
               ) : (
-                <Text style={(styles.userC, { marginRight: 20 })}>
+                <Text style={(styles.userC, { marginRight: 10 })}>
                   {props.time}
                 </Text>
               )}
@@ -259,7 +259,7 @@ const mainCommentCard = (props) => {
           </TouchableOpacity>
         ) : (
           <View style={styles.mainBubble}>
-            <View style={{ marginHorizontal: 5 }}>
+            <View>
             <View
               style={{
                 flexDirection: "row",
@@ -268,9 +268,9 @@ const mainCommentCard = (props) => {
             >
               <Text style={styles.userName}>{props.postedBy} </Text>
               {props.creation === null ? (
-                <Text style={(styles.userC, { marginRight: 5 })}>Now</Text>
+                <Text style={(styles.userC, { marginRight: 10 })}>Now</Text>
               ) : (
-                <Text style={(styles.userC, { marginRight: 5 })}>
+                <Text style={(styles.userC, { marginRight: 10 })}>
                   {props.time}
                 </Text>
               )}
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     borderColor: "#E3562A",
     borderBottomWidth: 5,
     width: "85 %",
-    paddingVertical: 3,
+    padding: 5,
     backgroundColor: "#D3D3D3",
     borderRadius: 10,
     marginBottom: 5,

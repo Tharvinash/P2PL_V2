@@ -198,7 +198,6 @@ function ViewRoom(props) {
       const index = date.indexOf(finalDate);
 
       interactionPoint[index] = interactionPoint[index] + 1;
-      console.log(interactionPoint);
 
       firebase
         .firestore()
@@ -276,7 +275,6 @@ function ViewRoom(props) {
     if (!result.cancelled) {
       setDoc(result.uri);
       setName(result.name);
-      console.log(result.name);
     }
   };
 

@@ -33,7 +33,7 @@ function RoomReplyComment(props) {
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const [mainComment, setMainComment] = useState([]);
   const [data, setData] = useState(0);
-  const [datas, setDatas] = useState("");
+  const [datas, setDatas] = useState([]);
   const [keyword, setKeyword] = useState("");
   const [editComment, setEditComment] = useState("");
   const [editReplyComment, setEditReplyComment] = useState("");
@@ -51,6 +51,8 @@ function RoomReplyComment(props) {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null); //save local uri
   const [Doc, setDoc] = useState(null); //save local uri
+  const [interactionPoint, setInteractionPoint] = useState([]);
+  const [date, setDate] = useState([]);
   const [mainCommentAuthorName, setMainCommentAuthorName] = useState(
     props.route.params.mainCommentAuthorName
   );
@@ -128,6 +130,16 @@ function RoomReplyComment(props) {
         });
         setReplyComment(replyComment);
       });
+
+    firebase
+      .firestore()
+      .collection("DiscussionRoom")
+      .doc(props.route.params.did)
+      .get()
+      .then((snapshot) => {
+        setDate(snapshot.data().date);
+        setInteractionPoint(snapshot.data().interaction);
+      });
   }, [data]);
 
   useFocusEffect(
@@ -161,6 +173,48 @@ function RoomReplyComment(props) {
     }, [data])
   );
 
+  const addInteraction = () => {
+    const today = new Date();
+    const n = today.getMonth() + 1;
+    const tomorrow = new Date(today);
+    const createdDay = tomorrow.getDate();
+    const finalDate = createdDay + "/" + n;
+
+    if (date.includes(finalDate)) {
+      const index = date.indexOf(finalDate);
+
+      interactionPoint[index] = interactionPoint[index] + 1;
+
+      firebase
+        .firestore()
+        .collection("DiscussionRoom")
+        .doc(discussionId)
+        .update({
+          interaction: interactionPoint,
+        })
+        .then(() => {
+          console.log("done");
+        });
+    } else {
+      date.shift();
+      interactionPoint.shift();
+      date.push(finalDate);
+      interactionPoint.push(0);
+      const index = date.indexOf(finalDate);
+      interactionPoint[index] = interactionPoint[index] + 1;
+      firebase
+        .firestore()
+        .collection("DiscussionRoom")
+        .doc(discussionId)
+        .update({
+          interaction: interactionPoint,
+        })
+        .then(() => {
+          console.log("done");
+        });
+    }
+  };
+
   const pickDocument = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
     if (!result.cancelled) {
@@ -183,6 +237,7 @@ function RoomReplyComment(props) {
   };
 
   const UploadComment = () => {
+    addInteraction();
     if (image == null && Doc == null) {
       ReplyComment(null, null);
     }
@@ -201,6 +256,7 @@ function RoomReplyComment(props) {
   };
 
   const UploadCommentV2 = () => {
+    addInteraction();
     if (image == null && Doc == null) {
       ReplySubComment(null, null);
     }
@@ -486,6 +542,7 @@ function RoomReplyComment(props) {
   };
 
   const addLike = (nol) => {
+    addInteraction();
     const x = nol + 1;
     if (mainComment.likeBy.includes(userId)) {
     } else {
@@ -564,7 +621,7 @@ function RoomReplyComment(props) {
   };
 
   const EditReplyComment = (rcid) => {
-    setIsVisibleV2(false)
+    setIsVisibleV2(false);
     setEditReplyCommentId(rcid);
     firebase
       .firestore()
@@ -700,7 +757,7 @@ function RoomReplyComment(props) {
   };
 
   const DeleteReplyComment = (rcid) => {
-    setIsVisibleV2(false)
+    setIsVisibleV2(false);
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
@@ -739,6 +796,7 @@ function RoomReplyComment(props) {
   };
 
   const AddLikeToReplyComment = (rcid, nol, lb) => {
+    addInteraction()
     const x = nol + 1;
     if (lb.includes(userId)) {
     } else {

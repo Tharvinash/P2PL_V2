@@ -118,9 +118,9 @@ const commentCard = (props) => {
               >
                 <Text style={styles.userName}>{props.postedBy} </Text>
                 {props.creation === null ? (
-                  <Text style={(styles.time, { marginRight: 20 })}>Now</Text>
+                  <Text style={(styles.time, { marginRight: 10 })}>Now</Text>
                 ) : (
-                  <Text style={(styles.userC, { marginRight: 20 })}>
+                  <Text style={(styles.userC, { marginRight: 10 })}>
                     {timeDifference(new Date(), props.creation.toDate())}
                   </Text>
                 )}
@@ -270,9 +270,9 @@ const commentCard = (props) => {
               >
                 <Text style={styles.userName}>{props.postedBy} </Text>
                 {props.creation === null ? (
-                  <Text style={(styles.time, { marginRight: 5 })}>Now</Text>
+                  <Text style={(styles.time, { marginRight: 10 })}>Now</Text>
                 ) : (
-                  <Text style={(styles.userC, { marginRight: 5 })}>
+                  <Text style={(styles.userC, { marginRight: 10 })}>
                     {timeDifference(new Date(), props.creation.toDate())}
                   </Text>
                 )}
