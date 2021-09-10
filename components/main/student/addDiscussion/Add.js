@@ -49,7 +49,7 @@ function Add(props) {
         </View>
       ),
     });
-  }, [title]);
+  }, [title, selected]);
 
   useEffect(() => {
     (async () => {
@@ -101,7 +101,7 @@ function Add(props) {
       return;
     }
 
-    if (!selected.trim()) {
+    if (!selected) {
       alert("Please Enter Faculty");
       return;
     }

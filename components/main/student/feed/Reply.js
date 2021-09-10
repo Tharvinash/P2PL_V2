@@ -494,6 +494,7 @@ function Reply(props) {
   };
 
   const Delete = () => {
+    setIsVisible(false)
     // firebase.firestore().collection("Comment").doc(cid).delete();
     // console.log("delete");
     // props.navigation.goBack();
@@ -525,11 +526,13 @@ function Reply(props) {
   };
 
   const EditComment = () => {
+    setIsVisible(false)
     setEditComment(mainComment.comment);
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
   const EditReplyComment = (rcid) => {
+    setIsVisibleV2(false)
     setEditReplyCommentId(rcid);
     firebase
       .firestore()
@@ -655,6 +658,7 @@ function Reply(props) {
   };
 
   const DeleteReplyComment = (rcid) => {
+    setIsVisibleV2(false)
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",

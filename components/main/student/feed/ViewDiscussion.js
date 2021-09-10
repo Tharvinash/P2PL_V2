@@ -150,7 +150,7 @@ function ViewDiscussion(props) {
         setComment(comment);
       });
 
-    setData(11);
+    setData(5);
   }, [props.currentUser, props.route.params.did, data]);
 
   useFocusEffect(
@@ -168,7 +168,7 @@ function ViewDiscussion(props) {
           });
           setComment(comment);
         });
-      setData(88);
+      setData(6);
       firebase
         .firestore()
         .collection("users")
@@ -228,6 +228,7 @@ function ViewDiscussion(props) {
   const toggleVisibility = (cid) => {
     setIsVisible(true);
     setTemporaryId(cid);
+    console.log(24)
   };
 
   const finalCommentUpload = (doc, img) => {
@@ -254,7 +255,7 @@ function ViewDiscussion(props) {
         .then(function () {
           setModalVisible(!isModalVisible);
         });
-      setData(57);
+      setData(7);
     }
   };
 
@@ -510,6 +511,7 @@ function ViewDiscussion(props) {
   };
 
   const Delete = (cid) => {
+    setIsVisible(false)
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
@@ -574,6 +576,7 @@ function ViewDiscussion(props) {
   };
 
   const EditComment = (cid) => {
+    setIsVisible(false)
     setCommentId(cid);
     firebase
       .firestore()
@@ -605,7 +608,7 @@ function ViewDiscussion(props) {
       setEditCommentModalVisible(!isEditCommentModalVisible);
     }
 
-    setData(88);
+    setData(8);
   };
 
   const downlaodDoc = () => {
@@ -655,7 +658,7 @@ function ViewDiscussion(props) {
         }
         ListHeaderComponent={
           <View>
-            <View style={{ flexDirection: "row", marginTop: 10 }}>
+            <View style={{ flexDirection: "row"}}>
               <View style={{ flex: 1, justifyContent: "flex-start" }}>
                 <View style={{ width: "100%" }}>
                   <Text style={styles.title}>{userPosts.title}</Text>

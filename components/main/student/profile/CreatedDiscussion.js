@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -152,13 +152,17 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
+    width: Dimensions.get("window").width * 0.95,
     borderRadius: 16,
   },
 
   backRightBtnRight: {
     backgroundColor: "red",
     right: 0,
+  },
+
+  backTextWhite: {
+    color: "#fff",
   },
 });
 

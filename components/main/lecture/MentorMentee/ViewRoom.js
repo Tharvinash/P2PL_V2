@@ -54,6 +54,7 @@ function ViewRoom(props) {
   const [member, setMember] = useState([]);
   const [interactionPoint, setInteractionPoint] = useState([]);
   const [date, setDate] = useState([]);
+  const [userStatus, setUserStatus] = useState(0);
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
   const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
@@ -79,17 +80,20 @@ function ViewRoom(props) {
     props.navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-          <TouchableOpacity style={{ marginHorizontal: 5 }}>
-            <Icon
-              name="stats-chart-outline"
-              type="ionicon"
-              size={30}
-              color="#000"
-              onPress={() => {
-                navtostats();
-              }}
-            />
-          </TouchableOpacity>
+          {userStatus == 1 ? (
+            <TouchableOpacity style={{ marginHorizontal: 5 }}>
+              <Icon
+                name="stats-chart-outline"
+                type="ionicon"
+                size={30}
+                color="#000"
+                onPress={() => {
+                  navtostats();
+                }}
+              />
+            </TouchableOpacity>
+          ) : null}
+
           <TouchableOpacity style={{ marginHorizontal: 5, marginBottom: -5 }}>
             <Icon
               name="information-circle-outline"
@@ -144,7 +148,7 @@ function ViewRoom(props) {
         });
         setComment(comment);
       });
-
+    setUserStatus(currentUser.status);
     setData(11);
   }, [props.currentUser, props.route.params.did, data]);
 
