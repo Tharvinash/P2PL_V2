@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -6,7 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  RefreshControl,
+  ActivityIndicator,
   Dimensions,
 } from "react-native";
 import { Icon } from "react-native-elements";
@@ -22,18 +23,42 @@ function Feed(props) {
     return <View />;
   }
 
-  const [post, setPost] = useState(posts);
-  const [refreshing, setRefreshing] = useState(false);
-
+  const [post, setPost] = useState([]);
+  const [data, setData] = useState(0);
+  const [numberOfItem, setNumberOfItem] = useState(5);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
+  let stopFetchMore = true;
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
+  useEffect(() => {
+    LoadDiscussion();
+  }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      LoadDiscussion();
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setCu(snapshot.data().filteredFeed);
+          } else {
+            console.log("does not exist");
+          }
+        });
+    }, [])
+  );
+
+  const LoadDiscussion = () => {
+    setLoadingMore(true)
     firebase
       .firestore()
       .collection("Discussion")
       .orderBy("creation", "desc")
+      .limit(numberOfItem)
       .get()
       .then((snapshot) => {
         let posts = snapshot.docs.map((doc) => {
@@ -42,159 +67,113 @@ function Feed(props) {
           return { id, ...data };
         });
         setPost(posts);
-        setRefreshing(false);
+        console.log("length " + posts.length);
       });
+      setLoadingMore(false)
+  };
 
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setCu(snapshot.data().filteredFeed);
-        } else {
-          console.log("does not exist");
-        }
-      });
-    setRefreshing(false);
-  }, [refreshing]);
+  const ListFooterComponent = () => (
+    <View style={{ justifyContent: "center", alignItems: "center", backgroundColor:'#fff'}}>
+      <ActivityIndicator size="large" color="#E3562A" />
+    </View>
+  );
 
-  if (post.length == 0) {
+  const renderItem = ({ item }) => {
+    return FilterFeed.indexOf(item.faculty) !== -1 ? (
+      <View style={styles.card}>
+        <View style={styles.cardContent}>
+          <TouchableOpacity
+            style={{ flex: 1 }}
+            onPress={() =>
+              props.navigation.navigate("Discussion", {
+                did: item.id,
+              })
+            }
+          >
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                <View style={{ flexDirection: "row", width: "100%" }}>
+                  <Image
+                    style={{
+                      width: 35,
+                      height: 35,
+                      borderRadius: 35 / 2,
+                      marginBottom: 10,
+                    }}
+                    source={{ uri: item.image }}
+                  />
+                  <View style={{ flex: 1, paddingLeft: 10 }}>
+                    <Text style={styles.userName}>{item.postedBy}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <Text style={styles.postedTime}>
+                {timeDifference(new Date(), item.creation.toDate())}
+              </Text>
+            </View>
+
+            <Text numberOfLines={2} style={styles.title}>
+              {item.title}
+            </Text>
+
+            <View
+              style={{
+                backgroundColor: "#003565",
+                borderRadius: 16,
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ color: "#fff" }}>{item.faculty}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    ) : null;
+  };
+
+  const handleOnEndReached = () => {
+    console.log("reacherd end");
+    if (posts.length === post.length) {
+      return null;
+    } else {
+      if (!stopFetchMore) {
+        setNumberOfItem(numberOfItem + 5);
+        setTimeout(function () {
+          LoadDiscussion();
+        }, 1000);
+        stopFetchMore = true;
+      }
+    }
+  };
+
+  const FeedList = () => {
     return (
       <View style={styles.container}>
         <View style={{ marginTop: 8 }}>
           <FlatList
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
             horizontal={false}
-            data={posts}
-            renderItem={({ item }) =>
-              FilterFeed.indexOf(item.faculty) !== -1 ? (
-                <View style={styles.card}>
-                <View style={styles.cardContent}>
-                  <TouchableOpacity
-                    style={{ flex: 1 }}
-                    onPress={() =>
-                      props.navigation.navigate("Discussion", {
-                        did: item.id,
-                      })
-                    }
-                  >
-                    <View style={{ flexDirection: "row" }}>
-                      <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                        <View style={{ flexDirection: "row", width: "100%" }}>
-                          <Image
-                            style={{
-                              width: 35,
-                              height: 35,
-                              borderRadius: 35 / 2,
-                              marginBottom: 10,
-                            }}
-                            source={{ uri: item.image }}
-                          />
-                          <View style={{ flex: 1, paddingLeft: 10 }}>
-                            <Text style={styles.userName}>{item.postedBy}</Text>
-                          </View>
-                        </View>
-                      </View>
-
-                      <Text style={styles.postedTime}>
-                        {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
-                    </View>
-
-                    <Text numberOfLines={2} style={styles.title}>
-                      {item.title}
-                    </Text>
-
-                    <View
-                      style={{
-                        backgroundColor: "#003565",
-                        borderRadius: 16,
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Text style={{ color: "#fff" }}>{item.faculty}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              ) : null
-            }
+            data={post}
+            onEndReachedThreshold={0.01}
+            renderItem={renderItem}
+            onScrollBeginDrag={() => {
+              stopFetchMore = false;
+            }}
+            onEndReached={() => {
+              handleOnEndReached();
+            }}
+            ListFooterComponent={() => loadingMore && <ListFooterComponent />}
           />
         </View>
       </View>
     );
+  };
+
+  if (post.length == 0) {
+    return FeedList();
   }
 
-  return (
-    <View style={styles.container}>
-      <View style={{ marginTop: 8 }}>
-        <FlatList
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          horizontal={false}
-          data={post}
-          renderItem={({ item }) =>
-            FilterFeed.indexOf(item.faculty) !== -1 ? (
-              <View style={styles.card}>
-                <View style={styles.cardContent}>
-                  <TouchableOpacity
-                    style={{ flex: 1 }}
-                    onPress={() =>
-                      props.navigation.navigate("Discussion", {
-                        did: item.id,
-                      })
-                    }
-                  >
-                    <View style={{ flexDirection: "row" }}>
-                      <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                        <View style={{ flexDirection: "row", width: "100%" }}>
-                          <Image
-                            style={{
-                              width: 35,
-                              height: 35,
-                              borderRadius: 35 / 2,
-                              marginBottom: 10,
-                            }}
-                            source={{ uri: item.image }}
-                          />
-                          <View style={{ flex: 1, paddingLeft: 10 }}>
-                            <Text style={styles.userName}>{item.postedBy}</Text>
-                          </View>
-                        </View>
-                      </View>
-
-                      <Text style={styles.postedTime}>
-                        {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
-                    </View>
-
-                    <Text numberOfLines={2} style={styles.title}>
-                      {item.title}
-                    </Text>
-
-                    <View
-                      style={{
-                        backgroundColor: "#003565",
-                        borderRadius: 16,
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Text style={{ color: "#fff" }}>{item.faculty}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : null
-          }
-        />
-      </View>
-    </View>
-  );
+  return FeedList();
 }
 
 const styles = StyleSheet.create({

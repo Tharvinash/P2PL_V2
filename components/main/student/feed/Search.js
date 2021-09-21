@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,18 +6,35 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  Picker,
   Dimensions,
 } from "react-native";
 import { Icon } from "react-native-elements";
+import SelectPicker from "react-native-form-select-picker";
 
 import firebase from "firebase";
 require("firebase/firestore");
 
 export default function Search(props) {
   const [users, setUsers] = useState(" ");
+  const [fac, setFac] = useState(" ");
+  const [selected, setSelected] = useState();
   const [faculty, setFaculty] = useState("");
   const userId = firebase.auth().currentUser.uid;
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .collection("Faculty")
+      .get()
+      .then((snapshot) => {
+        let faculty = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setFac(faculty);
+      });
+  }, []);
 
   const fetchUsers = (search) => {
     firebase
@@ -37,11 +54,11 @@ export default function Search(props) {
   };
 
   const searchByCategory = (xxx) => {
-    setFaculty(xxx)
+    setFaculty(xxx);
     firebase
       .firestore()
       .collection("Discussion")
-      .where("faculty", "==", xxx)
+      .where("faculty", "==", selected)
       .get()
       .then((snapshot) => {
         let users = snapshot.docs.map((doc) => {
@@ -72,78 +89,37 @@ export default function Search(props) {
           style={{ flex: 1, paddingLeft: 10, fontSize: 18 }}
         />
       </View>
-      <View style={styles.dropdown}>
-        <Picker
-          selectedValue={faculty}
-          style={{
-            height: 50,
-            width: 300,
-            alignItems:'center',
-            justifyContent:'center',
-            color: "#fff",
+      <View style={{ justifyContent: "center" }}>
+        <SelectPicker
+          placeholder="Faculty"
+          placeholderStyle={{
             fontFamily: "Poppins",
+            fontSize: 20,
+            color: "#fff",
           }}
-          onValueChange={(faculty) => searchByCategory(faculty)}
+          onSelectedStyle={{
+            fontFamily: "Poppins",
+            fontSize: 15,
+            color: "#fff",
+          }}
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            ...styles.ui,
+          }}
+          onValueChange={(value) => {
+            setSelected(value);
+          }}
+          selected={selected}
         >
-          <Picker.Item
-            label="FACULTY OF EDUCATION"
-            value="FACULTY OF EDUCATION"
-          />
-          <Picker.Item
-            label="FACULTY OF DENTISTRY"
-            value="FACULTY OF DENTISTRY"
-          />
-          <Picker.Item
-            label="FACULTY OF ENGINEERING"
-            value="FACULTY OF ENGINEERING"
-          />
-          <Picker.Item label="FACULTY OF SCIENCE" value="FACULTY OF SCIENCE" />
-          <Picker.Item label="FACULTY OF LAW" value="FACULTY OF LAW" />
-          <Picker.Item
-            label="FACULTY OF MEDICINE"
-            value="FACULTY OF MEDICINE"
-          />
-          <Picker.Item
-            label="FACULTY OF ARTS AND SOCIAL SCIENCE"
-            value="FACULTY OF ARTS AND SOCIAL SCIENCE"
-          />
-          <Picker.Item
-            label="FACULTY OF BUSINESS AND ACCOUNTANCY"
-            value="FACULTY OF BUSINESS AND ACCOUNTANCY"
-          />
-          <Picker.Item
-            label="FACULTY OF ECONOMICS AND ADMINISTRATION"
-            value="FACULTY OF ECONOMICS AND ADMINISTRATION"
-          />
-          <Picker.Item
-            label="FACULTY OF LANGUAGE AND LINGUISTICS"
-            value="FACULTY OF LANGUAGE AND LINGUISTICS"
-          />
-          <Picker.Item
-            label="FACULTY OF BUILT ENVIRONMENT"
-            value="FACULTY OF BUILT ENVIRONMENT"
-          />
-          <Picker.Item
-            label="FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY"
-            value="FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY"
-          />
-          <Picker.Item
-            label="FACULTY OF PHARMACY"
-            value="FACULTY OF PHARMACY"
-          />
-          <Picker.Item
-            label="FACULTY OF CREATIVE ARTS"
-            value="FACULTY OF CREATIVE ARTS"
-          />
-          <Picker.Item
-            label="ACADEMY OF ISLAMIC STUDIES"
-            value="ACADEMY OF ISLAMIC STUDIES"
-          />
-          <Picker.Item
-            label="ACADEMY OF MALAY STUDIES"
-            value="ACADEMY OF MALAY STUDIES"
-          />
-        </Picker>
+          {Object.values(fac).map((val) => (
+            <SelectPicker.Item
+              label={val.faculty}
+              value={val.faculty}
+              key={val.id}
+            />
+          ))}
+        </SelectPicker>
       </View>
 
       <FlatList
@@ -201,6 +177,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
   },
+
+  ui: {
+    marginVertical: 10,
+    width: Dimensions.get("window").width * 0.8,
+    height: Dimensions.get("window").width * 0.1,
+    backgroundColor: "#E3562A",
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   card: {
     borderRadius: Dimensions.get("window").width / 24.5,
     elevation: 5,
@@ -225,8 +212,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: "#E3562A",
     height: Dimensions.get("window").height / 15,
-    justifyContent:'center',
-    alignItems:'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   input: {
@@ -241,7 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingLeft:10
+    paddingLeft: 10,
   },
 
   search: {

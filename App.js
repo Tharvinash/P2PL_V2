@@ -165,8 +165,16 @@ export class App extends Component {
             />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="ResetPassword" component={ResetPassword} />
-            <Stack.Screen name="LectureRegister" component={LectureRegister} />
+            <Stack.Screen
+              name="ResetPassword"
+              component={ResetPassword}
+              options={{ headerTitle: "Reset Password" }}
+            />
+            <Stack.Screen
+              name="LectureRegister"
+              component={LectureRegister}
+              options={{ headerTitle: "Register" }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       );
@@ -321,7 +329,7 @@ export class App extends Component {
               <Stack.Screen
                 name="StudentMain"
                 component={MainScreen}
-                options={{ headerShown: false }}
+                options={{ headerShown: false, headerBackTitleVisible: false }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
@@ -351,6 +359,7 @@ export class App extends Component {
               />
               <Stack.Screen
                 name="Discussion"
+                options={{ headerBackTitleVisible: false }} // add for everything to make ammend in ios
                 component={DiscussionTitle}
                 navigation={this.props.navigation}
               />

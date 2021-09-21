@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Picker,
 } from "react-native";
+import SelectPicker from "react-native-form-select-picker";
 import validator from "validator";
 import firebase from "firebase";
 import "firebase/firestore";
@@ -24,6 +25,8 @@ export class Register extends Component {
       year: null,
       mc: null,
       data: [],
+      fac: [],
+      options: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"],
     };
 
     this.onSignUp = this.onSignUp.bind(this);
@@ -55,12 +58,33 @@ export class Register extends Component {
     }, 1000);
   }
 
+  getFac() {
+    setTimeout(() => {
+      firebase
+        .firestore()
+        .collection("Faculty")
+        .get()
+        .then((snapshot) => {
+          let faculty = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          console.log(faculty);
+          this.setState({
+            fac: faculty,
+          });
+        });
+    }, 1000);
+  }
+
   componentDidMount() {
     this.getData();
+    this.getFac();
   }
 
   validate() {
-    const { email, password, name, faculty, year, data, mc } = this.state;
+    const { email, password, name, faculty, year, data } = this.state;
     const found = data.some((el) => el.email === email);
     const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     // ------------------------------------------------------------------------ //
@@ -273,90 +297,51 @@ export class Register extends Component {
           onChangeText={(password) => this.setState({ password })}
         />
 
-        <View style={styles.input}>
-          <Picker
-            selectedValue={this.state.faculty}
-            style={{ height: 50, width: 300, color: "#000", marginTop: -10 }}
-            itemStyle={{ fontFamily: "Poppins" }}
-            onValueChange={this.updateFaculty}
-          >
-            <Picker.Item
-              label="FACULTY OF EDUCATION"
-              value="FACULTY OF EDUCATION"
+        <SelectPicker
+          placeholder="Faculty"
+          placeholderStyle={{
+            fontFamily: "Poppins",
+            fontSize: 15,
+            color: "#000",
+            marginTop: 5,
+          }}
+          onSelectedStyle={{
+            fontSize: 15,
+            color: "#000",
+          }}
+          style={styles.input}
+          onValueChange={this.updateFaculty}
+          selected={this.state.faculty}
+        >
+          {Object.values(this.state.fac).map((val) => (
+            <SelectPicker.Item
+              label={val.faculty}
+              value={val.faculty}
+              key={val.id}
             />
-            <Picker.Item
-              label="FACULTY OF DENTISTRY"
-              value="FACULTY OF DENTISTRY"
-            />
-            <Picker.Item
-              label="FACULTY OF ENGINEERING"
-              value="FACULTY OF ENGINEERING"
-            />
-            <Picker.Item
-              label="FACULTY OF SCIENCE"
-              value="FACULTY OF SCIENCE"
-            />
-            <Picker.Item label="FACULTY OF LAW" value="FACULTY OF LAW" />
-            <Picker.Item
-              label="FACULTY OF MEDICINE"
-              value="FACULTY OF MEDICINE"
-            />
-            <Picker.Item
-              label="FACULTY OF ARTS AND SOCIAL SCIENCE"
-              value="FACULTY OF ARTS AND SOCIAL SCIENCE"
-            />
-            <Picker.Item
-              label="FACULTY OF BUSINESS AND ACCOUNTANCY"
-              value="FACULTY OF BUSINESS AND ACCOUNTANCY"
-            />
-            <Picker.Item
-              label="FACULTY OF ECONOMICS AND ADMINISTRATION"
-              value="FACULTY OF ECONOMICS AND ADMINISTRATION"
-            />
-            <Picker.Item
-              label="FACULTY OF LANGUAGE AND LINGUISTICS"
-              value="FACULTY OF LANGUAGE AND LINGUISTICS"
-            />
-            <Picker.Item
-              label="FACULTY OF BUILT ENVIRONMENT"
-              value="FACULTY OF BUILT ENVIRONMENT"
-            />
-            <Picker.Item
-              label="FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY"
-              value="FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY"
-            />
-            <Picker.Item
-              label="FACULTY OF PHARMACY"
-              value="FACULTY OF PHARMACY"
-            />
-            <Picker.Item
-              label="FACULTY OF CREATIVE ARTS"
-              value="FACULTY OF CREATIVE ARTS"
-            />
-            <Picker.Item
-              label="ACADEMY OF ISLAMIC STUDIES"
-              value="ACADEMY OF ISLAMIC STUDIES"
-            />
-            <Picker.Item
-              label="ACADEMY OF MALAY STUDIES"
-              value="ACADEMY OF MALAY STUDIES"
-            />
-          </Picker>
-        </View>
-
-        <View style={styles.input}>
-          <Picker
-            selectedValue={this.state.year}
-            style={{ height: 50, width: 300, color: "#000", marginTop: -10 }}
-            onValueChange={this.updateYear}
-          >
-            <Picker.Item label="Year 1" value="1" />
-            <Picker.Item label="Year 2" value="2" />
-            <Picker.Item label="Year 3" value="3" />
-            <Picker.Item label="Year 4" value="4" />
-            <Picker.Item label="Year 5" value="5" />
-          </Picker>
-        </View>
+          ))}
+        </SelectPicker>
+        
+        <SelectPicker
+          placeholder="Year"
+          placeholderStyle={{
+            fontFamily: "Poppins",
+            fontSize: 15,
+            color: "#000",
+            marginTop: 5,
+          }}
+          onSelectedStyle={{
+            fontSize: 15,
+            color: "#000",
+          }}
+          style={styles.input}
+          onValueChange={this.updateYear}
+          selected={this.state.year}
+        >
+          {Object.values(this.state.options).map((val, index) => (
+            <SelectPicker.Item label={val} value={val} key={index} />
+          ))}
+        </SelectPicker>
 
         <TouchableOpacity style={styles.button} onPress={() => this.validate()}>
           <Text style={styles.text}>Register</Text>
