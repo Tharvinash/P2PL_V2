@@ -161,19 +161,19 @@ export class App extends Component {
             <Stack.Screen
               name="Landing"
               component={LandingScreen}
-              options={{ headerShown: false }}
+              options={{ headerShown: false, headerBackTitleVisible: false }}
             />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen
               name="ResetPassword"
               component={ResetPassword}
-              options={{ headerTitle: "Reset Password" }}
+              options={{ headerTitle: "Reset Password", headerBackTitleVisible: false }}
             />
             <Stack.Screen
               name="LectureRegister"
               component={LectureRegister}
-              options={{ headerTitle: "Register" }}
+              options={{ headerTitle: "Register", headerBackTitleVisible: false }}
             />
           </Stack.Navigator>
         </NavigationContainer>
@@ -188,12 +188,12 @@ export class App extends Component {
               <Stack.Screen
                 name="Main2"
                 component={LectureMainScreen}
-                options={{ headerShown: false }}
+                options={{ headerShown: false, headerBackTitleVisible: false }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
                 name="LectureDiscussionView"
-                options={{ headerTitle: "Discussion" }}
+                options={{ headerTitle: "Discussion", headerBackTitleVisible: false }}
                 component={LectureDiscussionView}
                 navigation={this.props.navigation}
               />
@@ -236,31 +236,31 @@ export class App extends Component {
                 name="RoomReplyComment"
                 component={RoomReplyComment}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Reply" }}
+                options={{ headerTitle: "Replies", headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="ViewRequest"
                 component={ViewRequest}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "View Request" }}
+                options={{ headerTitle: "View Request", headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="ViewDetailMentor"
                 component={ViewDetailMentor}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Details" }}
+                options={{ headerTitle: "Details", headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="ViewDetailMentee"
                 component={ViewDetailMentee}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Details" }}
+                options={{ headerTitle: "Details", headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="AddInGroup"
                 component={AddInGroup}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Available Group" }}
+                options={{ headerTitle: "Available Group", headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="AddInGroupV2"
@@ -272,19 +272,19 @@ export class App extends Component {
                 name="GroupDetail"
                 component={GroupDetail}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Group Info" }}
+                options={{ headerTitle: "Group Info", headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="ViewRequestCreateRoom"
                 component={ViewRequestCreateRoom}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Member List" }}
+                options={{ headerTitle: "Member List", headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="GroupStats"
                 component={GroupStats}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Group Statistics" }}
+                options={{ headerTitle: "Group Statistics", headerBackTitleVisible: false }}
               />
             </Stack.Navigator>
           </NavigationContainer>
@@ -300,18 +300,18 @@ export class App extends Component {
               <Stack.Screen
                 name="Main3"
                 component={AdminMainScreen}
-                options={{ headerShown: false }}
+                options={{ headerShown: false, headerBackTitleVisible: false }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
                 name="ViewDiscussion"
-                options={{ headerTitle: "Discussion" }}
+                options={{ headerTitle: "Discussion", headerBackTitleVisible: false }}
                 component={ViewDiscussion}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
                 name="ViewReply"
-                options={{ headerTitle: "Replies" }}
+                options={{ headerTitle: "Replies", headerBackTitleVisible: false}}
                 component={ViewReply}
                 navigation={this.props.navigation}
               />
@@ -336,26 +336,31 @@ export class App extends Component {
                 name="Add Discussion"
                 component={AddScreen}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Created Discussions"
                 component={CreatedDiscussion}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Activity Tracking"
                 component={ActivityTracking}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Filter Feed"
                 component={FilterFeed}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Favorite Discussion"
                 component={FavoriteDiscussion}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Discussion"
@@ -365,7 +370,7 @@ export class App extends Component {
               />
               <Stack.Screen
                 name="Created Discussion"
-                options={{ headerTitle: "Discussion" }}
+                options={{ headerTitle: "Discussion", headerBackTitleVisible: false }}
                 component={EditDeleteDiscussion}
                 navigation={this.props.navigation}
               />
@@ -373,10 +378,11 @@ export class App extends Component {
                 name="Edit Discussion"
                 component={EditDiscussion}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="EditProfile"
-                options={{ headerTitle: "Edit Profile Info" }}
+                options={{ headerTitle: "Edit Profile", headerBackTitleVisible: false }}
                 component={EditProfile}
                 navigation={this.props.navigation}
               />
@@ -384,60 +390,67 @@ export class App extends Component {
                 name="EditComment"
                 component={EditComment}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Post Comment"
                 component={PostComment}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Search Results"
                 component={Search}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Change Password"
                 component={EditPassword}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Reply Discussion"
                 component={Reply}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="Choose"
                 component={Choose}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="RequestForMentor"
                 component={RequestForMentor}
-                options={{ headerTitle: "Request For Mentor" }}
+                options={{ headerTitle: "Request For Mentor", headerBackTitleVisible: false }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
                 name="RequestToBeMentor"
                 component={RequestToBeMentor}
-                options={{ headerTitle: "Request To Be Mentor" }}
+                options={{ headerTitle: "Request To Be Mentor", headerBackTitleVisible: false }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
                 name="View Room"
                 component={ViewRoom}
                 navigation={this.props.navigation}
+                options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="RoomReplyComment"
                 component={RoomReplyComment}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Reply" }}
+                options={{ headerTitle: "Replies", headerBackTitleVisible: false }}
               />
               <Stack.Screen
                 name="GroupDetail"
                 component={GroupDetail}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Group Info" }}
+                options={{ headerTitle: "Group Info", headerBackTitleVisible: false }}
               />
             </Stack.Navigator>
           </NavigationContainer>

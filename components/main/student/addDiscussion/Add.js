@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Picker,
   Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -17,6 +16,7 @@ require("firebase/firestore");
 require("firebase/firebase-storage");
 import { connect } from "react-redux";
 import { Icon } from "react-native-elements";
+import { FAB } from "react-native-elements";
 import Modal from "react-native-modal";
 import Images from "react-native-scalable-image";
 import SelectPicker from "react-native-form-select-picker";
@@ -43,7 +43,7 @@ function Add(props) {
               type="ionicon"
               size={35}
               color="#000"
-              onPress={() => uploadImage()}
+              onPress={uploadImage}
             />
           </TouchableOpacity>
         </View>
@@ -105,6 +105,7 @@ function Add(props) {
       alert("Please Enter Faculty");
       return;
     }
+
 
     setModalVisible(!isModalVisible);
     if (image != null) {
@@ -180,115 +181,127 @@ function Add(props) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View
-        style={{
-          borderBottomColor: "#fff",
-          borderBottomWidth: 1,
-          margin: 20,
-        }}
-      >
-        <View>
-          <Text style={styles.title}>Title : </Text>
-        </View>
-        <TextInput
+    <View style={styles.container}>
+      <ScrollView>
+        <View
           style={{
-            fontFamily: "Poppins",
-            fontSize: 20,
-            color: "#fff",
-            marginTop: 5,
+            borderBottomColor: "#fff",
+            borderBottomWidth: 1,
+            margin: 20,
           }}
-          placeholder="Place your title here"
-          placeholderTextColor="#fff"
-          multiline={true}
-          onChangeText={(title) => setTitle(title)}
-        />
-      </View>
-
-      <View style={{ marginLeft: 20 }}>
-        <View style={{ justifyContent: "center" }}>
-          <Text style={styles.title}>Add Faculty: </Text>
-          <SelectPicker
-            placeholder="Faculty"
-            placeholderStyle={{
+        >
+          <View>
+            <Text style={styles.title}>Title : </Text>
+          </View>
+          <TextInput
+            style={{
               fontFamily: "Poppins",
               fontSize: 20,
               color: "#fff",
+              marginTop: 5,
             }}
-            onSelectedStyle={{
-              fontFamily: "Poppins",
-              fontSize: 15,
-              color: "#fff",
-            }}
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              ...styles.ui,
-            }}
-            onValueChange={(value) => {
-              setSelected(value);
-            }}
-            selected={selected}
-          >
-            {Object.values(faculty).map((val) => (
-              <SelectPicker.Item
-                label={val.faculty}
-                value={val.faculty}
-                key={val.id}
-              />
-            ))}
-          </SelectPicker>
+            placeholder="Place your title here"
+            placeholderTextColor="#fff"
+            multiline={true}
+            defaultValue={title}
+            onChangeText={(title) => setTitle(title)}
+          />
         </View>
 
-        <View>
-          <Text style={styles.title}>Add Image:</Text>
-          <TouchableOpacity style={styles.ui} onPress={pickImage}>
-            <Text
-              style={{
-                color: "#fff",
+        <View style={{ marginLeft: 20 }}>
+          <View style={{ justifyContent: "center" }}>
+            <Text style={styles.title}>Add Faculty: </Text>
+            <SelectPicker
+              placeholder="Faculty"
+              placeholderStyle={{
                 fontFamily: "Poppins",
                 fontSize: 20,
+                color: "#fff",
               }}
+              onSelectedStyle={{
+                fontFamily: "Poppins",
+                fontSize: 15,
+                color: "#fff",
+              }}
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                ...styles.ui,
+              }}
+              onValueChange={(value) => {
+                setSelected(value);
+              }}
+              selected={selected}
             >
-              Upload Image
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+              {Object.values(faculty).map((val) => (
+                <SelectPicker.Item
+                  label={val.faculty}
+                  value={val.faculty}
+                  key={val.id}
+                />
+              ))}
+            </SelectPicker>
+          </View>
 
-      <View style={{ alignItems: "center" }}>
-        {image && (
-          <Images
-            width={Dimensions.get("window").width} // height will be calculated automatically
-            source={{ uri: image }}
+          <View>
+            <Text style={styles.title}>Add Image:</Text>
+            <TouchableOpacity style={styles.ui} onPress={pickImage}>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontFamily: "Poppins",
+                  fontSize: 20,
+                }}
+              >
+                Upload Image
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{ alignItems: "center" }}>
+          {image && (
+            <Images
+              width={Dimensions.get("window").width} // height will be calculated automatically
+              source={{ uri: image }}
+            />
+          )}
+        </View>
+
+        <View
+          style={{
+            borderBottomColor: "#fff",
+            borderBottomWidth: 1,
+            margin: 20,
+          }}
+        >
+          <Text style={styles.title}>Discussion Description</Text>
+        </View>
+        <View>
+          <TextInput
+            style={styles.desc}
+            placeholder="Type here"
+            multiline={true}
+            defaultValue={description}
+            onChangeText={(description) => setDescription(description)}
           />
-        )}
-      </View>
-
-      <View
-        style={{
-          borderBottomColor: "#fff",
-          borderBottomWidth: 1,
-          margin: 20,
-        }}
-      >
-        <Text style={styles.title}>Discussion Description</Text>
-      </View>
-      <View>
-        <TextInput
-          style={styles.desc}
-          placeholder="Type here"
-          multiline={true}
-          onChangeText={(description) => setDescription(description)}
-        />
-      </View>
-
-      <Modal isVisible={isModalVisible}>
-        <View style={{ justifyContent: "center", flex: 1 }}>
-          <ActivityIndicator size="large" color="#E3562A" />
         </View>
-      </Modal>
-    </ScrollView>
+        <Modal isVisible={isModalVisible}>
+          <View style={{ justifyContent: "center", flex: 1 }}>
+            <ActivityIndicator size="large" color="#E3562A" />
+          </View>
+        </Modal>
+      </ScrollView>
+      <FAB
+        placement="right"
+        color="#E3562A"
+        onPress={uploadImage}
+        size="large"
+        icon={
+          <Icon name="arrow-up-circle-outline" type="ionicon" size={35} color="#FFF" />
+        }
+      />
+    </View>
   );
 }
 
