@@ -5,8 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator
 } from "react-native";
-import { Icon } from "react-native-elements";
 
 const editComment = (props) => {
   return (
@@ -15,11 +15,11 @@ const editComment = (props) => {
         <TextInput
           style={styles.input}
           //value={editComment}
-					value={props.editComment}
+          value={props.editComment}
           placeholderTextColor="#000"
           multiline={true}
           //onChangeText={(editComment) => setEditComment(editComment)}
-					onChangeText={props.setEditComment}
+          onChangeText={props.setEditComment}
         />
       </View>
 
@@ -37,11 +37,14 @@ const editComment = (props) => {
         >
           <TouchableOpacity
             style={styles.blogout}
-            //onPress={() => uploadUpdatedComment()}
-						onPress={props. uploadUpdatedComment}
-
+            //onPress={() => UploadComment()}
+            onPress={props.uploadUpdatedComment}
           >
-            <Text style={styles.Ltext}>Update Comment</Text>
+            {props.loading ? (
+              <ActivityIndicator size="large" color="#140F38" />
+            ) : (
+              <Text style={styles.Ltext}>Update Comment</Text>
+            )}
           </TouchableOpacity>
         </View>
         <View
@@ -49,7 +52,10 @@ const editComment = (props) => {
             paddingHorizontal: 20,
           }}
         >
-          <TouchableOpacity style={styles.blogout} onPress={props.toggleEditComment}>
+          <TouchableOpacity
+            style={styles.blogout}
+            onPress={props.toggleEditComment}
+          >
             <Text style={styles.Ltext}>Cancel</Text>
           </TouchableOpacity>
         </View>

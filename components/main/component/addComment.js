@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { Icon } from "react-native-elements";
 
@@ -40,7 +41,7 @@ const addComment = (props) => {
           // onPress={() => {
           //   pickImage();
           // }}
-					onPress={props.pickImage}
+          onPress={props.pickImage}
         />
       </View>
 
@@ -59,9 +60,13 @@ const addComment = (props) => {
           <TouchableOpacity
             style={styles.blogout}
             //onPress={() => UploadComment()}
-						onPress={props.UploadComment}
+            onPress={props.UploadComment}
           >
-            <Text style={styles.Ltext}>Add Comment</Text>
+            {props.loading ? (
+              <ActivityIndicator size="large" color="#140F38" />
+            ) : (
+              <Text style={styles.Ltext}>Add Comment</Text>
+            )}
           </TouchableOpacity>
         </View>
         <View
@@ -69,11 +74,11 @@ const addComment = (props) => {
             paddingHorizontal: 20,
           }}
         >
-          <TouchableOpacity 
-					style={styles.blogout} 
-					//onPress={toggleModal}
-					onPress={props.toggleModal}
-					>
+          <TouchableOpacity
+            style={styles.blogout}
+            //onPress={toggleModal}
+            onPress={props.toggleModal}
+          >
             <Text style={styles.Ltext}>Cancel</Text>
           </TouchableOpacity>
         </View>

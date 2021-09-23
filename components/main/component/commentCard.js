@@ -107,7 +107,7 @@ const commentCard = (props) => {
             activeOpacity={0.8}
             style={styles.mainBubble}
             onLongPress={props.xxx}
-            delayLongPress={500}
+            delayLongPress={100}
           >
             <View style={{ marginLeft: 5 }}>
               <View

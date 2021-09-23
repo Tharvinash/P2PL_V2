@@ -53,7 +53,7 @@ function Feed(props) {
   );
 
   const LoadDiscussion = () => {
-    setLoadingMore(true)
+    setLoadingMore(!loadingMore)
     firebase
       .firestore()
       .collection("Discussion")
@@ -69,11 +69,11 @@ function Feed(props) {
         setPost(posts);
         console.log("length " + posts.length);
       });
-      setLoadingMore(false)
+      //setLoadingMore(false)
   };
 
   const ListFooterComponent = () => (
-    <View style={{ justifyContent: "center", alignItems: "center", backgroundColor:'#fff'}}>
+    <View style={{ justifyContent: "center", alignItems: "center", backgroundColor:'#140F38'}}>
       <ActivityIndicator size="large" color="#E3562A" />
     </View>
   );
@@ -135,6 +135,7 @@ function Feed(props) {
   const handleOnEndReached = () => {
     console.log("reacherd end");
     if (posts.length === post.length) {
+      setLoadingMore(false)
       return null;
     } else {
       if (!stopFetchMore) {

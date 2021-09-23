@@ -27,10 +27,11 @@ import * as Linking from "expo-linking";
 import Images from "react-native-scalable-image";
 import { timeDifference } from "../../../utils";
 import { FAB, ListItem, BottomSheet } from "react-native-elements";
+import { ActivityIndicator } from "react-native-paper";
 require("firebase/firestore");
 
 function ViewDiscussion(props) {
-  const { currentUser, options } = props;
+  const { currentUser, options, fullComments } = props;
   const [isModalVisible, setModalVisible] = useState(false);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
@@ -53,6 +54,10 @@ function ViewDiscussion(props) {
   const [name, setName] = useState(null);
   const [imageURI, setImageURI] = useState(null);
   const [docURI, setDocURI] = useState(null);
+  const [loading1, setLoading1] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const [loadMore, setLoadMore] = useState(8);
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
 
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
@@ -105,7 +110,7 @@ function ViewDiscussion(props) {
       ),
     });
   }, [data]);
-  // props.navigation.setParams({ toggleReport: toggleReport })
+
   useEffect(() => {
     const { currentUser, comments } = props;
     setDoc(null);
@@ -139,7 +144,8 @@ function ViewDiscussion(props) {
     firebase
       .firestore()
       .collection("Comment")
-      .orderBy("creation", "asc")
+      .orderBy("creation", "desc")
+      .limit(loadMore)
       .get()
       .then((snapshot) => {
         let comment = snapshot.docs.map((doc) => {
@@ -149,6 +155,9 @@ function ViewDiscussion(props) {
         });
         setComment(comment);
       });
+    setTimeout(function () {
+      setLoadMoreLoading(false);
+    }, 2000);
 
     setData(5);
   }, [props.currentUser, props.route.params.did, data]);
@@ -158,7 +167,8 @@ function ViewDiscussion(props) {
       firebase
         .firestore()
         .collection("Comment")
-        .orderBy("creation", "asc")
+        .orderBy("creation", "desc")
+        .limit(loadMore)
         .get()
         .then((snapshot) => {
           let comment = snapshot.docs.map((doc) => {
@@ -228,7 +238,6 @@ function ViewDiscussion(props) {
   const toggleVisibility = (cid) => {
     setIsVisible(true);
     setTemporaryId(cid);
-    console.log(24)
   };
 
   const finalCommentUpload = (doc, img) => {
@@ -253,6 +262,7 @@ function ViewDiscussion(props) {
           attachedImage: img,
         })
         .then(function () {
+          setLoading1(false);
           setModalVisible(!isModalVisible);
         });
       setData(7);
@@ -260,6 +270,7 @@ function ViewDiscussion(props) {
   };
 
   const UploadComment = () => {
+    setLoading1(true);
     if (image == null && Doc == null) {
       finalCommentUpload(null, null);
     }
@@ -511,7 +522,7 @@ function ViewDiscussion(props) {
   };
 
   const Delete = (cid) => {
-    setIsVisible(false)
+    setIsVisible(false);
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
@@ -576,7 +587,7 @@ function ViewDiscussion(props) {
   };
 
   const EditComment = (cid) => {
-    setIsVisible(false)
+    setIsVisible(false);
     setCommentId(cid);
     firebase
       .firestore()
@@ -590,6 +601,7 @@ function ViewDiscussion(props) {
   };
 
   const uploadUpdatedComment = () => {
+    setLoading2(true);
     if (!editComment.trim()) {
       alert("Please Enter Comment");
       return;
@@ -600,11 +612,12 @@ function ViewDiscussion(props) {
         .doc(commentId)
         .update({
           comment: editComment,
-          creation: firebase.firestore.FieldValue.serverTimestamp(),
+          //creation: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
           console.log("save");
         });
+      setLoading2(false);
       setEditCommentModalVisible(!isEditCommentModalVisible);
     }
 
@@ -613,6 +626,13 @@ function ViewDiscussion(props) {
 
   const downlaodDoc = () => {
     console.log(36);
+  };
+
+  const loadMoreComment = () => {
+    setLoadMoreLoading(true);
+    let x = 8;
+    setLoadMore(loadMore + x);
+    setData(9);
   };
 
   return (
@@ -658,7 +678,7 @@ function ViewDiscussion(props) {
         }
         ListHeaderComponent={
           <View>
-            <View style={{ flexDirection: "row"}}>
+            <View style={{ flexDirection: "row" }}>
               <View style={{ flex: 1, justifyContent: "flex-start" }}>
                 <View style={{ width: "100%" }}>
                   <Text style={styles.title}>{userPosts.title}</Text>
@@ -714,6 +734,27 @@ function ViewDiscussion(props) {
         }
         ListFooterComponent={
           <View>
+            {loadMoreLoading && (
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <ActivityIndicator size="large" color="#E3562A" />
+              </View>
+            )}
+            {comment.length != 0 && loadMore >= 8 && fullComments.length>loadMore && loadMoreLoading == false? (
+              <TouchableOpacity
+                onPress={loadMoreComment}
+                style={{ marginLeft: 50, flex: 1 }}
+              >
+                <Text style={{ fontSize: 15, fontFamily: "Poppins" }}>
+                  Load More...
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+
             <BottomSheet
               isVisible={isVisible}
               containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
@@ -741,6 +782,7 @@ function ViewDiscussion(props) {
                   pickImage={() => pickImage()}
                   UploadComment={() => UploadComment()}
                   toggleModal={() => toggleModal()}
+                  loading={loading1}
                 />
               </Modal>
 
@@ -750,6 +792,7 @@ function ViewDiscussion(props) {
                   setEditComment={(editComment) => setEditComment(editComment)}
                   uploadUpdatedComment={() => uploadUpdatedComment()}
                   toggleEditComment={() => toggleEditComment()}
+                  loading={loading2}
                 />
               </Modal>
 
@@ -937,7 +980,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
-  comments: store.userState.comment,
+  fullComments: store.userState.comment,
   options: store.userState.option,
 });
 
