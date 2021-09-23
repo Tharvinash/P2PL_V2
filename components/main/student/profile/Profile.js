@@ -87,114 +87,116 @@ function Profile(props) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={{ alignItems: "center", marginBottom: 20, marginTop: 10 }}>
-        <Image
-          style={{
-            width: 140,
-            height: 140,
-            borderRadius: 140 / 2,
-            marginBottom: 10,
-          }}
-          source={{
-            uri: user.image,
-          }}
-        />
-      </View>
-
-      <View>
-        <Text style={styles.us}>{user.name}</Text>
-      </View>
-      <View style={styles.bb}>
-        <View style={{ marginHorizontal: 10 }}>
-          <TouchableOpacity style={styles.title}>
-            <Text style={styles.Ltext}>Beginner</Text>
-          </TouchableOpacity>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={{ alignItems: "center", marginBottom: 20, marginTop: 10 }}>
+          <Image
+            style={{
+              width: 140,
+              height: 140,
+              borderRadius: 140 / 2,
+              marginBottom: 10,
+            }}
+            source={{
+              uri: user.image,
+            }}
+          />
         </View>
 
-        <View style={{ marginHorizontal: 10 }}>
-          <TouchableOpacity
-            style={styles.title}
-            onPress={() => toggleVisibility()}
-          >
-            <Text style={styles.Ltext}>Edit Profile</Text>
-          </TouchableOpacity>
+        <View>
+          <Text style={styles.us}>{user.name}</Text>
         </View>
-      </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          props.navigation.navigate("Created Discussions", { data: 123 })
-        }
-      >
-        <Text style={styles.text}>Created Discussion</Text>
-        <Icon
-          style={styles.arrow}
-          name="chevron-forward-outline"
-          type="ionicon"
-          size={20}
-          color="#3C3A36"
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          props.navigation.navigate("Favorite Discussion", { uid: userId })
-        }
-      >
-        <Text style={styles.text}>Favorite Discussion</Text>
-        <Icon
-          style={styles.arrow}
-          name="chevron-forward-outline"
-          type="ionicon"
-          size={20}
-          color="#3C3A36"
-        />
-      </TouchableOpacity>
+        <View style={styles.bb}>
+          <View style={{ marginHorizontal: 10 }}>
+            <TouchableOpacity style={styles.title}>
+              <Text style={styles.Ltext}>Beginner</Text>
+            </TouchableOpacity>
+          </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => props.navigation.navigate("Filter Feed")}
-      >
-        <Text style={styles.text}>Filter Feed</Text>
-        <Icon
-          style={styles.arrow}
-          name="chevron-forward-outline"
-          type="ionicon"
-          size={20}
-          color="#3C3A36"
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => props.navigation.navigate("Activity Tracking")}
-      >
-        <Text style={styles.text}>Discussion Room</Text>
-        <Icon
-          style={styles.arrow}
-          name="chevron-forward-outline"
-          type="ionicon"
-          size={20}
-          color="#3C3A36"
-        />
-      </TouchableOpacity>
-      <BottomSheet
-        isVisible={isVisible}
-        containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-      >
-        {list.map((l, i) => (
-          <ListItem
-            key={i}
-            containerStyle={l.containerStyle}
-            onPress={l.onPress}
-          >
-            <ListItem.Content>
-              <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-            </ListItem.Content>
-          </ListItem>
-        ))}
-      </BottomSheet>
-    </ScrollView>
+          <View style={{ marginHorizontal: 10 }}>
+            <TouchableOpacity
+              style={styles.title}
+              onPress={() => toggleVisibility()}
+            >
+              <Text style={styles.Ltext}>Edit Profile</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            props.navigation.navigate("Created Discussions", { data: 123 })
+          }
+        >
+          <Text style={styles.text}>Created Discussion</Text>
+          <Icon
+            style={styles.arrow}
+            name="chevron-forward-outline"
+            type="ionicon"
+            size={20}
+            color="#3C3A36"
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            props.navigation.navigate("Favorite Discussion", { uid: userId })
+          }
+        >
+          <Text style={styles.text}>Favorite Discussion</Text>
+          <Icon
+            style={styles.arrow}
+            name="chevron-forward-outline"
+            type="ionicon"
+            size={20}
+            color="#3C3A36"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => props.navigation.navigate("Filter Feed")}
+        >
+          <Text style={styles.text}>Filter Feed</Text>
+          <Icon
+            style={styles.arrow}
+            name="chevron-forward-outline"
+            type="ionicon"
+            size={20}
+            color="#3C3A36"
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => props.navigation.navigate("Activity Tracking")}
+        >
+          <Text style={styles.text}>Discussion Room</Text>
+          <Icon
+            style={styles.arrow}
+            name="chevron-forward-outline"
+            type="ionicon"
+            size={20}
+            color="#3C3A36"
+          />
+        </TouchableOpacity>
+        <BottomSheet
+          isVisible={isVisible}
+          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+        >
+          {list.map((l, i) => (
+            <ListItem
+              key={i}
+              containerStyle={l.containerStyle}
+              onPress={l.onPress}
+            >
+              <ListItem.Content>
+                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          ))}
+        </BottomSheet>
+      </ScrollView>
+    </View>
   );
 }
 
