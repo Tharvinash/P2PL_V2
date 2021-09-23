@@ -57,6 +57,7 @@ function EditDeleteDiscussion(props) {
   const [loading1, setLoading1] = useState(false);
   const [loading2, setLoading2] = useState(false);
   const [loadMore, setLoadMore] = useState(8);
+  const [totalComment, setTotalComment] = useState(0);
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
 
   const userId = firebase.auth().currentUser.uid;
@@ -138,6 +139,23 @@ function EditDeleteDiscussion(props) {
         setUserPosts(snapshot.data());
       });
 
+      firebase
+      .firestore()
+      .collection("Comment")
+      .orderBy("creation", "desc")
+      .get()
+      .then((snapshot) => {
+        let comment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        const newArray2 = comment.filter(
+          (e) => e.discussionId === discussionId
+        );
+        setTotalComment(newArray2.length)
+      });
+
     firebase
       .firestore()
       .collection("Comment")
@@ -150,7 +168,10 @@ function EditDeleteDiscussion(props) {
           const id = doc.id;
           return { id, ...data };
         });
-        setComment(comment);
+        const newArray2 = comment.filter(
+          (e) => e.discussionId === discussionId
+        );
+        setComment(newArray2);
       });
     setTimeout(function () {
       setLoadMoreLoading(false);
@@ -173,7 +194,10 @@ function EditDeleteDiscussion(props) {
             const id = doc.id;
             return { id, ...data };
           });
-          setComment(comment);
+          const newArray2 = comment.filter(
+            (e) => e.discussionId === discussionId
+          );
+          setComment(newArray2);
         });
       setData(6);
       firebase
@@ -773,7 +797,7 @@ function EditDeleteDiscussion(props) {
                 <ActivityIndicator size="large" color="#E3562A" />
               </View>
             )}
-            {comment.length != 0 && loadMore >= 8 && fullComments.length>loadMore && loadMoreLoading == false? (
+            {comment.length != 0 && loadMore >= 8 && totalComment>loadMore && loadMoreLoading == false? (
               <TouchableOpacity
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}

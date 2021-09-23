@@ -33,23 +33,23 @@ function Add(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selected, setSelected] = useState();
 
-  useLayoutEffect(() => {
-    props.navigation.setOptions({
-      headerRight: () => (
-        <View style={{ flexDirection: "row", paddingRight: 15 }}>
-          <TouchableOpacity>
-            <Icon
-              name="arrow-up-circle-outline"
-              type="ionicon"
-              size={35}
-              color="#000"
-              onPress={uploadImage}
-            />
-          </TouchableOpacity>
-        </View>
-      ),
-    });
-  }, [title, selected]);
+  // useLayoutEffect(() => {
+  //   props.navigation.setOptions({
+  //     headerRight: () => (
+  //       <View style={{ flexDirection: "row", paddingRight: 15 }}>
+  //         <TouchableOpacity>
+  //           <Icon
+  //             name="arrow-up-circle-outline"
+  //             type="ionicon"
+  //             size={35}
+  //             color="#000"
+  //             onPress={uploadImage}
+  //           />
+  //         </TouchableOpacity>
+  //       </View>
+  //     ),
+  //   });
+  // }, [title, selected]);
 
   useEffect(() => {
     (async () => {
@@ -222,6 +222,14 @@ function Add(props) {
                 fontFamily: "Poppins",
                 fontSize: 15,
                 color: "#fff",
+                ...Platform.select({
+                  ios: {
+                    flex:1,
+                    justifyContent:'center',
+                    alignItems:'center',
+                    paddingBottom: 0
+                  },
+                })
               }}
               style={{
                 justifyContent: "center",
@@ -298,7 +306,7 @@ function Add(props) {
         onPress={uploadImage}
         size="large"
         icon={
-          <Icon name="arrow-up-circle-outline" type="ionicon" size={35} color="#FFF" />
+          <Icon name="add-outline" type="ionicon" size={35} color="#FFF" style={{flex:1, justifyContent:'center', alignItems:'center'}}/>
         }
       />
     </View>
