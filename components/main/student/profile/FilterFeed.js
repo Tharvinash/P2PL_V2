@@ -11,6 +11,7 @@ import {
   Switch,
   ActivityIndicator,
   ScrollView,
+  Platform,
 } from "react-native";
 import firebase from "firebase";
 import { connect } from "react-redux";
@@ -274,6 +275,36 @@ function FilterFeed(props) {
             />
           </View>
           <View style={styles.filterContainer}>
+            <Text style={styles.faculty}>FACULTY OF BUILT ENVIRONMENT</Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#767577" }}
+              thumbColor={fobe ? "#E3562A" : "#140F38"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={toggleSwitchFobe}
+              value={fobe}
+            />
+          </View>
+          <View style={styles.filterContainer}>
+            <Text style={styles.faculty}>ACADEMY OF ISLAMIC STUDIES</Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#767577" }}
+              thumbColor={aois ? "#E3562A" : "#140F38"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={toggleSwitchAois}
+              value={aois}
+            />
+          </View>
+          <View style={styles.filterContainer}>
+            <Text style={styles.faculty}>ACADEMY OF MALAY STUDIES</Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#767577" }}
+              thumbColor={aoms ? "#E3562A" : "#140F38"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={toggleSwitchAoms}
+              value={aoms}
+            />
+          </View>
+          <View style={styles.filterContainer}>
             <Text style={styles.faculty}>
               FACULTY OF ARTS AND SOCIAL SCIENCE
             </Text>
@@ -329,21 +360,23 @@ function FilterFeed(props) {
               />
             </View>
           </View>
+
           <View style={styles.filterContainer}>
-            <Text style={styles.faculty}>FACULTY OF BUILT ENVIRONMENT</Text>
-            <Switch
-              trackColor={{ false: "#767577", true: "#767577" }}
-              thumbColor={fobe ? "#E3562A" : "#140F38"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitchFobe}
-              value={fobe}
-            />
-          </View>
-          <View style={styles.filterContainer}>
-            <Text style={styles.faculty}>
-              FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY
-            </Text>
-            <View style={{ marginLeft: -50 }}>
+            <View style={{ width: "80%" }}>
+              <Text
+                style={{
+                  color: "#000",
+                  fontFamily: "Poppins",
+                  fontWeight: "700",
+                  fontSize: 18,
+                  paddingLeft: 10,
+                }}
+              >
+                FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY
+              </Text>
+            </View>
+
+            <View style={{ marginLeft: 0 }}>
               <Switch
                 trackColor={{ false: "#767577", true: "#767577" }}
                 thumbColor={fcsit ? "#E3562A" : "#140F38"}
@@ -352,26 +385,6 @@ function FilterFeed(props) {
                 value={fcsit}
               />
             </View>
-          </View>
-          <View style={styles.filterContainer}>
-            <Text style={styles.faculty}>ACADEMY OF ISLAMIC STUDIES</Text>
-            <Switch
-              trackColor={{ false: "#767577", true: "#767577" }}
-              thumbColor={aois ? "#E3562A" : "#140F38"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitchAois}
-              value={aois}
-            />
-          </View>
-          <View style={styles.filterContainer}>
-            <Text style={styles.faculty}>ACADEMY OF MALAY STUDIES</Text>
-            <Switch
-              trackColor={{ false: "#767577", true: "#767577" }}
-              thumbColor={aoms ? "#E3562A" : "#140F38"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitchAoms}
-              value={aoms}
-            />
           </View>
         </View>
       </ScrollView>
@@ -402,17 +415,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-
   filterContainer: {
     flexDirection: "row",
+    flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
-    width: "80%",
+    width: "100%",
     marginVertical: 10,
     backgroundColor: "#FFF",
     borderRadius: 16,
-    height: 48,
     width: 350,
+    ...Platform.select({
+      ios: {
+        paddingRight: 10,
+      },
+    }),
+    paddingVertical: 10,
   },
 
   floatButton: {
@@ -432,13 +450,12 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: "Poppins",
     fontSize: 22,
     color: "#fff",
-    margin:20
+    margin: 20,
   },
-
 });
 
 const mapStateToProps = (store) => ({
