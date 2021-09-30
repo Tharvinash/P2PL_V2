@@ -12,6 +12,7 @@ import {
 import { SpeedDial } from "react-native-elements";
 import { connect } from "react-redux";
 import { timeDifference } from "../../../utils";
+import { Icon } from "react-native-elements";
 import firebase from "firebase";
 require("firebase/firestore");
 
@@ -109,12 +110,26 @@ function MainScreen(props) {
           onClose={() => setOpen(!open)}
         >
           <SpeedDial.Action
-            icon={(<Image source={require('../../../../assets/rtmb.png')} style={{height: 30, width:30}}/>)}
+            icon={
+              <Icon
+                reverse
+                name="chalkboard-teacher"
+                type="font-awesome-5"
+                color="#140F38"
+              />
+            }
             title="Request To Be Mentor"
             onPress={() => props.navigation.navigate("RequestToBeMentor")}
           />
           <SpeedDial.Action
-            icon={(<Image source={require('../../../../assets/rfm.png')} style={{height: 30, width:30}}/>)}
+            icon={
+              <Icon
+                reverse
+                name="user-graduate"
+                type="font-awesome-5"
+                color="#140F38"
+              />
+            }
             title="Request For Mentor"
             onPress={() => props.navigation.navigate("RequestForMentor")}
           />
@@ -123,7 +138,7 @@ function MainScreen(props) {
     </View>
   );
 }
-//icon={{ name: "add", color: "#fff" }}
+//<Image source={require('../../../../assets/rfm.png')} style={{height: 30, width:30}}/>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -145,7 +160,7 @@ const styles = StyleSheet.create({
   userName: {
     color: "#fff",
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: "PoppinsMedium",
   },
 
   card: {
@@ -176,8 +191,8 @@ const styles = StyleSheet.create({
   title: {
     color: "#fff",
     fontSize: 25,
-    fontFamily: "Poppins",
-    lineHeight: 35,
+    fontFamily: "PoppinsSemiBold",
+    lineHeight: 30,
   },
 });
 

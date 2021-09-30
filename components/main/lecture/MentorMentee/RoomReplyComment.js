@@ -634,7 +634,7 @@ function RoomReplyComment(props) {
         setCaption(snapshot.data().comment);
       });
     setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible);
-    console.log(rcid);
+    //console.log(rcid);
   };
 
   const toggleEditComment = () => {

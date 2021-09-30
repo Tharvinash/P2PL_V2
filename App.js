@@ -95,7 +95,9 @@ import ViewReply from "./components/main/admin/ReportDiscussion/ViewReply";
 
 let customFonts = {
   Poppins: require("./assets/fonts/Poppins.ttf"),
-  "Poppins-MediumItalic": require("./assets/fonts/Poppins-MediumItalic.ttf"),
+  PoppinsMedium: require("./assets/fonts/PoppinsMedium.ttf"),
+  PoppinsSemiBold: require("./assets/fonts/PoppinsSemiBold.ttf"),
+  
 };
 
 export class App extends Component {

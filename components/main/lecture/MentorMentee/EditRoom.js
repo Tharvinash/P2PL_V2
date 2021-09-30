@@ -62,7 +62,7 @@ function EditRoom(props) {
           );
           
           const secArray2 = newArray2.map((element) => element.id);
-          console.log(secArray2);
+          //console.log(secArray2);
           setDntbc(secArray2);
         });
 
@@ -143,13 +143,11 @@ function EditRoom(props) {
         })
         .then(() => {
           xxx(userId);
-          console.log("xxx");
         });
     }
   };
 
   const xxx = (newName) => {
-    console.log(88);
     for (var i = 0; i < cntbu.length; i++) {
       firebase
         .firestore()

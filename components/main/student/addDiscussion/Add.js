@@ -106,7 +106,6 @@ function Add(props) {
       return;
     }
 
-
     setModalVisible(!isModalVisible);
     if (image != null) {
       //const uri = props.route.params.image;
@@ -224,12 +223,12 @@ function Add(props) {
                 color: "#fff",
                 ...Platform.select({
                   ios: {
-                    flex:1,
-                    justifyContent:'center',
-                    alignItems:'center',
-                    paddingBottom: 0
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingBottom: 0,
                   },
-                })
+                }),
               }}
               style={{
                 justifyContent: "center",
@@ -306,13 +305,35 @@ function Add(props) {
         onPress={uploadImage}
         size="large"
         icon={
-          <Icon name="add-outline" type="ionicon" size={35} color="#FFF" style={{flex:1, justifyContent:'center', alignItems:'center'}}/>
+          <Icon
+            reverse
+            name="add-outline"
+            type="ionicon"
+            color="#E3562A"
+            size={35}
+            containerStyle={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginLeft: 11,
+            }}
+          />
         }
       />
     </View>
   );
 }
 
+/*
+
+      <FAB
+        placement="right"
+        color="#E3562A"
+        style={styles.floatButton}
+        onPress={toggleModal}
+        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
+      />
+
+*/
 const styles = StyleSheet.create({
   container: {
     flex: 1,

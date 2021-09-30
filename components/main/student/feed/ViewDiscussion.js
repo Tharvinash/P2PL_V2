@@ -142,7 +142,7 @@ function ViewDiscussion(props) {
         setUserPosts(snapshot.data());
       });
 
-      firebase
+    firebase
       .firestore()
       .collection("Comment")
       .orderBy("creation", "desc")
@@ -156,7 +156,7 @@ function ViewDiscussion(props) {
         const newArray2 = comment.filter(
           (e) => e.discussionId === discussionId
         );
-        setTotalComment(newArray2.length)
+        setTotalComment(newArray2.length);
       });
 
     firebase
@@ -748,7 +748,7 @@ function ViewDiscussion(props) {
               </View>
             )}
 
-            <View style={styles.desc}>
+            <View>
               <Text style={styles.descT}>{userPosts.description}</Text>
             </View>
             <View style={{ paddingBottom: 10 }}>
@@ -768,7 +768,10 @@ function ViewDiscussion(props) {
                 <ActivityIndicator size="large" color="#E3562A" />
               </View>
             )}
-            {comment.length != 0 && loadMore >= 8 && totalComment>loadMore && loadMoreLoading == false? (
+            {comment.length != 0 &&
+            loadMore >= 8 &&
+            totalComment > loadMore &&
+            loadMoreLoading == false ? (
               <TouchableOpacity
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}
@@ -857,9 +860,21 @@ function ViewDiscussion(props) {
       <FAB
         placement="right"
         color="#E3562A"
-        style={styles.floatButton}
         onPress={toggleModal}
-        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
+        icon={
+          <Icon
+            reverse
+            name="add-outline"
+            type="ionicon"
+            color="#E3562A"
+            size={35}
+            containerStyle={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginLeft: 11,
+            }}
+          />
+        }
       />
     </View>
   );
@@ -870,17 +885,6 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10,
     marginBottom: 5,
-  },
-
-  titlex: {
-    color: "#fff",
-    fontSize: 20,
-    fontFamily: "Poppins",
-    paddingVertical: 0,
-    //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
   },
 
   floatButton: {
@@ -902,59 +906,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  card: {
-    borderRadius: 16,
-    elevation: 5,
-    backgroundColor: "#140F38",
-    shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    marginHorizontal: 4,
-    marginVertical: 6,
-    width: 340,
-  },
-
-  cardContent: {
-    marginVertical: 10,
-    marginHorizontal: 18,
-  },
-  searchSection: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderColor: "#E3562A",
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 8,
-  },
-  input: {
-    flex: 1,
-    paddingTop: 10,
-    paddingRight: 10,
-    paddingBottom: 10,
-    paddingLeft: 0,
-    backgroundColor: "#fff",
-    color: "#424242",
-  },
-
   title: {
     fontSize: 20,
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: "PoppinsMedium",
     marginBottom: 5,
-  },
-
-  commentCon: {
-    borderColor: "#E3562A",
-    borderBottomWidth: 5,
-    width: 300,
-    paddingVertical: 3,
-  },
-
-  desc: {
-    fontSize: 14,
   },
 
   descT: {
@@ -965,21 +920,8 @@ const styles = StyleSheet.create({
   },
 
   comT: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: "PoppinsSemiBold",
     fontSize: 18,
-  },
-
-  userT: {
-    fontFamily: "Poppins",
-    fontWeight: "600",
-    fontSize: 15,
-  },
-
-  userC: {
-    fontFamily: "Poppins",
-    lineHeight: 20,
-    fontSize: 15,
   },
 
   blogout: {

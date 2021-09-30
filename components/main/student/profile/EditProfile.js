@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   Image,
+  Dimensions,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
@@ -62,7 +63,7 @@ function EditProfile(props) {
           );
           
           const secArray2 = newArray2.map((element) => element.id);
-          console.log(secArray2);
+          //console.log(secArray2);
           setDntbc(secArray2);
         });
 
@@ -149,7 +150,7 @@ function EditProfile(props) {
   };
 
   const xxx = (newName) => {
-    console.log(88);
+    //console.log(88);
     for (var i = 0; i < cntbu.length; i++) {
       firebase
         .firestore()

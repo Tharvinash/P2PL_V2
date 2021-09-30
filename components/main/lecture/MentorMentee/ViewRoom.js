@@ -251,7 +251,7 @@ function ViewRoom(props) {
   };
 
   const UploadComment = () => {
-    addInteraction()
+    addInteraction();
 
     if (image == null && Doc == null) {
       finalCommentUpload(null, null);
@@ -475,7 +475,7 @@ function ViewRoom(props) {
   };
 
   const Delete = (cid) => {
-    setIsVisible(false)
+    setIsVisible(false);
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
@@ -519,7 +519,7 @@ function ViewRoom(props) {
       .then(() => {
         console.log("done");
       });
-      addInteraction();
+    addInteraction();
     setData(2);
   };
 
@@ -545,7 +545,7 @@ function ViewRoom(props) {
   };
 
   const EditComment = (cid) => {
-    setIsVisible(false)
+    setIsVisible(false);
     setCommentId(cid);
     firebase
       .firestore()
@@ -736,8 +736,21 @@ function ViewRoom(props) {
       <FAB
         placement="right"
         color="#E3562A"
-        onPress={toggleModal} 
-        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
+        onPress={toggleModal}
+        icon={
+          <Icon
+            reverse
+            name="add-outline"
+            type="ionicon"
+            color="#E3562A"
+            size={35}
+            containerStyle={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginLeft: 11,
+            }}
+          />
+        }
       />
     </View>
   );
