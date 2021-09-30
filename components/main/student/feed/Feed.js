@@ -118,8 +118,8 @@ function Feed(props) {
         setNumberOfItem(numberOfItem + 5);
 
         setPost([...post, ...newArray]);
-        console.log(post);
-        console.log(post.length);
+        // console.log(post);
+        // console.log(post.length);
         stopFetchMore = true;
         setrerender(4);
       }

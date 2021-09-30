@@ -196,10 +196,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Poppins",
   },
-
+  //name
   userName: {
     color: "#fff",
     fontSize: 20,
+    fontFamily: "PoppinsMedium",
+  },
+
+  //title
+  title: {
+    color: "#fff",
+    fontSize: 25,
+    fontFamily: "PoppinsSemiBold",
+    lineHeight: 30,
+  },
+
+  //faculty
+  faculty: {
+    color: "#fff",
+    fontSize: 15,
     fontFamily: "Poppins",
   },
 
@@ -220,19 +235,6 @@ const styles = StyleSheet.create({
   cardContent: {
     marginVertical: 10,
     marginHorizontal: 18,
-  },
-
-  faculty: {
-    color: "#fff",
-    fontSize: 15,
-    fontFamily: "Poppins",
-  },
-
-  title: {
-    color: "#fff",
-    fontSize: 25,
-    fontFamily: "Poppins",
-    lineHeight: 35,
   },
 });
 

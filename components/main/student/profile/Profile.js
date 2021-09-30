@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+ import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
@@ -19,15 +19,8 @@ import { ListItem, BottomSheet } from "react-native-elements";
 function Profile(props) {
   const userId = firebase.auth().currentUser.uid;
   const { currentUser, posts } = props;
-  const [refreshing, setRefreshing] = useState(false);
   const [user, setUser] = useState(currentUser);
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [items, setItems] = useState([
-    { label: "Edit Personal Info", value: "pi" },
-    { label: "Edit Password", value: "ep" },
-  ]);
 
   const list = [
     {
@@ -45,10 +38,6 @@ function Profile(props) {
       onPress: () => setIsVisible(false),
     },
   ];
-
-  const onLogout = () => {
-    firebase.auth().signOut();
-  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -73,14 +62,6 @@ function Profile(props) {
     return <View />;
   }
 
-  const xxx = (x) => {
-    if (x === "pi") {
-      props.navigation.navigate("EditProfile", { uid: userId });
-    }
-    if (x === "ep") {
-      props.navigation.navigate("Change Password");
-    }
-  };
 
   const toggleVisibility = () => {
     setIsVisible(true);
@@ -231,14 +212,6 @@ const styles = StyleSheet.create({
     left: 20,
   },
 
-  logout: {
-    width: 160,
-    height: 40,
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E3562A",
-    borderRadius: 16,
-    marginTop: 5,
-  },
 
   Ltext: {
     color: "#000000",
@@ -263,41 +236,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-  },
-
-  edit: {
-    width: 160,
-    height: 40,
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E3562A",
-    borderRadius: 16,
-    marginTop: 10,
-    marginHorizontal: 10,
-  },
-
-  dropdown: {
-    width: 160,
-    height: 42,
-    left: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-
-    marginHorizontal: 110,
-  },
-
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-
-  imageContainer: {
-    borderRadius: (Dimensions.get("window").width * 0.7) / 2,
-    borderColor: "black",
-    borderWidth: 3,
-    width: Dimensions.get("window").width * 0.3,
-    height: Dimensions.get("window").width * 0.3,
-    overflow: "hidden",
-    marginVertical: Dimensions.get("window").height / 30,
   },
 
   us: {

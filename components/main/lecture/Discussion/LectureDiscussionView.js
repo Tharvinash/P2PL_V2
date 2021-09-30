@@ -529,7 +529,6 @@ function LectureDiscussionView(props) {
       <FAB
         placement="right"
         color="#E3562A"
-        style={styles.floatButton}
         onPress={toggleModal}
         icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
       />

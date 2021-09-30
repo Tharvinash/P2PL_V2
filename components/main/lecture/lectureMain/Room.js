@@ -124,7 +124,7 @@ function Room(props) {
   );
 
   return (
-    <View style={{ justifyContent: "center", alignItems: "center" }}>
+    <View style={{ justifyContent: "center", alignItems: "center", backgroundColor: "#140F38", flex:1, paddingVertical:10  }}>
       <SwipeListView
         disableRightSwipe
         data={post}
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
+    width: Dimensions.get("window").width * 0.95,
     borderRadius: 16,
   },
 
@@ -207,14 +207,11 @@ const styles = StyleSheet.create({
 
   title: {
     color: "#fff",
-    fontSize: 20,
-    fontFamily: "Poppins",
-    paddingVertical: 0,
-    //  marginVertical: -5,
-    flexDirection: "column",
+    fontSize: 25,
+    fontFamily: "PoppinsSemiBold",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    lineHeight: 25,
+    lineHeight: 30,
   },
 });
 

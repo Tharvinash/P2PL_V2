@@ -12,6 +12,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { connect } from "react-redux";
 import firebase from "firebase";
+import SelectPicker from "react-native-form-select-picker";
 import * as ImagePicker from "expo-image-picker";
 import Modal from "react-native-modal";
 require("firebase/firestore");
@@ -25,10 +26,12 @@ function EditProfile(props) {
   const [discussion, setDiscussion] = useState(posts);
   const [dntbc, setDntbc] = useState([]);
   const [userId, setUserId] = useState("");
+  const [year, setYear] = useState(0);
   const [image, setImage] = useState(null);
   const [imageChanged, setImageChanged] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [cu, setCu] = useState(currentUser);
+  let options = [1, 2, 3, 4, 5];
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const defaultImage =
     "https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/default%2FnewProfile.png?alt=media&token=b2e22482-506a-4e78-ae2e-e38c83ee7c27";
@@ -41,6 +44,7 @@ function EditProfile(props) {
       .get()
       .then((snapshot) => {
         setUserId(snapshot.data().name);
+        setYear(snapshot.data().year);
       });
   }, []);
 
@@ -57,13 +61,12 @@ function EditProfile(props) {
             return { id, ...data };
           });
           //discussion
-         
+
           const newArray2 = discussion.filter(
             (e) => e.userId === nameToBeEditted
           );
-          
+
           const secArray2 = newArray2.map((element) => element.id);
-          //console.log(secArray2);
           setDntbc(secArray2);
         });
 
@@ -121,6 +124,7 @@ function EditProfile(props) {
               name: userId,
               creation: firebase.firestore.FieldValue.serverTimestamp(),
               image: snapshot,
+              year: parseInt(year),
             })
             .then(() => {
               yyy(userId, snapshot);
@@ -141,16 +145,15 @@ function EditProfile(props) {
         .update({
           name: userId,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
+          year: year,
         })
         .then(() => {
           xxx(userId);
-          console.log("xxx");
         });
     }
   };
 
   const xxx = (newName) => {
-    //console.log(88);
     for (var i = 0; i < cntbu.length; i++) {
       firebase
         .firestore()
@@ -173,7 +176,6 @@ function EditProfile(props) {
           postedBy: newName,
         })
         .then(() => {});
-      //console.log(24);
     }
     setModalVisible(!isModalVisible);
     props.navigation.goBack();
@@ -206,19 +208,6 @@ function EditProfile(props) {
     props.navigation.goBack();
   };
 
-  // const Save = () => {
-  //       firebase.firestore()
-  //         .collection("users")
-  //         .doc(props.route.params.uid)
-  //         .update({
-  //             name:userId,
-  //             creation: firebase.firestore.FieldValue.serverTimestamp  ()
-  //         }).then(()=> {
-  //             props.navigation.goBack()
-  //             console.log("save")
-  //         })
-  // }
-
   const pickImage = async () => {
     if (true) {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -246,7 +235,7 @@ function EditProfile(props) {
       })
       .then(() => {
         //setModalVisible(!isModalVisible);
-        yyy(cu.name, defaultImage )
+        yyy(cu.name, defaultImage);
       });
   };
 
@@ -260,6 +249,29 @@ function EditProfile(props) {
             value={userId}
             onChangeText={(userId) => setUserId(userId)}
           />
+        </View>
+        <View style={styles.formControl}>
+          <Text style={styles.label}>Year of Study</Text>
+          <SelectPicker
+            placeholder={year}
+            placeholderStyle={{
+              fontFamily: "Poppins",
+              fontSize: 15,
+              color: "#000",
+              marginTop: 5,
+            }}
+            onSelectedStyle={{
+              fontSize: 15,
+              color: "#000",
+            }}
+            style={styles.input}
+            onValueChange={setYear}
+            selected={year}
+          >
+            {Object.values(options).map((val, index) => (
+              <SelectPicker.Item label={val} value={val} key={index} />
+            ))}
+          </SelectPicker>
         </View>
         <View style={styles.formControl}>
           <Text style={styles.label}>Profile Picture</Text>

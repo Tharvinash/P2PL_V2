@@ -26,7 +26,7 @@ export class Register extends Component {
       mc: null,
       data: [],
       fac: [],
-      options: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"],
+      options: [1, 2, 3, 4, 5],
     };
 
     this.onSignUp = this.onSignUp.bind(this);
