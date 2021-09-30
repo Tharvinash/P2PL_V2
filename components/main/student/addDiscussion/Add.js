@@ -307,15 +307,9 @@ function Add(props) {
         icon={
           <Icon
             reverse
-            name="add-outline"
-            type="ionicon"
+            name="upload"
+            type="font-awesome-5"
             color="#E3562A"
-            size={35}
-            containerStyle={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginLeft: 11,
-            }}
           />
         }
       />
