@@ -25,6 +25,7 @@ function Feed(props) {
 
   const [post, setPost] = useState([]);
   const [data, setData] = useState(0);
+  const [rerender, setrerender] = useState(0);
   const [numberOfItem, setNumberOfItem] = useState(5);
   const [loadingMore, setLoadingMore] = useState(false);
   const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
@@ -32,7 +33,8 @@ function Feed(props) {
 
   useEffect(() => {
     LoadDiscussion();
-  }, []);
+    FetchAllDiscussion();
+  }, [rerender]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -53,7 +55,7 @@ function Feed(props) {
   );
 
   const LoadDiscussion = () => {
-    setLoadingMore(!loadingMore)
+    setLoadingMore(!loadingMore);
     firebase
       .firestore()
       .collection("Discussion")
@@ -67,16 +69,66 @@ function Feed(props) {
           return { id, ...data };
         });
         setPost(posts);
-        console.log("length " + posts.length);
       });
-      //setLoadingMore(false)
+    //setLoadingMore(false)
+  };
+
+  const FetchAllDiscussion = () => {
+    firebase
+      .firestore()
+      .collection("Discussion")
+      .orderBy("creation", "desc")
+      .get()
+      .then((snapshot) => {
+        let posts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setData(posts);
+      });
   };
 
   const ListFooterComponent = () => (
-    <View style={{ justifyContent: "center", alignItems: "center", backgroundColor:'#140F38'}}>
+    <View
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#140F38",
+      }}
+    >
       <ActivityIndicator size="large" color="#E3562A" />
     </View>
   );
+
+  const handleOnEndReached = () => {
+    if (numberOfItem == data.length || numberOfItem > data.length) {
+      setLoadingMore(false);
+      return null;
+    } else {
+      let newArray = [];
+      if (!stopFetchMore) {
+        for (var i = numberOfItem; i < numberOfItem + 5; i++) {
+          if (data[i]) {
+            newArray.push(data[i]);
+          } else {
+            break;
+          }
+        }
+        setNumberOfItem(numberOfItem + 5);
+
+        setPost([...post, ...newArray]);
+        console.log(post);
+        console.log(post.length);
+        stopFetchMore = true;
+        setrerender(4);
+      }
+    }
+
+    setTimeout(function () {
+      setLoadingMore(false);
+    }, 1000);
+  };
 
   const renderItem = ({ item }) => {
     return FilterFeed.indexOf(item.faculty) !== -1 ? (
@@ -132,21 +184,21 @@ function Feed(props) {
     ) : null;
   };
 
-  const handleOnEndReached = () => {
-    console.log("reacherd end");
-    if (posts.length === post.length) {
-      setLoadingMore(false)
-      return null;
-    } else {
-      if (!stopFetchMore) {
-        setNumberOfItem(numberOfItem + 5);
-        setTimeout(function () {
-          LoadDiscussion();
-        }, 1000);
-        stopFetchMore = true;
-      }
-    }
-  };
+  // const handleOnEndReached = () => {
+
+  //   if (posts.length === post.length) {
+  //     setLoadingMore(false)
+  //     return null;
+  //   } else {
+  //     if (!stopFetchMore) {
+  //       setNumberOfItem(numberOfItem + 5);
+  //       setTimeout(function () {
+  //         LoadDiscussion();
+  //       }, 1000);
+  //       stopFetchMore = true;
+  //     }
+  //   }
+  // };
 
   const FeedList = () => {
     return (
@@ -194,15 +246,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Poppins",
   },
-//name
+  //name
   userName: {
     color: "#fff",
     fontSize: 20,
-    fontFamily: 'PoppinsMedium',
-    
+    fontFamily: "PoppinsMedium",
   },
 
-//title
+  //title
   title: {
     color: "#fff",
     fontSize: 25,
@@ -210,7 +261,7 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
 
-//faculty
+  //faculty
   faculty: {
     color: "#fff",
     fontSize: 15,
@@ -235,7 +286,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 18,
   },
-
 });
 
 const mapStateToProps = (store) => ({
