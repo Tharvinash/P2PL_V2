@@ -28,8 +28,9 @@ import { ListItem, BottomSheet } from "react-native-elements";
 function RoomReplyComment(props) {
   const { currentUser } = props;
   const [currentUserName, setCurrentUserName] = useState(currentUser.name);
-  const [loginCurrentUser, setLoginCurrentUser] = useState(currentUser);
+  const [loginCurrentUser, setLoginCurrentUser] = useState(currentUser); //numberOfReply
   const [mainCommentId, setMainCommentId] = useState(props.route.params.cid);
+  const [numberOfReply, setNumberOfReply] = useState(0);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
   const [mainComment, setMainComment] = useState([]);
   const [data, setData] = useState(0);
@@ -110,7 +111,6 @@ function RoomReplyComment(props) {
 
   useEffect(() => {
     setCaption("");
-
     firebase
       .firestore()
       .collection("DiscussionRoomComment")
@@ -118,6 +118,8 @@ function RoomReplyComment(props) {
       .get()
       .then((snapshot) => {
         setMainComment(snapshot.data());
+        setNumberOfReply(snapshot.data().numberOfReply)
+        console.log("Reply "+snapshot.data().numberOfReply)
       });
 
     firebase
@@ -726,8 +728,8 @@ function RoomReplyComment(props) {
           attachedImage: img,
         });
 
-      const totalReply = mainComment.numberOfReply + 1;
-      firebase.firestore().collection("Comment").doc(mainCommentId).update({
+      const totalReply = numberOfReply + 1;
+      firebase.firestore().collection("DiscussionRoomComment").doc(mainCommentId).update({
         numberOfReply: totalReply,
       });
       setReplySubCommentModalVisible(!isReplySubCommentModalVisible);
@@ -760,8 +762,9 @@ function RoomReplyComment(props) {
           attachedImage: img,
         });
 
-      const totalReply = mainComment.numberOfReply + 1;
-      firebase.firestore().collection("Comment").doc(mainCommentId).update({
+      const totalReply = numberOfReply + 1;
+      console.log("totalReply " + totalReply)
+      firebase.firestore().collection("DiscussionRoomComment").doc(mainCommentId).update({
         numberOfReply: totalReply,
       });
       setReplyCommentModalVisible(!isReplyCommentModalVisible);
@@ -788,10 +791,10 @@ function RoomReplyComment(props) {
               .doc(rcid)
               .delete();
 
-            const totalReply = mainComment.numberOfReply - 1;
+            const totalReply = numberOfReply - 1;
             firebase
               .firestore()
-              .collection("Comment")
+              .collection("DiscussionRoomComment")
               .doc(mainCommentId)
               .update({
                 numberOfReply: totalReply,
