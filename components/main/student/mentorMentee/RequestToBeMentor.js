@@ -210,7 +210,9 @@ function requesttobementor(props) {
           </View>
         </View>
 
-        <View style={{ justifyContent: "center", marginLeft: 20, marginBottom:10 }}>
+        <View
+          style={{ justifyContent: "center", marginLeft: 20, marginBottom: 10 }}
+        >
           <TouchableOpacity
             style={styles.logout}
             onPress={() => pickDocument()}
@@ -223,9 +225,7 @@ function requesttobementor(props) {
         placement="right"
         color="#E3562A"
         onPress={() => uploadDoc()}
-        icon={
-          <Icon name="send-outline" type="ionicon" size={25} color="#fff" />
-        }
+        icon={<Icon reverse name="send" type="font-awesome" color="#E3562A" />}
       />
     </View>
   );

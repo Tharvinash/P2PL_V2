@@ -64,7 +64,7 @@ function requestformentor(props) {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <ScrollView>
         <View style={styles.form}>
           <View style={styles.formControl}>
@@ -129,9 +129,7 @@ function requestformentor(props) {
         placement="right"
         color="#E3562A"
         onPress={() => UploadReq()}
-        icon={
-          <Icon name="send-outline" type="ionicon" size={25} color="#fff" />
-        }
+        icon={<Icon reverse name="send" type="font-awesome" color="#E3562A" />}
       />
     </View>
   );

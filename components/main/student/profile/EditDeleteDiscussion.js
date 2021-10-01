@@ -59,6 +59,8 @@ function EditDeleteDiscussion(props) {
   const [loadMore, setLoadMore] = useState(8);
   const [totalComment, setTotalComment] = useState(0);
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+  const [totalCommentIdOfDiscussion, setTotalCommentIdOfDiscussion] =
+    useState(0);
 
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
@@ -139,7 +141,7 @@ function EditDeleteDiscussion(props) {
         setUserPosts(snapshot.data());
       });
 
-      firebase
+    firebase
       .firestore()
       .collection("Comment")
       .orderBy("creation", "desc")
@@ -153,7 +155,9 @@ function EditDeleteDiscussion(props) {
         const newArray2 = comment.filter(
           (e) => e.discussionId === discussionId
         );
-        setTotalComment(newArray2.length)
+        const IdForComment = newArray2.map((element) => element.id);
+        setTotalCommentIdOfDiscussion(IdForComment);
+        setTotalComment(newArray2.length);
       });
 
     firebase
@@ -219,8 +223,18 @@ function EditDeleteDiscussion(props) {
     return <View />;
   }
 
-  const xxx = () => {
-    console.log(24);
+  const DeleteDiscussionAndRelatedData = () => {
+    firebase.firestore().collection("Discussion").doc(discussionId).delete();
+
+    for (var i = 0; i < totalCommentIdOfDiscussion.length; i++) {
+      firebase
+        .firestore()
+        .collection("Comment")
+        .doc(totalCommentIdOfDiscussion[i])
+        .delete();
+    }
+
+    props.navigation.goBack({ data: 5 });
   };
 
   const EditDiscussion = () => {
@@ -238,12 +252,7 @@ function EditDeleteDiscussion(props) {
         {
           text: "Yes",
           onPress: () => {
-            firebase
-              .firestore()
-              .collection("Discussion")
-              .doc(discussionId)
-              .delete();
-            props.navigation.goBack({ data: 5 });
+            DeleteDiscussionAndRelatedData();
           },
         },
         // The "No" button
@@ -797,7 +806,10 @@ function EditDeleteDiscussion(props) {
                 <ActivityIndicator size="large" color="#E3562A" />
               </View>
             )}
-            {comment.length != 0 && loadMore >= 8 && totalComment>loadMore && loadMoreLoading == false? (
+            {comment.length != 0 &&
+            loadMore >= 8 &&
+            totalComment > loadMore &&
+            loadMoreLoading == false ? (
               <TouchableOpacity
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}

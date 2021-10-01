@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   rowBack: {
     alignItems: "center",
-    backgroundColor: "#DDD",
+    backgroundColor: "#140F38",
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
