@@ -53,6 +53,7 @@ function RoomReplyComment(props) {
   const [Doc, setDoc] = useState(null); //save local uri
   const [interactionPoint, setInteractionPoint] = useState([]);
   const [date, setDate] = useState([]);
+  const [member, setMember] = useState([]);
   const [mainCommentAuthorName, setMainCommentAuthorName] = useState(
     props.route.params.mainCommentAuthorName
   );
@@ -119,7 +120,7 @@ function RoomReplyComment(props) {
         setMainComment(snapshot.data());
       });
 
-      firebase
+    firebase
       .firestore()
       .collection("DiscussionRoomComment")
       .doc(mainCommentId)
@@ -159,11 +160,12 @@ function RoomReplyComment(props) {
       .get()
       .then((snapshot) => {
         setDate(snapshot.data().date);
+        setMember(snapshot.data().groupMember);
         setInteractionPoint(snapshot.data().interaction);
       });
-      setTimeout(function () {
-        setLoadMoreLoading(false);
-      }, 2000);
+    setTimeout(function () {
+      setLoadMoreLoading(false);
+    }, 2000);
   }, [data]);
 
   useFocusEffect(
@@ -548,22 +550,9 @@ function RoomReplyComment(props) {
 
   const callback = (keyword) => {
     setKeyword(keyword);
-    firebase
-      .firestore()
-      .collection("DiscussionRoom")
-      .doc(discussionId)
-      .collection("Mentee")
-      .where("name", ">=", keyword.substring(1))
-      .limit(10)
-      .get()
-      .then((snapshot) => {
-        let result = snapshot.docs.map((doc) => {
-          const datas = doc.data();
-          const id = doc.id;
-          return { id, ...datas };
-        });
-        setDatas(result);
-      });
+    let x = keyword.substring(1);
+    const newArray2 = member.filter((e) => e.name >= x);
+    setDatas(newArray2);
   };
 
   const addLike = (nol) => {
