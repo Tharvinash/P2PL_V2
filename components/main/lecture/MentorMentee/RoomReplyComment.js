@@ -66,6 +66,10 @@ function RoomReplyComment(props) {
   const [isReplySubCommentModalVisible, setReplySubCommentModalVisible] =
     useState(false);
 
+  const [loadMore, setLoadMore] = useState(8);
+  const [totalComment, setTotalComment] = useState(0);
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+
   const userId = firebase.auth().currentUser.uid;
   const time = props.route.params.time;
 
@@ -115,12 +119,29 @@ function RoomReplyComment(props) {
         setMainComment(snapshot.data());
       });
 
+      firebase
+      .firestore()
+      .collection("DiscussionRoomComment")
+      .doc(mainCommentId)
+      .collection("Reply")
+      .orderBy("creation", "asc")
+      .get()
+      .then((snapshot) => {
+        let replyComment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setTotalComment(replyComment.length);
+      });
+
     firebase
       .firestore()
       .collection("DiscussionRoomComment")
       .doc(mainCommentId)
       .collection("Reply")
       .orderBy("creation", "asc")
+      .limit(loadMore)
       .get()
       .then((snapshot) => {
         let replyComment = snapshot.docs.map((doc) => {
@@ -140,6 +161,9 @@ function RoomReplyComment(props) {
         setDate(snapshot.data().date);
         setInteractionPoint(snapshot.data().interaction);
       });
+      setTimeout(function () {
+        setLoadMoreLoading(false);
+      }, 2000);
   }, [data]);
 
   useFocusEffect(
@@ -159,6 +183,7 @@ function RoomReplyComment(props) {
         .doc(mainCommentId)
         .collection("Reply")
         .orderBy("creation", "asc")
+        .limit(loadMore)
         .get()
         .then((snapshot) => {
           let replyComment = snapshot.docs.map((doc) => {
@@ -796,7 +821,7 @@ function RoomReplyComment(props) {
   };
 
   const AddLikeToReplyComment = (rcid, nol, lb) => {
-    addInteraction()
+    addInteraction();
     const x = nol + 1;
     if (lb.includes(userId)) {
     } else {
@@ -867,223 +892,255 @@ function RoomReplyComment(props) {
     setData(44);
   };
 
+  const loadMoreComment = () => {
+    setLoadMoreLoading(true);
+    let x = 8;
+    setLoadMore(loadMore + x);
+    setData(9);
+  };
+
   return (
-    <ScrollView
-      contentContainerStyle={{ alignItems: "center", justifyContent: "center" }}
-    >
-      <View style={styles.container}>
-        <MainCommentCard
-          picture={mainComment.image}
-          time={time}
-          status={loginCurrentUser.status}
-          verify={mainComment.verify}
-          postedBy={mainComment.postedBy}
-          creation={mainComment.creation}
-          comment={mainComment.comment}
-          attachedDocument={mainComment.attachedDocument}
-          attachedImage={mainComment.attachedImage}
-          numOfLike={mainComment.numOfLike}
-          likeBy={likeBy}
-          removeVerifyComment={() => removeVerifyComment()}
-          verifyComment={() => verifyComment()}
-          removeLike={() => removeLike(mainComment.numOfLike)}
-          xxx={() => toggleVisibility(mainComment.id)}
-          addLike={() => addLike(mainComment.numOfLike)}
-          firstUserId={mainComment.userId}
-          secondUserId={userId}
-          delete={() => Delete(mainComment.id)}
-          editComment={() => EditComment(mainComment.id)}
-          toggleReplyComment={() => toggleReplyComment()}
-        />
+    <View style={styles.container}>
+      <FlatList
+        horizontal={false}
+        extraData={replyComment}
+        data={replyComment}
+        renderItem={({ item }) => (
+          <View style={{ marginLeft: 30, marginTop: 5 }}>
+            <ReplyCommentCard
+              removeVerifyReplyComment={() => removeVerifyReplyComment(item.id)}
+              verifyReplyComment={() => verifyReplyComment(item.id)}
+              image={item.image}
+              status={loginCurrentUser.status}
+              verify={item.verify}
+              firstUserId={item.userId}
+              secondUserId={userId}
+              xxx={() => toggleVisibilityV2(item.id)}
+              postedBy={item.postedBy}
+              maincommentIdV1={item.mainCommentId}
+              mainCommentIdV2={mainCommentId}
+              repliedTo={item.repliedTo}
+              currentUserName={currentUserName}
+              creation={item.creation}
+              comment={item.comment}
+              attachedImage={item.attachedImage}
+              attachedDocument={item.attachedDocument}
+              numOfLike={item.numOfLike}
+              likeBy={item.likeBy.includes(userId)}
+              RemoveLikeToReplyComment={() =>
+                RemoveLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
+              }
+              AddLikeToReplyComment={() =>
+                AddLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
+              }
+              toggleSubReplyComment={() =>
+                toggleSubReplyComment(item.id, item.postedBy)
+              }
+            />
+          </View>
+        )}
+        ListHeaderComponent={
+          <View>
+            <MainCommentCard
+              picture={mainComment.image}
+              time={time}
+              status={loginCurrentUser.status}
+              verify={mainComment.verify}
+              postedBy={mainComment.postedBy}
+              creation={mainComment.creation}
+              comment={mainComment.comment}
+              attachedDocument={mainComment.attachedDocument}
+              attachedImage={mainComment.attachedImage}
+              numOfLike={mainComment.numOfLike}
+              likeBy={likeBy}
+              removeVerifyComment={() => removeVerifyComment()}
+              verifyComment={() => verifyComment()}
+              removeLike={() => removeLike(mainComment.numOfLike)}
+              xxx={() => toggleVisibility(mainComment.id)}
+              addLike={() => addLike(mainComment.numOfLike)}
+              firstUserId={mainComment.userId}
+              secondUserId={userId}
+              delete={() => Delete(mainComment.id)}
+              editComment={() => EditComment(mainComment.id)}
+              toggleReplyComment={() => toggleReplyComment()}
+            />
+          </View>
+        }
+        ListFooterComponent={
+          <View>
+            {loadMoreLoading && (
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <ActivityIndicator size="large" color="#E3562A" />
+              </View>
+            )}
+            {replyComment.length != 0 &&
+            loadMoreLoading == false &&
+            totalComment > loadMore ? (
+              <TouchableOpacity
+                onPress={loadMoreComment}
+                style={{ marginLeft: 50, flex: 1 }}
+              >
+                <Text style={{ fontSize: 15, fontFamily: "Poppins" }}>
+                  Load More ...
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+            <BottomSheet
+              isVisible={isVisible}
+              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+            >
+              {list.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
+                >
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>
+                      {l.title}
+                    </ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
 
-        {/* ------------------------------------  reply comment  ------------------------- */}
-        <View style={{ marginLeft: 30, marginTop: 5 }}>
-          <FlatList
-            horizontal={false}
-            extraData={replyComment}
-            data={replyComment}
-            renderItem={({ item }) => (
-              <ReplyCommentCard
-                removeVerifyReplyComment={() =>
-                  removeVerifyReplyComment(item.id)
-                }
-                verifyReplyComment={() => verifyReplyComment(item.id)}
-                image={item.image}
-                status={loginCurrentUser.status}
-                verify={item.verify}
-                firstUserId={item.userId}
-                secondUserId={userId}
-                xxx={() => toggleVisibilityV2(item.id)}
-                postedBy={item.postedBy}
-                maincommentIdV1={item.mainCommentId}
-                mainCommentIdV2={mainCommentId}
-                repliedTo={item.repliedTo}
-                currentUserName={currentUserName}
-                creation={item.creation}
-                comment={item.comment}
-                attachedImage={item.attachedImage}
-                attachedDocument={item.attachedDocument}
-                numOfLike={item.numOfLike}
-                likeBy={item.likeBy.includes(userId)}
-                RemoveLikeToReplyComment={() =>
-                  RemoveLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
-                }
-                AddLikeToReplyComment={() =>
-                  AddLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
-                }
-                toggleSubReplyComment={() =>
-                  toggleSubReplyComment(item.id, item.postedBy)
-                }
+            <BottomSheet
+              isVisible={isVisibleV2}
+              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+            >
+              {listV2.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
+                >
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>
+                      {l.title}
+                    </ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
+
+            {/* Edit Reply Modal */}
+            <Modal isVisible={isEditCommentModalVisible}>
+              <MMCommentCard
+                loadingComponent={() => (
+                  <View
+                    style={{
+                      flex: 1,
+                      width: 200,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ActivityIndicator />
+                  </View>
+                )}
+                caption={caption}
+                setCaption={setCaption}
+                callback={callback.bind(this)}
+                renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+                datas={datas}
+                keyExtractor={(item, index) => item.name}
+                UploadComment={() => uploadUpdatedComment()}
+                toggleModal={() => toggleEditComment()}
               />
-            )}
-          />
-        </View>
+            </Modal>
 
-        <BottomSheet
-          isVisible={isVisible}
-          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-        >
-          {list.map((l, i) => (
-            <ListItem
-              key={i}
-              containerStyle={l.containerStyle}
-              onPress={l.onPress}
-            >
-              <ListItem.Content>
-                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </BottomSheet>
+            {/* Reply Comment Modal */}
+            <Modal isVisible={isReplyCommentModalVisible}>
+              <MMCommentCard
+                loadingComponent={() => (
+                  <View
+                    style={{
+                      flex: 1,
+                      width: 200,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ActivityIndicator />
+                  </View>
+                )}
+                caption={caption}
+                setCaption={setCaption}
+                callback={callback.bind(this)}
+                renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+                datas={datas}
+                keyExtractor={(item, index) => item.name}
+                UploadComment={() => UploadComment()}
+                toggleModal={() => toggleReplyComment()}
+                pickDocument={() => pickDocument()}
+                pickImage={() => pickImage()}
+              />
+            </Modal>
 
-        <BottomSheet
-          isVisible={isVisibleV2}
-          containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-        >
-          {listV2.map((l, i) => (
-            <ListItem
-              key={i}
-              containerStyle={l.containerStyle}
-              onPress={l.onPress}
-            >
-              <ListItem.Content>
-                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </BottomSheet>
+            {/* Reply to Reply Comment Modal */}
 
-        {/* Edit Reply Modal */}
-        <Modal isVisible={isEditCommentModalVisible}>
-          <MMCommentCard
-            loadingComponent={() => (
-              <View
-                style={{
-                  flex: 1,
-                  width: 200,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <ActivityIndicator />
-              </View>
-            )}
-            caption={caption}
-            setCaption={setCaption}
-            callback={callback.bind(this)}
-            renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-            datas={datas}
-            keyExtractor={(item, index) => item.name}
-            UploadComment={() => uploadUpdatedComment()}
-            toggleModal={() => toggleEditComment()}
-          />
-        </Modal>
+            <Modal isVisible={isReplySubCommentModalVisible}>
+              <MMCommentCard
+                loadingComponent={() => (
+                  <View
+                    style={{
+                      flex: 1,
+                      width: 200,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ActivityIndicator />
+                  </View>
+                )}
+                caption={caption}
+                setCaption={setCaption}
+                callback={callback.bind(this)}
+                renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+                datas={datas}
+                keyExtractor={(item, index) => item.name}
+                UploadComment={() => UploadCommentV2()}
+                toggleModal={() => toggleSubReplyComment()}
+                pickDocument={() => pickDocument()}
+                pickImage={() => pickImage()}
+              />
+            </Modal>
 
-        {/* Reply Comment Modal */}
-        <Modal isVisible={isReplyCommentModalVisible}>
-          <MMCommentCard
-            loadingComponent={() => (
-              <View
-                style={{
-                  flex: 1,
-                  width: 200,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <ActivityIndicator />
-              </View>
-            )}
-            caption={caption}
-            setCaption={setCaption}
-            callback={callback.bind(this)}
-            renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-            datas={datas}
-            keyExtractor={(item, index) => item.name}
-            UploadComment={() => UploadComment()}
-            toggleModal={() => toggleReplyComment()}
-            pickDocument={() => pickDocument()}
-            pickImage={() => pickImage()}
-          />
-        </Modal>
+            {/* Edit Reply Comment */}
 
-        {/* Reply to Reply Comment Modal */}
-
-        <Modal isVisible={isReplySubCommentModalVisible}>
-          <MMCommentCard
-            loadingComponent={() => (
-              <View
-                style={{
-                  flex: 1,
-                  width: 200,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <ActivityIndicator />
-              </View>
-            )}
-            caption={caption}
-            setCaption={setCaption}
-            callback={callback.bind(this)}
-            renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-            datas={datas}
-            keyExtractor={(item, index) => item.name}
-            UploadComment={() => UploadCommentV2()}
-            toggleModal={() => toggleSubReplyComment()}
-            pickDocument={() => pickDocument()}
-            pickImage={() => pickImage()}
-          />
-        </Modal>
-
-        {/* Edit Reply Comment */}
-
-        <Modal isVisible={isEditReplyCommentModalVisible}>
-          <MMCommentCard
-            loadingComponent={() => (
-              <View
-                style={{
-                  flex: 1,
-                  width: 200,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <ActivityIndicator />
-              </View>
-            )}
-            caption={caption}
-            setCaption={setCaption}
-            callback={callback.bind(this)}
-            renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-            datas={datas}
-            keyExtractor={(item, index) => item.name}
-            UploadComment={() => UploadEditSubComment()}
-            toggleModal={() => toggleReplyEditComment()}
-          />
-        </Modal>
-      </View>
-    </ScrollView>
+            <Modal isVisible={isEditReplyCommentModalVisible}>
+              <MMCommentCard
+                loadingComponent={() => (
+                  <View
+                    style={{
+                      flex: 1,
+                      width: 200,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ActivityIndicator />
+                  </View>
+                )}
+                caption={caption}
+                setCaption={setCaption}
+                callback={callback.bind(this)}
+                renderSuggestionsRow={renderSuggestionsRow.bind(this)}
+                datas={datas}
+                keyExtractor={(item, index) => item.name}
+                UploadComment={() => UploadEditSubComment()}
+                toggleModal={() => toggleReplyEditComment()}
+              />
+            </Modal>
+          </View>
+        }
+      />
+    </View>
   );
 }
 

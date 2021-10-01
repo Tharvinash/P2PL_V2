@@ -8,7 +8,7 @@ import {
   FlatList,
   TextInput,
   Alert,
-  ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
@@ -60,6 +60,9 @@ function Reply(props) {
     useState(false);
   const [isReplySubCommentModalVisible, setReplySubCommentModalVisible] =
     useState(false);
+  const [loadMore, setLoadMore] = useState(8);
+  const [totalComment, setTotalComment] = useState(0);
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
 
   const userId = firebase.auth().currentUser.uid;
   const userIdV2 = firebase.auth().currentUser.uid;
@@ -115,7 +118,6 @@ function Reply(props) {
     setTemporaryId(cid);
   };
 
-
   useEffect(() => {
     firebase
       .firestore()
@@ -139,8 +141,28 @@ function Reply(props) {
           const id = doc.id;
           return { id, ...data };
         });
+        setTotalComment(replyComment.length);
+      });
+
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .collection("Reply")
+      .orderBy("creation", "asc")
+      .limit(loadMore)
+      .get()
+      .then((snapshot) => {
+        let replyComment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
         setReplyComment(replyComment);
       });
+    setTimeout(function () {
+      setLoadMoreLoading(false);
+    }, 2000);
   }, [data]);
 
   useFocusEffect(
@@ -160,6 +182,7 @@ function Reply(props) {
         .doc(mainCommentId)
         .collection("Reply")
         .orderBy("creation", "asc")
+        .limit(loadMore)
         .get()
         .then((snapshot) => {
           let replyComment = snapshot.docs.map((doc) => {
@@ -494,7 +517,7 @@ function Reply(props) {
   };
 
   const Delete = () => {
-    setIsVisible(false)
+    setIsVisible(false);
     // firebase.firestore().collection("Comment").doc(cid).delete();
     // console.log("delete");
     // props.navigation.goBack();
@@ -526,13 +549,13 @@ function Reply(props) {
   };
 
   const EditComment = () => {
-    setIsVisible(false)
+    setIsVisible(false);
     setEditComment(mainComment.comment);
     setEditCommentModalVisible(!isEditCommentModalVisible);
   };
 
   const EditReplyComment = (rcid) => {
-    setIsVisibleV2(false)
+    setIsVisibleV2(false);
     setEditReplyCommentId(rcid);
     firebase
       .firestore()
@@ -658,7 +681,7 @@ function Reply(props) {
   };
 
   const DeleteReplyComment = (rcid) => {
-    setIsVisibleV2(false)
+    setIsVisibleV2(false);
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to delete this comment ?",
@@ -828,6 +851,13 @@ function Reply(props) {
     setData(70);
   };
 
+  const loadMoreComment = () => {
+    setLoadMoreLoading(true);
+    let x = 8;
+    setLoadMore(loadMore + x);
+    setData(9);
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -836,80 +866,99 @@ function Reply(props) {
         data={replyComment}
         renderItem={({ item }) => (
           <View style={{ marginLeft: 30, marginTop: 5 }}>
-              <ReplyCommentCard
-                removeVerifyReplyComment={() =>
-                  removeVerifyReplyComment(item.id)
-                }
-                verifyReplyComment={() => verifyReplyComment(item.id)}
-                image={item.image}
-                status={loginCurrentUser.status}
-                verify={item.verify}
-                firstUserId={item.userId}
-                secondUserId= {userId}
-                xxx={() => toggleVisibilityV2(item.id)}
-                postedBy={item.postedBy}
-                maincommentIdV1={item.mainCommentId}
-                mainCommentIdV2={mainCommentId}
-                repliedTo={item.repliedTo}
-                currentUserName={currentUserName}
-                creation={item.creation}
-                comment={item.comment}
-                attachedImage={item.attachedImage}
-                attachedDocument={item.attachedDocument}
-                numOfLike={item.numOfLike}
-                likeBy={item.likeBy.includes(userId)}
-                RemoveLikeToReplyComment={() =>
-                  RemoveLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
-                }
-                AddLikeToReplyComment={() =>
-                  AddLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
-                }
-                toggleSubReplyComment={() =>
-                  toggleSubReplyComment(item.id, item.postedBy)
-                }
-              />
+            <ReplyCommentCard
+              removeVerifyReplyComment={() => removeVerifyReplyComment(item.id)}
+              verifyReplyComment={() => verifyReplyComment(item.id)}
+              image={item.image}
+              status={loginCurrentUser.status}
+              verify={item.verify}
+              firstUserId={item.userId}
+              secondUserId={userId}
+              xxx={() => toggleVisibilityV2(item.id)}
+              postedBy={item.postedBy}
+              maincommentIdV1={item.mainCommentId}
+              mainCommentIdV2={mainCommentId}
+              repliedTo={item.repliedTo}
+              currentUserName={currentUserName}
+              creation={item.creation}
+              comment={item.comment}
+              attachedImage={item.attachedImage}
+              attachedDocument={item.attachedDocument}
+              numOfLike={item.numOfLike}
+              likeBy={item.likeBy.includes(userId)}
+              RemoveLikeToReplyComment={() =>
+                RemoveLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
+              }
+              AddLikeToReplyComment={() =>
+                AddLikeToReplyComment(item.id, item.numOfLike, item.likeBy)
+              }
+              toggleSubReplyComment={() =>
+                toggleSubReplyComment(item.id, item.postedBy)
+              }
+            />
           </View>
         )}
-
         ListHeaderComponent={
           <View>
-        <MainCommentCard
-          picture={mainComment.image}
-          time={time}
-          status={loginCurrentUser.status}
-          verify={mainComment.verify}
-          postedBy={mainComment.postedBy}
-          creation={mainComment.creation}
-          comment={mainComment.comment}
-          attachedDocument={mainComment.attachedDocument}
-          attachedImage={mainComment.attachedImage}
-          numOfLike={mainComment.numOfLike}
-          likeBy={likeBy}
-          removeVerifyComment={() => removeVerifyComment()}
-          verifyComment={() => verifyComment()}
-          removeLike={() =>
-            removeLike(
-              mainComment.id,
-              mainComment.numOfLike,
-              mainComment.likeBy
-            )
-          }
-          xxx={() => toggleVisibility(mainComment.id)}
-          addLike={() =>
-            addLike(mainComment.id, mainComment.numOfLike, mainComment.likeBy)
-          }
-          firstUserId={mainComment.userId}
-          secondUserId={userId}
-          delete={() => Delete(mainComment.id)}
-          editComment={() => EditComment(mainComment.id)}
-          toggleReplyComment={() => toggleReplyComment()}
-        />
+            <MainCommentCard
+              picture={mainComment.image}
+              time={time}
+              status={loginCurrentUser.status}
+              verify={mainComment.verify}
+              postedBy={mainComment.postedBy}
+              creation={mainComment.creation}
+              comment={mainComment.comment}
+              attachedDocument={mainComment.attachedDocument}
+              attachedImage={mainComment.attachedImage}
+              numOfLike={mainComment.numOfLike}
+              likeBy={likeBy}
+              removeVerifyComment={() => removeVerifyComment()}
+              verifyComment={() => verifyComment()}
+              removeLike={() =>
+                removeLike(
+                  mainComment.id,
+                  mainComment.numOfLike,
+                  mainComment.likeBy
+                )
+              }
+              xxx={() => toggleVisibility(mainComment.id)}
+              addLike={() =>
+                addLike(
+                  mainComment.id,
+                  mainComment.numOfLike,
+                  mainComment.likeBy
+                )
+              }
+              firstUserId={mainComment.userId}
+              secondUserId={userId}
+              delete={() => Delete(mainComment.id)}
+              editComment={() => EditComment(mainComment.id)}
+              toggleReplyComment={() => toggleReplyComment()}
+            />
           </View>
         }
-
-
         ListFooterComponent={
           <View>
+            {loadMoreLoading && (
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <ActivityIndicator size="large" color="#E3562A" />
+              </View>
+            )}
+            {replyComment.length != 0 && loadMoreLoading == false && totalComment > loadMore ? (
+              <TouchableOpacity
+                onPress={loadMoreComment}
+                style={{ marginLeft: 50, flex: 1 }}
+              >
+                <Text style={{ fontSize: 15, fontFamily: "Poppins" }}>
+                  Load More ...
+                </Text>
+              </TouchableOpacity>
+            ) : null}
             {/* BottomSheet for main comment */}
             <BottomSheet
               isVisible={isVisible}
@@ -922,7 +971,9 @@ function Reply(props) {
                   onPress={l.onPress}
                 >
                   <ListItem.Content>
-                    <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                    <ListItem.Title style={l.titleStyle}>
+                      {l.title}
+                    </ListItem.Title>
                   </ListItem.Content>
                 </ListItem>
               ))}
@@ -940,7 +991,9 @@ function Reply(props) {
                   onPress={l.onPress}
                 >
                   <ListItem.Content>
-                    <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                    <ListItem.Title style={l.titleStyle}>
+                      {l.title}
+                    </ListItem.Title>
                   </ListItem.Content>
                 </ListItem>
               ))}

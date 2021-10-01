@@ -56,7 +56,7 @@ function ViewDiscussion(props) {
   const [docURI, setDocURI] = useState(null);
   const [loading1, setLoading1] = useState(false);
   const [loading2, setLoading2] = useState(false);
-  const [loadMore, setLoadMore] = useState(8);
+  const [loadMore, setLoadMore] = useState(11);
   const [totalComment, setTotalComment] = useState(0);
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
 
@@ -777,7 +777,7 @@ function ViewDiscussion(props) {
                 style={{ marginLeft: 50, flex: 1 }}
               >
                 <Text style={{ fontSize: 15, fontFamily: "Poppins" }}>
-                  Load More ...
+                  Load More ... 
                 </Text>
               </TouchableOpacity>
             ) : null}

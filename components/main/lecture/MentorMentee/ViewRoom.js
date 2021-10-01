@@ -55,6 +55,9 @@ function ViewRoom(props) {
   const [interactionPoint, setInteractionPoint] = useState([]);
   const [date, setDate] = useState([]);
   const [userStatus, setUserStatus] = useState(0);
+  const [loadMore, setLoadMore] = useState(8);
+  const [totalComment, setTotalComment] = useState(0);
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
   const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
@@ -138,7 +141,22 @@ function ViewRoom(props) {
     firebase
       .firestore()
       .collection("DiscussionRoomComment")
-      .orderBy("creation", "asc")
+      .orderBy("creation", "desc")
+      .get()
+      .then((snapshot) => {
+        let comment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setTotalComment(comment.length);
+      });
+
+    firebase
+      .firestore()
+      .collection("DiscussionRoomComment")
+      .orderBy("creation", "desc")
+      .limit(loadMore)
       .get()
       .then((snapshot) => {
         let comment = snapshot.docs.map((doc) => {
@@ -148,6 +166,10 @@ function ViewRoom(props) {
         });
         setComment(comment);
       });
+
+    setTimeout(function () {
+      setLoadMoreLoading(false);
+    }, 2000);
     setUserStatus(currentUser.status);
     setData(11);
   }, [props.currentUser, props.route.params.did, data]);
@@ -157,7 +179,8 @@ function ViewRoom(props) {
       firebase
         .firestore()
         .collection("DiscussionRoomComment")
-        .orderBy("creation", "asc")
+        .orderBy("creation", "desc")
+        .limit(loadMore)
         .get()
         .then((snapshot) => {
           let comment = snapshot.docs.map((doc) => {
@@ -580,6 +603,13 @@ function ViewRoom(props) {
     setData(88);
   };
 
+  const loadMoreComment = () => {
+    setLoadMoreLoading(true);
+    let x = 8;
+    setLoadMore(loadMore + x);
+    setData(9);
+  };
+
   return (
     <View style={{ flex: 1, margin: 10, marginBottom: 5 }}>
       <FlatList
@@ -658,6 +688,29 @@ function ViewRoom(props) {
         }
         ListFooterComponent={
           <View>
+            {loadMoreLoading && (
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <ActivityIndicator size="large" color="#E3562A" />
+              </View>
+            )}
+            {comment.length != 0 &&
+            loadMore >= 8 &&
+            totalComment > loadMore &&
+            loadMoreLoading == false ? (
+              <TouchableOpacity
+                onPress={loadMoreComment}
+                style={{ marginLeft: 50, flex: 1 }}
+              >
+                <Text style={{ fontSize: 15, fontFamily: "Poppins" }}>
+                  Load More ...
+                </Text>
+              </TouchableOpacity>
+            ) : null}
             <BottomSheet
               isVisible={isVisible}
               containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
