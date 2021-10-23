@@ -140,7 +140,7 @@ function ViewDetailMentor(props) {
 
 const styles = StyleSheet.create({
   form: {
-    marginLeft: 20,
+    marginHorizontal: 20,
     marginVertical: 10,
   },
   formControl: {
