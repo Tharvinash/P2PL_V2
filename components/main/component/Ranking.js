@@ -1,0 +1,104 @@
+import React from "react";
+import { View, Text, StyleSheet, Image } from "react-native";
+
+const Ranking = (props) => {
+    return (
+        <View style={styles.screen}>
+            <View style={styles.details}>
+                <View style={styles.imageBox}>
+                    <Image
+                        style={styles.image}
+                        source={{ uri: props.image }} />
+                </View>
+                <View style={styles.userInfo}>
+                    <Text style={styles.userName}>{props.name}</Text>
+                    <Text style={styles.userTitle}>{props.title}</Text>
+                    <Text style={styles.userFaculty}>{props.faculty}</Text>
+                </View>
+            </View>
+            <View style={styles.points}>
+                <Text style={styles.pointsText}>{props.points}</Text>
+                <Text style={styles.pointsText2}>points</Text>
+            </View>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        flexDirection: "row",
+        height: 120,
+        margin:5,
+        borderRadius:20,
+        overflow:"hidden",
+        backgroundColor: "#003565",
+      
+    },
+    details: {
+        flexDirection: "row",
+        width: "80%",
+        justifyContent: "flex-start",
+        alignItems:"center",
+        backgroundColor: "#003565"
+    },
+    imageBox: {
+        width:"32%",
+        marginHorizontal:5,
+        
+    },
+    image: {
+        width:90,
+        height: 90,
+        borderRadius:45,
+        marginLeft:3
+    },
+    userInfo: {
+        padding:5,
+        paddingLeft:5,
+        width:"68%",
+        // backgroundColor:"red"
+    },
+    userName: {
+        fontFamily: "Poppins",
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom:3,
+        color:"white"
+    },
+    userTitle: {
+        fontFamily: "Poppins",
+        fontSize: 15,
+        fontWeight: "600",
+        color:"white"
+    },
+    userFaculty: {
+        fontFamily: "Poppins",
+        fontSize: 10,
+        fontWeight: "300",
+        color:"white"
+    },
+    points: {
+        width: "20%",
+        justifyContent:"center",
+        alignItems:"center",
+        backgroundColor:"#694fad"
+        
+    },
+    pointsText:{
+        fontFamily: "Poppins",
+        fontSize: 22,
+        fontWeight: "bold",
+        color:"white"
+    },
+    pointsText2:{
+        fontFamily: "Poppins",
+        fontSize: 12,
+        fontWeight: "bold",
+        color:"white",
+        
+    }
+
+});
+
+export default Ranking;

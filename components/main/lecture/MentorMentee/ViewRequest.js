@@ -5,9 +5,10 @@ import { connect } from "react-redux";
 import DiscussinCard from "../../component/discussionCard";
 
 function ViewRequest(props) {
-  const { requestForAMentor, requestToBeAMentor } = props;
+  const { requestForAMentor, requestToBeAMentor, currentUser } = props;
   const [index, setIndex] = React.useState(0);
-
+  const menteeArray = [...requestForAMentor].filter(el=>el.faculty === currentUser.faculty); // CHANGES
+  const mentorArray = [...requestToBeAMentor].filter(el=>el.faculty === currentUser.faculty);// CHANGES
   const renderItem = ({ item }) => <Item title={item.title} />;
   return (
     <>
@@ -21,8 +22,8 @@ function ViewRequest(props) {
           <View style={{ alignItems: "center" }}>
             <FlatList
               horizontal={false}
-              extraData={requestForAMentor}
-              data={requestForAMentor}
+              extraData={menteeArray}
+              data={menteeArray}
               keyExtractor={(requestForAMentor) => requestForAMentor.id}
               renderItem={
                 ({ item }) => (
@@ -46,8 +47,8 @@ function ViewRequest(props) {
 				<View style={{ alignItems: "center" }}>
             <FlatList
               horizontal={false}
-              extraData={requestToBeAMentor}
-              data={requestToBeAMentor}
+              extraData={mentorArray}
+              data={mentorArray}
               keyExtractor={(requestToBeAMentor) => requestToBeAMentor.id}
               renderItem={
                 ({ item }) => (
@@ -91,6 +92,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (store) => ({
   requestForAMentor: store.userState.requestForAMentor,
   requestToBeAMentor: store.userState.requestToBeAMentor,
+  currentUser: store.userState.currentUser,
+
 });
 
 export default connect(mapStateToProps, null)(ViewRequest);

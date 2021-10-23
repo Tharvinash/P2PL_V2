@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   ScrollView,
   CheckBox,
-} from "react-native";
-import { connect } from "react-redux";
-import firebase from "firebase";
-require("firebase/firestore");
-import * as DocumentPicker from "expo-document-picker";
-import { FAB } from "react-native-elements";
-import { Icon } from "react-native-elements";
+} from 'react-native';
+import { connect } from 'react-redux';
+import firebase from 'firebase';
+require('firebase/firestore');
+import * as DocumentPicker from 'expo-document-picker';
+import { FAB } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 
 function requesttobementor(props) {
   const { currentUser } = props;
@@ -27,8 +27,8 @@ function requesttobementor(props) {
   const [finalValue, setFinalValue] = useState([]);
   const [Doc, setDoc] = useState(null);
   const [name, setName] = useState(null);
-  const [desc, setDesc] = useState("");
-  const [qualification, setQualification] = useState("");
+  const [desc, setDesc] = useState('');
+  const [qualification, setQualification] = useState('');
   const userId = firebase.auth().currentUser.uid;
 
   const pickDocument = async () => {
@@ -42,56 +42,60 @@ function requesttobementor(props) {
   };
 
   const uploadDoc = async () => {
-    if (name.contains(".docx")) {
-      const childPath = `doc/${1234}/${name}`;
-      console.log(childPath);
+    if (name != null) {
+      if (name.contains('.docx')) {
+        const childPath = `doc/${1234}/${name}`;
+        console.log(childPath);
+      } else {
+        const childPath = `doc/${1234}/${Math.random().toString(36)}`;
+        console.log(childPath);
+      }
+
+      const response = await fetch(Doc);
+      const blob = await response.blob();
+
+      const task = firebase.storage().ref().child(childPath).put(blob);
+
+      const taskProgress = (snapshot) => {
+        console.log(`transferred: ${snapshot.bytesTransferred}`);
+      };
+
+      const taskCompleted = () => {
+        task.snapshot.ref.getDownloadURL().then((snapshot) => {
+          savePostDoc(snapshot);
+        });
+      };
+
+      const taskError = (snapshot) => {
+        console.log(snapshot);
+      };
+
+      task.on('state_changed', taskProgress, taskError, taskCompleted);
     } else {
-      const childPath = `doc/${1234}/${Math.random().toString(36)}`;
-      console.log(childPath);
+      savePostDoc(null);
     }
-
-    const response = await fetch(Doc);
-    const blob = await response.blob();
-
-    const task = firebase.storage().ref().child(childPath).put(blob);
-
-    const taskProgress = (snapshot) => {
-      console.log(`transferred: ${snapshot.bytesTransferred}`);
-    };
-
-    const taskCompleted = () => {
-      task.snapshot.ref.getDownloadURL().then((snapshot) => {
-        savePostDoc(snapshot);
-      });
-    };
-
-    const taskError = (snapshot) => {
-      console.log(snapshot);
-    };
-
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
   };
 
   const savePostDoc = (downloadURL) => {
     if (problem1 === true) {
-      finalValue.push("Problem 1");
+      finalValue.push('Problem 1');
     }
     if (problem2 === true) {
-      finalValue.push("Problem 2");
+      finalValue.push('Problem 2');
     }
     if (problem3 === true) {
-      finalValue.push("Problem 3");
+      finalValue.push('Problem 3');
     }
     if (problem4 === true) {
-      finalValue.push("Problem 4");
+      finalValue.push('Problem 4');
     }
     if (problem5 === true) {
-      finalValue.push("Problem 5");
+      finalValue.push('Problem 5');
     }
 
     firebase
       .firestore()
-      .collection("RequestToBeMentor")
+      .collection('RequestToBeMentor')
       .add({
         name: user.name,
         faculty: user.faculty,
@@ -106,7 +110,7 @@ function requesttobementor(props) {
         userId,
       })
       .then(function () {
-        console.log("Done");
+        console.log('Done');
       });
   };
 
@@ -182,8 +186,8 @@ function requesttobementor(props) {
           <View style={styles.formControl}>
             <Text style={styles.label}>Description: </Text>
             <TextInput
-              placeholder="Description"
-              autoCapitalize="sentences"
+              placeholder='Description'
+              autoCapitalize='sentences'
               style={styles.input}
               multiline={true}
               value={desc}
@@ -195,8 +199,8 @@ function requesttobementor(props) {
           <View style={styles.formControl}>
             <Text style={styles.label}>Qualification: </Text>
             <TextInput
-              placeholder="Description"
-              autoCapitalize="sentences"
+              placeholder='Description'
+              autoCapitalize='sentences'
               style={styles.input}
               multiline={true}
               value={qualification}
@@ -211,7 +215,7 @@ function requesttobementor(props) {
         </View>
 
         <View
-          style={{ justifyContent: "center", marginLeft: 20, marginBottom: 10 }}
+          style={{ justifyContent: 'center', marginLeft: 20, marginBottom: 10 }}
         >
           <TouchableOpacity
             style={styles.logout}
@@ -222,10 +226,10 @@ function requesttobementor(props) {
         </View>
       </ScrollView>
       <FAB
-        placement="right"
-        color="#E3562A"
+        placement='right'
+        color='#E3562A'
         onPress={() => uploadDoc()}
-        icon={<Icon reverse name="send" type="font-awesome" color="#E3562A" />}
+        icon={<Icon reverse name='send' type='font-awesome' color='#E3562A' />}
       />
     </View>
   );
@@ -237,49 +241,49 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   formControl: {
-    width: "100%",
+    width: '100%',
   },
   label: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     fontSize: 20,
   },
 
   label2: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     fontSize: 16,
     marginTop: 5,
   },
 
   row: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
 
   input: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingHorizontal: 2,
     paddingVertical: 5,
-    borderBottomColor: "#ccc",
+    borderBottomColor: '#ccc',
     borderBottomWidth: 1,
   },
 
   logout: {
-    width: Dimensions.get("window").width * 0.4,
-    height: Dimensions.get("window").width * 0.1,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
+    width: Dimensions.get('window').width * 0.4,
+    height: Dimensions.get('window').width * 0.1,
+    backgroundColor: '#E3562A',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
 });
 

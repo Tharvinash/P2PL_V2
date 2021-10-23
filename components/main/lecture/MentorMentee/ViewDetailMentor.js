@@ -85,31 +85,33 @@ function ViewDetailMentor(props) {
             </Text>
           </View>
         </View>
-        <View style={styles.form}>
-          <View style={styles.formControl}>
-            <Text style={styles.label}>Attachment: {info.description} </Text>
-            <View style={styles.attachment}>
-              <TouchableOpacity
-                style={styles.icon}
-                onPress={() => setIsVisible(true)}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Poppins",
-                  }}
+        {info.qualificationProof && (
+          <View style={styles.form}>
+            <View style={styles.formControl}>
+              <Text style={styles.label}>Attachment: </Text>
+              <View style={styles.attachment}>
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => setIsVisible(true)}
                 >
-                  Doc
-                </Text>
-                <Icon
-                  name="download-outline"
-                  type="ionicon"
-                  size={25}
-                  color="#000"
-                />
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    Doc
+                  </Text>
+                  <Icon
+                    name="download-outline"
+                    type="ionicon"
+                    size={25}
+                    color="#000"
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
+        )}
       </ScrollView>
 
       <Modal isVisible={isVisible}>
@@ -118,9 +120,9 @@ function ViewDetailMentor(props) {
             uri: info.qualificationProof,
           }}
         />
-				<TouchableOpacity onPress={() => setIsVisible(false)}>
-					<Text>Cancel</Text>
-				</TouchableOpacity>
+        <TouchableOpacity onPress={() => setIsVisible(false)}>
+          <Text>Cancel</Text>
+        </TouchableOpacity>
       </Modal>
 
 

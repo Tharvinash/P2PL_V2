@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -10,22 +10,23 @@ import {
   ScrollView,
   FlatList,
   TouchableHighlight,
-} from "react-native";
-import { connect } from "react-redux";
-import firebase from "firebase";
-import { Icon } from "react-native-elements";
-import { RefreshControlBase } from "react-native";
-import { SwipeListView } from "react-native-swipe-list-view";
+} from 'react-native';
+import { connect } from 'react-redux';
+import firebase from 'firebase';
+import { Icon } from 'react-native-elements';
+import { RefreshControlBase } from 'react-native';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 function ReportedDiscussion(props) {
   const { reportedDiscussion } = props;
   const [data, setData] = useState(reportedDiscussion);
   const [x, setX] = useState(0);
+  const [discussionList, setDiscussionList] = useState(); // changes
 
   useEffect(() => {
     firebase
       .firestore()
-      .collection("ReportedDiscussion")
+      .collection('ReportedDiscussion')
       .get()
       .then((snapshot) => {
         let reportedDiscussion = snapshot.docs.map((doc) => {
@@ -36,6 +37,21 @@ function ReportedDiscussion(props) {
         setData(reportedDiscussion);
       });
 
+    //changes
+    firebase
+      .firestore()
+      .collection('Discussion')
+      .get()
+      .then((snapshot) => {
+        let discussion = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setDiscussionList(discussion);
+      });
+    //changes
+
     setX(1);
   }, [x]);
 
@@ -43,7 +59,7 @@ function ReportedDiscussion(props) {
     React.useCallback(() => {
       firebase
         .firestore()
-        .collection("ReportedDiscussion")
+        .collection('ReportedDiscussion')
         .get()
         .then((snapshot) => {
           let reportedDiscussion = snapshot.docs.map((doc) => {
@@ -63,7 +79,7 @@ function ReportedDiscussion(props) {
       <View style={styles.cardContent}>
         <TouchableOpacity
           onPress={() =>
-            props.navigation.navigate("ViewDiscussion", {
+            props.navigation.navigate('ViewDiscussion', {
               did: data.item.reportedDiscussion,
               rid: data.item.id,
             })
@@ -72,30 +88,35 @@ function ReportedDiscussion(props) {
           <Text numberOfLines={2} style={styles.title}>
             {data.item.discussionTitle}
           </Text>
-          <Text style={styles.faculty}>{data.item.Reason}</Text>
+          {/* changes */}
+          {data.item.Reason.map((el) => (
+            <Text style={styles.faculty}>{el}</Text>
+          ))}
+          {/* <Text style={styles.faculty}>{data.item.Reason}</Text> */}
         </TouchableOpacity>
       </View>
     </View>
   );
 
   const closeRow = (rowKey) => {
-    firebase.firestore().collection("ReportedDiscussion").doc(rowKey).delete();
+    firebase.firestore().collection('ReportedDiscussion').doc(rowKey).delete();
     setX(2);
   };
 
   const deleteRow = (x, y) => {
+
     return Alert.alert(
-      "Are your sure?",
-      "Are you sure you want to remove this Discussion ?",
+      'Are your sure?',
+      'Are you sure you want to remove this Discussion ?',
       [
         // The "Yes" button
         {
-          text: "Yes",
+          text: 'Yes',
           onPress: () => {
-            firebase.firestore().collection("Discussion").doc(y).delete();
+            firebase.firestore().collection('Discussion').doc(y).delete();
             firebase
               .firestore()
-              .collection("ReportedDiscussion")
+              .collection('ReportedDiscussion')
               .doc(x)
               .delete();
             setX(3);
@@ -104,7 +125,7 @@ function ReportedDiscussion(props) {
         // The "No" button
         // Does nothing but dismiss the dialog when tapped
         {
-          text: "No",
+          text: 'No',
         },
       ]
     );
@@ -128,15 +149,15 @@ function ReportedDiscussion(props) {
   );
 
   return (
-    <View style={{ justifyContent: "center", alignItems: "center" }}>
+    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
       <SwipeListView
         disableRightSwipe
         data={data}
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
-        previewRowKey={"0"}
+        previewRowKey={'0'}
         rightOpenValue={-150}
-        previewRowKey={"0"}
+        previewRowKey={'0'}
         previewOpenValue={-40}
         previewOpenDelay={3000}
       />
@@ -147,41 +168,41 @@ function ReportedDiscussion(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backTextWhite: {
-    color: "#FFF",
-    fontFamily: "Poppins",
+    color: '#FFF',
+    fontFamily: 'Poppins',
   },
 
   backRightBtnLeft: {
-    backgroundColor: "blue",
+    backgroundColor: 'blue',
     right: 75,
   },
 
   backRightBtn: {
-    alignItems: "center",
+    alignItems: 'center',
     bottom: 0,
-    justifyContent: "center",
-    position: "absolute",
+    justifyContent: 'center',
+    position: 'absolute',
     top: 0,
     width: 75,
     borderRadius: 16,
   },
 
   backRightBtnRight: {
-    backgroundColor: "red",
+    backgroundColor: 'red',
     right: 0,
   },
 
   rowBack: {
-    alignItems: "center",
-    backgroundColor: "#DDD",
+    alignItems: 'center',
+    backgroundColor: '#DDD',
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingLeft: 15,
     marginHorizontal: 4,
     marginVertical: 6,
@@ -192,9 +213,9 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
     elevation: 5,
-    backgroundColor: "#003565",
+    backgroundColor: '#003565',
     shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.3,
     shadowRadius: 2,
     marginHorizontal: 4,
@@ -208,20 +229,20 @@ const styles = StyleSheet.create({
   },
 
   faculty: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   title: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   FlatList,
@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-} from "react-native";
-import firebase from "firebase";
-import { connect } from "react-redux";
-import { Icon } from "react-native-elements";
-import DiscussinCard from "../../component/discussionCard";
-import ViewAvailableGroup from "../../component/viewAvailableGroup";
-import Modal from "react-native-modal";
+} from 'react-native';
+import firebase from 'firebase';
+import { connect } from 'react-redux';
+import { Icon } from 'react-native-elements';
+import DiscussinCard from '../../component/discussionCard';
+import ViewAvailableGroup from '../../component/viewAvailableGroup';
+import Modal from 'react-native-modal';
 
 function ViewRequestCreateRoom(props) {
   const { requestForAMentor, requestToBeAMentor, currentUser } = props;
@@ -30,27 +30,27 @@ function ViewRequestCreateRoom(props) {
 
   const list = [
     {
-      title: "View Request To Be Mentor",
+      title: 'View Request To Be Mentor',
       id: 5,
     },
     {
-      title: "View Request For Mentor",
+      title: 'View Request For Mentor',
       id: 6,
     },
     {
-      title: "Year 1",
+      title: 'Year 1',
       id: 1,
     },
     {
-      title: "Year 2",
+      title: 'Year 2',
       id: 2,
     },
     {
-      title: "Year 3",
+      title: 'Year 3',
       id: 3,
     },
     {
-      title: "Year 4",
+      title: 'Year 4',
       id: 4,
     },
   ];
@@ -68,13 +68,13 @@ function ViewRequestCreateRoom(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+        <View style={{ flexDirection: 'row', paddingRight: 15 }}>
           <TouchableOpacity>
             <Icon
-              name="add-circle-outline"
-              type="ionicon"
+              name='add-circle-outline'
+              type='ionicon'
               size={30}
-              color="#000"
+              color='#000'
               onPress={() => {
                 createRoom();
               }}
@@ -86,11 +86,12 @@ function ViewRequestCreateRoom(props) {
   }, [data]);
 
   useEffect(() => {
+    setUpdate(99);
     if (filter == 5) {
       firebase
         .firestore()
-        .collection("RequestToBeMentor")
-        .where("faculty", "==", currentUser.faculty)
+        .collection('RequestToBeMentor')
+        .where('faculty', '==', currentUser.faculty)
         .get()
         .then((snapshot) => {
           let rtbam = snapshot.docs.map((doc) => {
@@ -103,8 +104,8 @@ function ViewRequestCreateRoom(props) {
     } else if (filter == 6) {
       firebase
         .firestore()
-        .collection("RequestForMentor")
-        .where("faculty", "==", currentUser.faculty)
+        .collection('RequestForMentor')
+        .where('faculty', '==', currentUser.faculty)
         .get()
         .then((snapshot) => {
           let rfam = snapshot.docs.map((doc) => {
@@ -117,8 +118,8 @@ function ViewRequestCreateRoom(props) {
     } else {
       firebase
         .firestore()
-        .collection("users")
-        .where("year", "==", filter, "&&", "faculty", "==", currentUser.faculty)
+        .collection('users')
+        .where('year', '==', filter, '&&', 'faculty', '==', currentUser.faculty)
         .get()
         .then((snapshot) => {
           let user = snapshot.docs.map((doc) => {
@@ -140,7 +141,7 @@ function ViewRequestCreateRoom(props) {
     a.push({
       userId: userId,
       name: currentUser.name,
-      image: "image",
+      image: 'image',
       status: 0,
     });
 
@@ -150,13 +151,13 @@ function ViewRequestCreateRoom(props) {
       if (newArray[i].status == 1) {
         firebase
           .firestore()
-          .collection("RequestToBeMentor")
+          .collection('RequestToBeMentor')
           .doc(newArray[i].reqId)
           .delete();
       } else {
         firebase
           .firestore()
-          .collection("RequestForMentor")
+          .collection('RequestForMentor')
           .doc(newArray[i].reqId)
           .delete();
       }
@@ -164,7 +165,7 @@ function ViewRequestCreateRoom(props) {
 
     firebase
       .firestore()
-      .collection("DiscussionRoom")
+      .collection('DiscussionRoom')
       .add({
         title: title,
         description: desc,
@@ -173,17 +174,17 @@ function ViewRequestCreateRoom(props) {
         createrId: userId,
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         date: [
-          createdDay + "/" + n,
-          first + "/" + n,
-          second + "/" + n,
-          third + "/" + n,
-          fourth + "/" + n,
-          fifth + "/" + n
+          createdDay + '/' + n,
+          first + '/' + n,
+          second + '/' + n,
+          third + '/' + n,
+          fourth + '/' + n,
+          fifth + '/' + n,
         ],
         interaction: [0, 0, 0, 0, 0, 0],
       })
       .then(function () {
-        props.navigation.navigate("Room");
+        props.navigation.navigate('Room');
       });
   };
 
@@ -226,23 +227,23 @@ function ViewRequestCreateRoom(props) {
       <FlatList
         data={list}
         horizontal
-        keyExtractor={(list) => list.id}
+        keyExtractor={(list) => list.id.toString()}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
           <View style={{ flex: 1, marginVertical: 10 }}>
             <TouchableOpacity
               onPress={() => chageList(item.id)}
               style={{
-                backgroundColor: item.id == filter ? "#003565" : "#140F38",
+                backgroundColor: item.id == filter ? '#003565' : '#140F38',
                 marginHorizontal: 5,
-                width: Dimensions.get("window").width * 0.5,
+                width: Dimensions.get('window').width * 0.5,
                 height: 50,
-                justifyContent: "center",
-                alignItems: "center",
+                justifyContent: 'center',
+                alignItems: 'center',
                 borderRadius: 16,
               }}
             >
-              <Text style={{ color: "#fff" }}>{item.title}</Text>
+              <Text style={{ color: '#fff' }}>{item.title}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -253,7 +254,7 @@ function ViewRequestCreateRoom(props) {
         data={data}
         keyExtractor={(data) => data.id}
         renderItem={({ item }) => (
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View style={styles.card}>
               <View style={styles.cardContent}>
                 <View style={{ flex: 1 }}>
@@ -273,16 +274,16 @@ function ViewRequestCreateRoom(props) {
                           userId: item.userId,
                           name: item.name,
                           mc: item.matricNumber,
-                          image: "image",
+                          image: 'image',
                           reqId: item.id,
                         })
                       }
                     >
                       <Icon
-                        name="remove-outline"
-                        type="ionicon"
+                        name='remove-outline'
+                        type='ionicon'
                         size={30}
-                        color="#fff"
+                        color='#fff'
                         onPress={() => removeMember(item.userId)}
                       />
                     </TouchableOpacity>
@@ -293,16 +294,16 @@ function ViewRequestCreateRoom(props) {
                           userId: item.userId,
                           name: item.name,
                           mc: item.matricNumber,
-                          image: "image",
+                          image: 'image',
                           reqId: item.id,
                         })
                       }
                     >
                       <Icon
-                        name="add-outline"
-                        type="ionicon"
+                        name='add-outline'
+                        type='ionicon'
                         size={30}
-                        color="#fff"
+                        color='#fff'
                       />
                     </TouchableOpacity>
                   )}
@@ -317,15 +318,15 @@ function ViewRequestCreateRoom(props) {
                           userId: item.id,
                           name: item.name,
                           mc: item.matricNumber,
-                          image: "image",
+                          image: 'image',
                         })
                       }
                     >
                       <Icon
-                        name="remove-outline"
-                        type="ionicon"
+                        name='remove-outline'
+                        type='ionicon'
                         size={30}
-                        color="#fff"
+                        color='#fff'
                         onPress={() => removeMember(item.id)}
                       />
                     </TouchableOpacity>
@@ -336,15 +337,15 @@ function ViewRequestCreateRoom(props) {
                           userId: item.id,
                           name: item.name,
                           mc: item.matricNumber,
-                          image: "image",
+                          image: 'image',
                         })
                       }
                     >
                       <Icon
-                        name="add-outline"
-                        type="ionicon"
+                        name='add-outline'
+                        type='ionicon'
                         size={30}
-                        color="#fff"
+                        color='#fff'
                       />
                     </TouchableOpacity>
                   )}
@@ -355,7 +356,7 @@ function ViewRequestCreateRoom(props) {
         )}
       />
       <Modal isVisible={isModalVisible}>
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           {filter == 5 ? (
             <TouchableOpacity
               style={styles.button}
@@ -403,25 +404,25 @@ function ViewRequestCreateRoom(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   card: {
     borderRadius: 16,
     elevation: 5,
-    backgroundColor: "#003565",
+    backgroundColor: '#003565',
     shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.3,
     shadowRadius: 2,
     marginHorizontal: 5,
     marginVertical: 5,
-    width: Dimensions.get("window").width * 0.95,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    width: Dimensions.get('window').width * 0.95,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingRight: 10,
   },
 
@@ -431,27 +432,27 @@ const styles = StyleSheet.create({
   },
 
   faculty: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   title: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     lineHeight: 25,
   },
 
   button: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#E3562A",
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E3562A',
     padding: 14,
     borderRadius: 20,
     width: 275,
@@ -460,12 +461,12 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    color: "white",
+    color: 'white',
     fontSize: 18,
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
-    alignItems: "flex-end",
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
+    alignItems: 'flex-end',
   },
 });
 

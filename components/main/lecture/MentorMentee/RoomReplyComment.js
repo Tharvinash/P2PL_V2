@@ -668,7 +668,7 @@ function RoomReplyComment(props) {
   };
 
   const uploadUpdatedComment = () => {
-    if (!editComment.trim()) {
+    if (!caption.trim()) {
       alert("Please Enter Comment");
       return;
     } else {

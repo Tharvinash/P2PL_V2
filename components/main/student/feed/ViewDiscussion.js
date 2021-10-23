@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -10,40 +10,40 @@ import {
   Share,
   ScrollView,
   Dimensions,
-} from "react-native";
+} from 'react-native';
 //---------reusable component-----------//
-import Report from "../../component/report";
-import AddComment from "../../component/addComment";
-import EditCommentCom from "../../component/editComment";
-import CommentCard from "../../component/commentCard";
+import Report from '../../component/report';
+import AddComment from '../../component/addComment';
+import EditCommentCom from '../../component/editComment';
+import CommentCard from '../../component/commentCard';
 //----------------------------------------------
-import * as ImagePicker from "expo-image-picker";
-import * as DocumentPicker from "expo-document-picker";
-import { Icon } from "react-native-elements";
-import Modal from "react-native-modal";
-import { connect } from "react-redux";
-import firebase from "firebase";
-import * as Linking from "expo-linking";
-import Images from "react-native-scalable-image";
-import { timeDifference } from "../../../utils";
-import { FAB, ListItem, BottomSheet } from "react-native-elements";
-import { ActivityIndicator } from "react-native-paper";
-require("firebase/firestore");
+import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
+import { connect } from 'react-redux';
+import firebase from 'firebase';
+import * as Linking from 'expo-linking';
+import Images from 'react-native-scalable-image';
+import { timeDifference } from '../../../utils';
+import { FAB, ListItem, BottomSheet } from 'react-native-elements';
+import { ActivityIndicator } from 'react-native-paper';
+require('firebase/firestore');
 
 function ViewDiscussion(props) {
-  const { currentUser, options, fullComments } = props;
+  const { currentUser, options, fullComments, report } = props;
   const [isModalVisible, setModalVisible] = useState(false);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
   const [commentId, setCommentId] = useState(null);
   const [isReportVisible, setReportVisible] = useState(false);
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState('');
   const [newOption, setOption] = useState(options);
-  const [editComment, setEditComment] = useState("");
+  const [editComment, setEditComment] = useState('');
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState('');
   const [data, setData] = useState(null);
   const [cu, setCu] = useState(currentUser);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
@@ -59,23 +59,28 @@ function ViewDiscussion(props) {
   const [loadMore, setLoadMore] = useState(11);
   const [totalComment, setTotalComment] = useState(0);
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+  //changes for reported discussion
+  const [reportData, setReportData] = useState(report);
+  const [admin, setAdmin] = useState([]);
+  //changes for reported discussion
+  const [allUsers, setAllUsers] = useState([]); //change for contribution
 
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
 
   const list = [
     {
-      title: "Edit",
+      title: 'Edit',
       onPress: () => EditComment(temporaryId),
     },
     {
-      title: "Delete",
+      title: 'Delete',
       onPress: () => Delete(temporaryId),
     },
     {
-      title: "Cancel",
-      containerStyle: { backgroundColor: "red" },
-      titleStyle: { color: "white" },
+      title: 'Cancel',
+      containerStyle: { backgroundColor: 'red' },
+      titleStyle: { color: 'white' },
       onPress: () => setIsVisible(false),
     },
   ];
@@ -83,13 +88,13 @@ function ViewDiscussion(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+        <View style={{ flexDirection: 'row', paddingRight: 15 }}>
           <TouchableOpacity>
             <Icon
-              name="alert-circle-outline"
-              type="ionicon"
+              name='alert-circle-outline'
+              type='ionicon'
               size={30}
-              color="#000"
+              color='#000'
               onPress={() => {
                 toggleReport();
               }}
@@ -98,10 +103,10 @@ function ViewDiscussion(props) {
 
           <TouchableOpacity>
             <Icon
-              name="share-social-outline"
-              type="ionicon"
+              name='share-social-outline'
+              type='ionicon'
               size={30}
-              color="#000"
+              color='#000'
               onPress={() => {
                 onShare();
               }}
@@ -122,7 +127,7 @@ function ViewDiscussion(props) {
 
       const galleryStatus =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setHasGalleryPermission(galleryStatus.status === "granted");
+      setHasGalleryPermission(galleryStatus.status === 'granted');
     })();
 
     if (currentUser.FavDiscussion !== null) {
@@ -135,7 +140,7 @@ function ViewDiscussion(props) {
 
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection('Discussion')
       .doc(props.route.params.did)
       .get()
       .then((snapshot) => {
@@ -144,8 +149,8 @@ function ViewDiscussion(props) {
 
     firebase
       .firestore()
-      .collection("Comment")
-      .orderBy("creation", "desc")
+      .collection('Comment')
+      .orderBy('creation', 'desc')
       .get()
       .then((snapshot) => {
         let comment = snapshot.docs.map((doc) => {
@@ -159,10 +164,56 @@ function ViewDiscussion(props) {
         setTotalComment(newArray2.length);
       });
 
+    //changes for reported discussion
     firebase
       .firestore()
-      .collection("Comment")
-      .orderBy("creation", "desc")
+      .collection('ReportedDiscussion')
+      .get()
+      .then((snapshot) => {
+        let report2 = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setReportData(report2);
+      });
+
+    firebase
+      .firestore()
+      .collection('users')
+      .get()
+      .then((snapshot) => {
+        let adminToken = [];
+        snapshot.docs.map((doc) => {
+          if (doc.data().status === 2) {
+            const token = doc.data().pushToken;
+            adminToken.push({ token });
+          }
+        });
+
+        setAdmin(adminToken);
+      });
+    //changes for reported discussion
+
+    //change for contribution module
+    firebase
+      .firestore()
+      .collection('users')
+      .get()
+      .then((snapshot) => {
+        let users = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setAllUsers(users);
+      });
+    //change for contribution module
+
+    firebase
+      .firestore()
+      .collection('Comment')
+      .orderBy('creation', 'desc')
       .limit(loadMore)
       .get()
       .then((snapshot) => {
@@ -187,8 +238,8 @@ function ViewDiscussion(props) {
     React.useCallback(() => {
       firebase
         .firestore()
-        .collection("Comment")
-        .orderBy("creation", "desc")
+        .collection('Comment')
+        .orderBy('creation', 'desc')
         .limit(loadMore)
         .get()
         .then((snapshot) => {
@@ -205,14 +256,14 @@ function ViewDiscussion(props) {
       setData(6);
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(firebase.auth().currentUser.uid)
         .get()
         .then((snapshot) => {
           if (snapshot.exists) {
             setCu(snapshot.data());
           } else {
-            console.log("does not exist");
+            console.log('does not exist');
           }
         });
     }, [])
@@ -227,25 +278,107 @@ function ViewDiscussion(props) {
   };
 
   const sendReport = (rid) => {
-    firebase
-      .firestore()
-      .collection("ReportedDiscussion")
-      .add({
-        reportedBy: userId,
-        Reason: rid,
-        reportedDiscussion: discussionId,
-        discussionTitle: userPosts.title,
-        timeReported: firebase.firestore.FieldValue.serverTimestamp(),
-        discussionPostedBy: userPosts.userId,
-      })
-      .then(function () {
-        setReportVisible(!isReportVisible);
-        Alert.alert(
-          "Done",
-          "Your report has been received and will be reviewed",
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-        );
-      });
+    //change for reported Discussion
+    console.log(reportData);
+    const alert = () => {
+      setReportVisible(!isReportVisible);
+      Alert.alert(
+        'Done',
+        'Your report has been received and will be reviewed',
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+      );
+    };
+
+    if (reportData.length > 0) {
+      const foundElement = reportData.find(
+        (el) => el.reportedDiscussion === discussionId
+      );
+      if (foundElement) {
+        if (foundElement.Reason.find((el) => el === rid)) {
+          const rB = foundElement.reportedBy;
+          if (rB.includes(userId)) {
+            console.log('Already reported');
+            alert();
+          } else {
+            rB.push(userId);
+            // console.log(rB)
+            firebase
+              .firestore()
+              .collection('ReportedDiscussion')
+              .doc(foundElement.id)
+              .update({
+                reportedBy: rB,
+              })
+              .then(() => {
+                alert();
+              });
+          }
+        } else {
+          const rB = foundElement.reportedBy;
+          const reason = foundElement.Reason;
+          if (rB.includes(userId)) {
+            console.log('Name already in reportedBy list');
+            reason.push(rid);
+            firebase
+              .firestore()
+              .collection('ReportedDiscussion')
+              .doc(foundElement.id)
+              .update({
+                Reason: reason,
+              })
+              .then(() => {
+                alert();
+              });
+          } else {
+            rB.push(userId);
+            reason.push(rid);
+            firebase
+              .firestore()
+              .collection('ReportedDiscussion')
+              .doc(foundElement.id)
+              .update({
+                reportedBy: rB,
+                Reason: reason,
+              })
+              .then(() => {
+                alert();
+              });
+          }
+        }
+      } else {
+        firebase
+          .firestore()
+          .collection('ReportedDiscussion')
+          .add({
+            reportedBy: [userId],
+            Reason: [rid],
+            reportedDiscussion: discussionId,
+            discussionTitle: userPosts.title,
+            timeReported: firebase.firestore.FieldValue.serverTimestamp(),
+            discussionPostedBy: userPosts.userId,
+          })
+          .then(() => {
+            alert();
+          });
+      }
+    } else {
+      firebase
+        .firestore()
+        .collection('ReportedDiscussion')
+        .add({
+          reportedBy: [userId],
+          Reason: [rid],
+          reportedDiscussion: discussionId,
+          discussionTitle: userPosts.title,
+          timeReported: firebase.firestore.FieldValue.serverTimestamp(),
+          discussionPostedBy: userPosts.userId,
+        })
+        .then(() => {
+          alert();
+        });
+    }
+    setData(71);
+    //change for reported Discussion
   };
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
@@ -266,12 +399,12 @@ function ViewDiscussion(props) {
 
   const finalCommentUpload = (doc, img) => {
     if (!newComment.trim()) {
-      alert("Please Enter Comment");
+      alert('Please Enter Comment');
       return;
     } else {
       firebase
         .firestore()
-        .collection("Comment")
+        .collection('Comment')
         .add({
           userId,
           postedBy: cu.name,
@@ -310,6 +443,188 @@ function ViewDiscussion(props) {
     if (image != null && Doc == null) {
       uploadImage();
     }
+
+    //change for contribution
+
+    //updating noOfComments under user
+    const commentNo = cu.noOfComments + 1;
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(userId)
+      .update({
+        noOfComments: commentNo,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    console.log(commentNo);
+    //updating noOfComments under user
+
+    //update totalPoints and awards based on the noOfComments
+    let points = cu.totalPoints;
+    let userTitle = cu.title;
+    const award = cu.awards;
+    let creation = new Date();
+
+    if (commentNo === 1 && !award.some((el) => el.title === 'First Comment')) {
+      award.push({
+        title: 'First Comment',
+        description: 'Post a comment on any discussion created to receive this',
+        pointsToBeAdded: 1,
+        creation: creation.toISOString(),
+      });
+      points = points + 1;
+    } else if (
+      commentNo === 30 &&
+      !award.some((el) => el.title === 'Keep Coming Back')
+    ) {
+      award.push({
+        title: 'Keep Coming Back',
+        description: '30 comments posted! You must like it here!',
+        pointsToBeAdded: 5,
+        creation: creation.toISOString(),
+      });
+      points = points + 5;
+    } else if (
+      commentNo === 100 &&
+      !award.some((el) => el.title === "Can't Stop")
+    ) {
+      award.push({
+        title: "Can't Stop",
+        description:
+          "You've posted 100 comments. I hope this took you more than a day",
+        pointsToBeAdded: 10,
+        creation: creation.toISOString(),
+      });
+      points = points + 10;
+    } else if (
+      commentNo === 300 &&
+      !award.some((el) => el.title === 'Contribution Fanatic')
+    ) {
+      award.push({
+        title: 'Contribution Fanatic',
+        description: '300 comments. Impressive',
+        pointsToBeAdded: 15,
+        creation: creation.toISOString(),
+      });
+      points = points + 15;
+    }
+    console.log(points);
+
+    //updating userTitle based on Points
+    if (points >= 0 && points <= 100) {
+      userTitle = 'Beginner';
+    } else if (points > 100 && points <= 300) {
+      userTitle = 'Intermediate';
+    } else if (points > 300 && points <= 500) {
+      userTitle = 'Expert';
+    } else if (points > 500) {
+      userTitle = 'Legend';
+    }
+    //updating userTitle based on Points
+
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(userId)
+      .update({
+        totalPoints: points,
+        awards: award,
+        title: userTitle,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    //update totalPoints and awards based on the noOfComments
+
+    //updating noOfComments under a specific discussion
+    console.log(userPosts.noOfComments);
+    const discussionCommentNo = userPosts.noOfComments + 1;
+    const discussionOwner = allUsers.find((el) => el.id === userPosts.userId);
+    let discussionOwnerPoints;
+    let discussionOwnerAwards;
+    let discussionOwnerTitle;
+
+    firebase
+      .firestore()
+      .collection('Discussion')
+      .doc(discussionId)
+      .update({
+        noOfComments: discussionCommentNo,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    //updating noOfComments under a specific discussion
+
+    //updating totalPoints and awards based on the noOfComments in a discussion
+    if (userId === discussionOwner.id) {
+      discussionOwnerPoints = points;
+      discussionOwnerAwards = award;
+      discussionOwnerTitle = userTitle;
+    } else {
+      discussionOwnerPoints = discussionOwner.totalPoints;
+      discussionOwnerAwards = discussionOwner.awards;
+      discussionOwnerTitle = discussionOwner.title;
+    }
+
+    console.log(discussionOwnerPoints);
+    console.log(discussionOwnerAwards);
+    console.log(discussionOwnerTitle);
+    if (
+      discussionCommentNo === 30 &&
+      !discussionOwnerAwards.some((el) => el.title === 'Interesting Topic')
+    ) {
+      discussionOwnerAwards.push({
+        title: 'Interesting Topic',
+        description: 'One of your posted disucssions has attracted 30 comments',
+        pointsToBeAdded: 15,
+        creation: creation.toISOString(),
+      });
+      discussionOwnerPoints = discussionOwnerPoints + 15;
+    } else if (
+      discussionCommentNo === 60 &&
+      !discussionOwnerAwards.some(
+        (el) => el.title === 'Super Interesting Topic'
+      )
+    ) {
+      discussionOwnerAwards.push({
+        title: 'Engaging Topic',
+        description: 'One of your posted disucssions has attracted 60 comments',
+        pointsToBeAdded: 25,
+        creation: creation.toISOString(),
+      });
+      discussionOwnerPoints = discussionOwnerPoints + 25;
+    }
+
+    //updating userTitle based on Points
+    if (discussionOwnerPoints >= 0 && discussionOwnerPoints <= 100) {
+      discussionOwnerTitle = 'Beginner';
+    } else if (discussionOwnerPoints > 100 && discussionOwnerPoints <= 300) {
+      discussionOwnerTitle = 'Intermediate';
+    } else if (discussionOwnerPoints > 300 && discussionOwnerPoints <= 500) {
+      discussionOwnerTitle = 'Expert';
+    } else if (discussionOwnerPoints > 500) {
+      discussionOwnerTitle = 'Legend';
+    }
+    //updating userTitle based on Points
+
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(discussionOwner.id)
+      .update({
+        totalPoints: discussionOwnerPoints,
+        awards: discussionOwnerAwards,
+        title: discussionOwnerTitle,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    //updating totalPoints and awards based on the noOfComments in a discussion
+
+    // //change for contribution
   };
 
   const pickDocument = async () => {
@@ -357,7 +672,7 @@ function ViewDiscussion(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadImage = async () => {
@@ -386,7 +701,7 @@ function ViewDiscussion(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadDocV2 = async () => {
@@ -412,7 +727,7 @@ function ViewDiscussion(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadImageV2 = async (docSnapshot) => {
@@ -441,7 +756,7 @@ function ViewDiscussion(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   if (hasGalleryPermission === false) {
@@ -455,33 +770,33 @@ function ViewDiscussion(props) {
     const FD = user.FavDiscussion;
 
     if (FD.includes(discussionId)) {
-      console.log("already added to fav");
+      console.log('already added to fav');
     } else {
       FD.push(discussionId);
     }
 
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(firebase.auth().currentUser.uid)
       .update({
         FavDiscussion: FD,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
 
     const FB = userPosts.favBy;
     FB.push(userId);
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection('Discussion')
       .doc(discussionId)
       .update({
         favBy: FB,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     setData(1);
   };
@@ -496,13 +811,13 @@ function ViewDiscussion(props) {
 
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(firebase.auth().currentUser.uid)
       .update({
         FavDiscussion: FD,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
 
     const FB = userPosts.favBy;
@@ -514,13 +829,13 @@ function ViewDiscussion(props) {
 
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection('Discussion')
       .doc(discussionId)
       .update({
         favBy: FB,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     setData(0);
   };
@@ -548,21 +863,66 @@ function ViewDiscussion(props) {
   const Delete = (cid) => {
     setIsVisible(false);
     return Alert.alert(
-      "Are your sure?",
-      "Are you sure you want to delete this comment ?",
+      'Are your sure?',
+      'Are you sure you want to delete this comment ?',
       [
         // The "Yes" button
         {
-          text: "Yes",
+          text: 'Yes',
           onPress: () => {
-            firebase.firestore().collection("Comment").doc(cid).delete();
+            //change for contribution
+
+            const commentList = [...comment];
+            //obtain noOfReplies for a mainComment
+            const currentReplyNo = commentList.find(
+              (el) => el.id === cid
+            ).numberOfReply;
+            console.log(currentReplyNo);
+            //obtain noOfReplies for a mainComment
+
+            //change for contribution
+            firebase.firestore().collection('Comment').doc(cid).delete();
             setData(4);
+
+            //change for contribution
+
+            //updating noOfComments under user
+            const commentNo = cu.noOfComments - 1;
+            firebase
+              .firestore()
+              .collection('users')
+              .doc(userId)
+              .update({
+                noOfComments: commentNo,
+              })
+              .then(() => {
+                console.log('done');
+              });
+            //updating noOfComments under user
+
+            //updating noOfComments under discussion
+            console.log(userPosts.noOfComments);
+            const discussionCommentNo =
+              userPosts.noOfComments - 1 - currentReplyNo;
+            firebase
+              .firestore()
+              .collection('Discussion')
+              .doc(discussionId)
+              .update({
+                noOfComments: discussionCommentNo,
+              })
+              .then(() => {
+                console.log('done');
+              });
+            //updating noOfComments under discussion
+
+            //change for contribution
           },
         },
         // The "No" button
         // Does nothing but dismiss the dialog when tapped
         {
-          text: "No",
+          text: 'No',
         },
       ]
     );
@@ -577,16 +937,129 @@ function ViewDiscussion(props) {
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(cid)
       .update({
         numOfLike: x,
         likeBy: lb,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     setData(2);
+
+    //change for contribution
+
+    //updating number of likes under user
+    const commentList = [...comment];
+    const commentPostedBy = commentList.find((el) => el.id === cid).userId;
+    const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
+    console.log(x);
+
+    let points = commentOwner.totalPoints;
+    let userTitle = commentOwner.title;
+    let likesNo = commentOwner.noOfLikes;
+    if (commentPostedBy !== userId) {
+      likesNo = likesNo + 1;
+    }
+    console.log(likesNo);
+
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(commentPostedBy)
+      .update({
+        noOfLikes: likesNo,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    //updating number of likes under user
+
+    //updating totalPoints and awards based on noOfLikes
+    const award = commentOwner.awards;
+    console.log(award);
+    let creation = new Date();
+    if (
+      likesNo === 1 &&
+      !award.some((el) => el.title === 'Somebody Likes You')
+    ) {
+      award.push({
+        title: 'Somebody Likes You',
+        description:
+          'Somebody out there liked one of your comments. Keep posting for more',
+        pointsToBeAdded: 2,
+        creation: creation.toISOString(),
+      });
+      points = points + 2;
+    } else if (
+      likesNo === 25 &&
+      !award.some((el) => el.title === 'I Like it A Lot')
+    ) {
+      award.push({
+        title: 'I Like it A Lot',
+        description: 'Your comments have been liked 25 times',
+        pointsToBeAdded: 7,
+        creation: creation.toISOString(),
+      });
+      points = points + 7;
+    } else if (
+      likesNo === 50 &&
+      !award.some((el) => el.title === 'Seriously Likeable')
+    ) {
+      award.push({
+        title: 'Seriously Likeable',
+        description: 'Your comments have been liked 50 times',
+        pointsToBeAdded: 10,
+        creation: creation.toISOString(),
+      });
+      points = points + 10;
+    } else if (x === 25 && !award.some((el) => el.title === 'Helpful')) {
+      award.push({
+        title: 'Helpful',
+        description: 'One of your comments has attracted 25 likes',
+        pointsToBeAdded: 15,
+        creation: creation.toISOString(),
+      });
+      points = points + 15;
+    } else if (x === 50 && !award.some((el) => el.title === 'Super Helpful')) {
+      award.push({
+        title: 'Super Helpful',
+        description: 'One of your comments has attracted 50 likes',
+        pointsToBeAdded: 25,
+        creation: creation.toISOString(),
+      });
+      points = points + 25;
+    }
+
+    //updating userTitle based on Points
+    if (points >= 0 && points <= 100) {
+      userTitle = 'Beginner';
+    } else if (points > 100 && points <= 300) {
+      userTitle = 'Intermediate';
+    } else if (points > 300 && points <= 500) {
+      userTitle = 'Expert';
+    } else if (points > 500) {
+      userTitle = 'Legend';
+    }
+    //updating userTitle based on Points
+
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(commentPostedBy)
+      .update({
+        totalPoints: points,
+        awards: award,
+        title: userTitle,
+      })
+      .then(() => {
+        console.log('done');
+      });
+
+    //updating totalPoints and awards based on noOfLikes
+
+    // change for contribution
   };
 
   const removeLike = (cid, nol, lb) => {
@@ -598,16 +1071,40 @@ function ViewDiscussion(props) {
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(cid)
       .update({
         numOfLike: x,
         likeBy: lb,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     setData(3);
+    //change for contribution
+
+    //updating number of likes under user
+    const commentList = [...comment];
+    const commentPostedBy = commentList.find((el) => el.id === cid).userId;
+    const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
+    let likesNo = commentOwner.noOfLikes;
+    if (commentPostedBy !== userId) {
+      likesNo = likesNo - 1;
+    }
+
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(commentPostedBy)
+      .update({
+        noOfLikes: likesNo,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    //updating number of likes under user
+
+    //change for contribution
   };
 
   const EditComment = (cid) => {
@@ -615,7 +1112,7 @@ function ViewDiscussion(props) {
     setCommentId(cid);
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(cid)
       .get()
       .then((snapshot) => {
@@ -627,19 +1124,19 @@ function ViewDiscussion(props) {
   const uploadUpdatedComment = () => {
     setLoading2(true);
     if (!editComment.trim()) {
-      alert("Please Enter Comment");
+      alert('Please Enter Comment');
       return;
     } else {
       firebase
         .firestore()
-        .collection("Comment")
+        .collection('Comment')
         .doc(commentId)
         .update({
           comment: editComment,
           //creation: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
-          console.log("save");
+          console.log('save');
         });
       setLoading2(false);
       setEditCommentModalVisible(!isEditCommentModalVisible);
@@ -690,7 +1187,7 @@ function ViewDiscussion(props) {
               editComment={() => EditComment(item.id)}
               numberOfReply={item.numberOfReply}
               onSelect={() =>
-                props.navigation.navigate("Reply Discussion", {
+                props.navigation.navigate('Reply Discussion', {
                   cid: item.id,
                   time: timeDifference(new Date(), item.creation.toDate()),
                   xxx: item.likeBy.includes(userId),
@@ -702,30 +1199,30 @@ function ViewDiscussion(props) {
         }
         ListHeaderComponent={
           <View>
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                <View style={{ width: "100%" }}>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+                <View style={{ width: '100%' }}>
                   <Text style={styles.title}>{userPosts.title}</Text>
                 </View>
               </View>
 
               <View
-                style={{ flexDirection: "row", justifyContent: "flex-end" }}
+                style={{ flexDirection: 'row', justifyContent: 'flex-end' }}
               >
                 {user.FavDiscussion.includes(discussionId) ? (
                   <Icon
-                    name="bookmark"
-                    type="ionicon"
+                    name='bookmark'
+                    type='ionicon'
                     size={35}
-                    Color="#000"
+                    Color='#000'
                     onPress={() => RemoveFavDiscussion()}
                   />
                 ) : (
                   <Icon
-                    name="bookmark-outline"
-                    type="ionicon"
+                    name='bookmark-outline'
+                    type='ionicon'
                     size={35}
-                    Color="#000"
+                    Color='#000'
                     onPress={() => AddFavDiscussion()}
                   />
                 )}
@@ -735,14 +1232,14 @@ function ViewDiscussion(props) {
             {userPosts.downloadURL && (
               <View
                 style={{
-                  flexDirection: "row",
+                  flexDirection: 'row',
                   paddingBottom: 10,
-                  justifyContent: "center",
+                  justifyContent: 'center',
                 }}
               >
                 {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
                 <Images
-                  width={Dimensions.get("window").width} // height will be calculated automatically
+                  width={Dimensions.get('window').width} // height will be calculated automatically
                   source={{ uri: userPosts.downloadURL }}
                 />
               </View>
@@ -761,11 +1258,11 @@ function ViewDiscussion(props) {
             {loadMoreLoading && (
               <View
                 style={{
-                  justifyContent: "center",
-                  alignItems: "center",
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
-                <ActivityIndicator size="large" color="#E3562A" />
+                <ActivityIndicator size='large' color='#E3562A' />
               </View>
             )}
             {comment.length != 0 &&
@@ -776,15 +1273,15 @@ function ViewDiscussion(props) {
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}
               >
-                <Text style={{ fontSize: 15, fontFamily: "Poppins" }}>
-                  Load More ... 
+                <Text style={{ fontSize: 15, fontFamily: 'Poppins' }}>
+                  Load More ...
                 </Text>
               </TouchableOpacity>
             ) : null}
 
             <BottomSheet
               isVisible={isVisible}
-              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+              containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
             >
               {list.map((l, i) => (
                 <ListItem
@@ -801,7 +1298,7 @@ function ViewDiscussion(props) {
               ))}
             </BottomSheet>
 
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
               <Modal isVisible={isModalVisible}>
                 <AddComment
                   setNewComment={(newComment) => setNewComment(newComment)}
@@ -825,7 +1322,7 @@ function ViewDiscussion(props) {
 
               <Modal isVisible={isReportVisible}>
                 <View
-                  style={{ justifyContent: "center", alignItems: "center" }}
+                  style={{ justifyContent: 'center', alignItems: 'center' }}
                 >
                   <Text style={styles.titley}>
                     Why are you reporting this post
@@ -843,7 +1340,7 @@ function ViewDiscussion(props) {
                   />
                 </View>
                 <View
-                  style={{ justifyContent: "center", alignItems: "center" }}
+                  style={{ justifyContent: 'center', alignItems: 'center' }}
                 >
                   <TouchableOpacity
                     style={styles.blogout}
@@ -858,19 +1355,19 @@ function ViewDiscussion(props) {
         }
       />
       <FAB
-        placement="right"
-        color="#E3562A"
+        placement='right'
+        color='#E3562A'
         onPress={toggleModal}
         icon={
           <Icon
             reverse
-            name="add-outline"
-            type="ionicon"
-            color="#E3562A"
+            name='add-outline'
+            type='ionicon'
+            color='#E3562A'
             size={35}
             containerStyle={{
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: 'center',
+              alignItems: 'center',
               marginLeft: 11,
             }}
           />
@@ -888,58 +1385,58 @@ const styles = StyleSheet.create({
   },
 
   floatButton: {
-    position: "absolute",
+    position: 'absolute',
     right: 0,
     bottom: 0,
   },
 
   titley: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 25,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    fontWeight: "700",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    fontWeight: '700',
     marginBottom: 20,
   },
 
   title: {
     fontSize: 20,
-    fontFamily: "PoppinsMedium",
+    fontFamily: 'PoppinsMedium',
     marginBottom: 5,
   },
 
   descT: {
     fontSize: 20,
     lineHeight: 25,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     marginTop: 10,
   },
 
   comT: {
-    fontFamily: "PoppinsSemiBold",
+    fontFamily: 'PoppinsSemiBold',
     fontSize: 18,
   },
 
   blogout: {
     width: 140,
     height: 40,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
+    backgroundColor: '#E3562A',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 20,
   },
 
   Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     paddingTop: 8,
   },
 });
@@ -948,6 +1445,7 @@ const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
   fullComments: store.userState.comment,
   options: store.userState.option,
+  report: store.userState.reportedDiscussion,
 });
 
 export default connect(mapStateToProps, null)(ViewDiscussion);

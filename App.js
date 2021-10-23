@@ -1,29 +1,29 @@
-import { StatusBar } from "expo-status-bar";
-import React, { Component, useState } from "react";
-import { View, Text, Button } from "react-native";
-import { Icon } from "react-native-elements";
-import * as Font from "expo-font";
-import * as Linking from "expo-linking";
-import AppLoading from "expo-app-loading";
+import { StatusBar } from 'expo-status-bar';
+import React, { Component, useState } from 'react';
+import { View, Text, Button } from 'react-native';
+import { Icon } from 'react-native-elements';
+import * as Font from 'expo-font';
+import * as Linking from 'expo-linking';
+import AppLoading from 'expo-app-loading';
 //import AppLoading from 'expo-app-loading';
 //-----------------REDUX---------------//
-import { Provider } from "react-redux";
-import { createStore, applyMiddleware } from "redux";
-import rootReducer from "./redux/reducers";
-import thunk from "redux-thunk";
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
+import rootReducer from './redux/reducers';
+import thunk from 'redux-thunk';
 const store = createStore(rootReducer, applyMiddleware(thunk));
 //-----------------REDUX---------------//
 
 //-----------------FIREBASE---------------//
-import * as firebase from "firebase";
+import * as firebase from 'firebase';
 const firebaseConfig = {
-  apiKey: "AIzaSyDPYOE3Lff7hHBqmOUxFp18JwONipAVPEg",
-  authDomain: "p2pl-bcbbd.firebaseapp.com",
-  projectId: "p2pl-bcbbd",
-  storageBucket: "p2pl-bcbbd.appspot.com",
-  messagingSenderId: "363868767911",
-  appId: "1:363868767911:web:e3cc40d0d5ea10527f3d82",
-  measurementId: "G-HHLLCS1WDW",
+  apiKey: 'AIzaSyDPYOE3Lff7hHBqmOUxFp18JwONipAVPEg',
+  authDomain: 'p2pl-bcbbd.firebaseapp.com',
+  projectId: 'p2pl-bcbbd',
+  storageBucket: 'p2pl-bcbbd.appspot.com',
+  messagingSenderId: '363868767911',
+  appId: '1:363868767911:web:e3cc40d0d5ea10527f3d82',
+  measurementId: 'G-HHLLCS1WDW',
 };
 
 if (firebase.apps.length === 0) {
@@ -31,73 +31,77 @@ if (firebase.apps.length === 0) {
 }
 //-----------------FIREBASE---------------//
 
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
 //Student Profile
-import CreatedDiscussion from "./components/main/student/profile/CreatedDiscussion";
-import ActivityTracking from "./components/main/student/profile/ActivityTracking";
-import FilterFeed from "./components/main/student/profile/FilterFeed";
-import FavoriteDiscussion from "./components/main/student/profile/FavoriteDiscussion";
-import EditProfile from "./components/main/student/profile/EditProfile";
-import EditDeleteDiscussion from "./components/main/student/profile/EditDeleteDiscussion";
-import EditPassword from "./components/main/student/profile/EditPassword";
+import CreatedDiscussion from './components/main/student/profile/CreatedDiscussion';
+import ActivityTracking from './components/main/student/profile/ActivityTracking';
+import FilterFeed from './components/main/student/profile/FilterFeed';
+import FavoriteDiscussion from './components/main/student/profile/FavoriteDiscussion';
+import EditProfile from './components/main/student/profile/EditProfile';
+import EditDeleteDiscussion from './components/main/student/profile/EditDeleteDiscussion';
+import EditPassword from './components/main/student/profile/EditPassword';
 
 //Auth
-import LandingScreen from "./components/auth/Landing";
-import RegisterScreen from "./components/auth/Register";
-import LoginScreen from "./components/auth/Login";
-import LectureRegister from "./components/auth/LectureRegister";
-import ResetPassword from "./components/auth/ResetPassword";
+import LandingScreen from './components/auth/Landing';
+import RegisterScreen from './components/auth/Register';
+import LoginScreen from './components/auth/Login';
+import LectureRegister from './components/auth/LectureRegister';
+import ResetPassword from './components/auth/ResetPassword';
 
 //Main Screen
-import MainScreen from "./components/StudentMain";
+import MainScreen from './components/StudentMain';
 
 //Add Discussion
-import AddScreen from "./components/main/student/addDiscussion/Add";
-import EditDiscussion from "./components/main/student/addDiscussion/EditDiscussion";
-import EditComment from "./components/main/student/addDiscussion/EditComment";
+import AddScreen from './components/main/student/addDiscussion/Add';
+import EditDiscussion from './components/main/student/addDiscussion/EditDiscussion';
+import EditComment from './components/main/student/addDiscussion/EditComment';
 
 //Lecture
-import LectureMainScreen from "./components/LectureMain";
-import LectureDiscussionView from "./components/main/lecture/Discussion/LectureDiscussionView";
+import LectureMainScreen from './components/LectureMain';
+import LectureDiscussionView from './components/main/lecture/Discussion/LectureDiscussionView';
 
 //feed
-import DiscussionTitle from "./components/main/student/feed/ViewDiscussion";
-import PostComment from "./components/main/student/addDiscussion/PostComment";
-import Search from "./components/main/student/feed/Search";
-import Reply from "./components/main/student/feed/Reply";
+import DiscussionTitle from './components/main/student/feed/ViewDiscussion';
+import PostComment from './components/main/student/addDiscussion/PostComment';
+import Search from './components/main/student/feed/Search';
+import Reply from './components/main/student/feed/Reply';
 
 //MentorMentee
-import Choose from "./components/main/student/mentorMentee/Choose";
-import RequestForMentor from "./components/main/student/mentorMentee/RequestForMentor";
-import RequestToBeMentor from "./components/main/student/mentorMentee/RequestToBeMentor";
+import Choose from './components/main/student/mentorMentee/Choose';
+import RequestForMentor from './components/main/student/mentorMentee/RequestForMentor';
+import RequestToBeMentor from './components/main/student/mentorMentee/RequestToBeMentor';
 
 //LectureMentorMentee
-import CreateRoom from "./components/main/lecture/MentorMentee/CreateRoom";
-import ViewRoom from "./components/main/lecture/MentorMentee/ViewRoom";
-import RoomReplyComment from "./components/main/lecture/MentorMentee/RoomReplyComment";
-import ViewRequest from "./components/main/lecture/MentorMentee/ViewRequest";
-import ViewDetailMentor from "./components/main/lecture/MentorMentee/ViewDetailMentor";
-import ViewDetailMentee from "./components/main/lecture/MentorMentee/ViewDetailMentee";
-import AddInGroup from "./components/main/lecture/MentorMentee/AddInGroup";
-import AddInGroupV2 from "./components/main/lecture/MentorMentee/AddInGroupV2";
-import GroupDetail from "./components/main/lecture/MentorMentee/GroupDetail";
-import ViewRequestCreateRoom from "./components/main/lecture/MentorMentee/ViewRequestCreateRoom";
-import GroupStats from "./components/main/lecture/MentorMentee/GroupStats";
+import CreateRoom from './components/main/lecture/MentorMentee/CreateRoom';
+import ViewRoom from './components/main/lecture/MentorMentee/ViewRoom';
+import RoomReplyComment from './components/main/lecture/MentorMentee/RoomReplyComment';
+import ViewRequest from './components/main/lecture/MentorMentee/ViewRequest';
+import ViewDetailMentor from './components/main/lecture/MentorMentee/ViewDetailMentor';
+import ViewDetailMentee from './components/main/lecture/MentorMentee/ViewDetailMentee';
+import AddInGroup from './components/main/lecture/MentorMentee/AddInGroup';
+import AddInGroupV2 from './components/main/lecture/MentorMentee/AddInGroupV2';
+import GroupDetail from './components/main/lecture/MentorMentee/GroupDetail';
+import ViewRequestCreateRoom from './components/main/lecture/MentorMentee/ViewRequestCreateRoom';
+import GroupStats from './components/main/lecture/MentorMentee/GroupStats';
 
 //Admin
-import AdminMainScreen from "./components/AdminMain";
-import ViewDiscussion from "./components/main/admin/ReportDiscussion/ViewDiscussion";
-import ViewReply from "./components/main/admin/ReportDiscussion/ViewReply";
+import AdminMainScreen from './components/AdminMain';
+import ViewDiscussion from './components/main/admin/ReportDiscussion/ViewDiscussion';
+import ViewReply from './components/main/admin/ReportDiscussion/ViewReply';
+
+//Contribution
+import ContributionPoints from './components/main/student/contribution/ContributionPoints';
+import AvailableAwards from './components/main/student/contribution/AvailableAwards';
+import LeaderBoard from './components/main/student/contribution/LeaderBoard';
 
 let customFonts = {
-  Poppins: require("./assets/fonts/Poppins.ttf"),
-  PoppinsMedium: require("./assets/fonts/PoppinsMedium.ttf"),
-  PoppinsSemiBold: require("./assets/fonts/PoppinsSemiBold.ttf"),
-  
+  Poppins: require('./assets/fonts/Poppins.ttf'),
+  PoppinsMedium: require('./assets/fonts/PoppinsMedium.ttf'),
+  PoppinsSemiBold: require('./assets/fonts/PoppinsSemiBold.ttf'),
 };
 
 export class App extends Component {
@@ -129,7 +133,7 @@ export class App extends Component {
         });
         firebase
           .firestore()
-          .collection("users")
+          .collection('users')
           .doc(firebase.auth().currentUser.uid)
           .get()
           .then((snapshot) => {
@@ -138,7 +142,7 @@ export class App extends Component {
                 status: snapshot.data().status,
               });
             } else {
-              console.log("does not exist");
+              console.log('does not exist');
             }
           });
       }
@@ -150,7 +154,7 @@ export class App extends Component {
     const { loggedIn, loaded, status, fontsLoaded } = this.state;
     if (!loaded || !fontsLoaded) {
       return (
-        <View style={{ flex: 1, justifyContent: "center" }}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
           <AppLoading />
         </View>
       );
@@ -159,23 +163,29 @@ export class App extends Component {
     if (!loggedIn) {
       return (
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Landing">
+          <Stack.Navigator initialRouteName='Landing'>
             <Stack.Screen
-              name="Landing"
+              name='Landing'
               component={LandingScreen}
               options={{ headerShown: false, headerBackTitleVisible: false }}
             />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name='Register' component={RegisterScreen} />
+            <Stack.Screen name='Login' component={LoginScreen} />
             <Stack.Screen
-              name="ResetPassword"
+              name='ResetPassword'
               component={ResetPassword}
-              options={{ headerTitle: "Reset Password", headerBackTitleVisible: false }}
+              options={{
+                headerTitle: 'Reset Password',
+                headerBackTitleVisible: false,
+              }}
             />
             <Stack.Screen
-              name="LectureRegister"
+              name='LectureRegister'
               component={LectureRegister}
-              options={{ headerTitle: "Register", headerBackTitleVisible: false }}
+              options={{
+                headerTitle: 'Register',
+                headerBackTitleVisible: false,
+              }}
             />
           </Stack.Navigator>
         </NavigationContainer>
@@ -186,107 +196,134 @@ export class App extends Component {
       return (
         <Provider store={store}>
           <NavigationContainer>
-            <Stack.Navigator initialRouteName="Main2">
+            <Stack.Navigator initialRouteName='Main2'>
               <Stack.Screen
-                name="Main2"
+                name='Main2'
                 component={LectureMainScreen}
                 options={{ headerShown: false, headerBackTitleVisible: false }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="LectureDiscussionView"
-                options={{ headerTitle: "Discussion", headerBackTitleVisible: false }}
+                name='LectureDiscussionView'
+                options={{
+                  headerTitle: 'Discussion',
+                  headerBackTitleVisible: false,
+                }}
                 component={LectureDiscussionView}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="EditProfile"
+                name='EditProfile'
                 component={EditProfile}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="Change Password"
+                name='Change Password'
                 component={EditPassword}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="Filter Feed"
+                name='Filter Feed'
                 component={FilterFeed}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="Search Results"
+                name='Search Results'
                 component={Search}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="Reply Discussion"
+                name='Reply Discussion'
                 component={Reply}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="Create Room"
+                name='Create Room'
                 component={CreateRoom}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="View Room"
+                name='View Room'
                 component={ViewRoom}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="RoomReplyComment"
+                name='RoomReplyComment'
                 component={RoomReplyComment}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Replies", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Replies',
+                  headerBackTitleVisible: false,
+                }}
               />
               <Stack.Screen
-                name="ViewRequest"
+                name='ViewRequest'
                 component={ViewRequest}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "View Request", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'View Request',
+                  headerBackTitleVisible: false,
+                }}
               />
               <Stack.Screen
-                name="ViewDetailMentor"
+                name='ViewDetailMentor'
                 component={ViewDetailMentor}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Details", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Details',
+                  headerBackTitleVisible: false,
+                }}
               />
               <Stack.Screen
-                name="ViewDetailMentee"
+                name='ViewDetailMentee'
                 component={ViewDetailMentee}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Details", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Details',
+                  headerBackTitleVisible: false,
+                }}
               />
               <Stack.Screen
-                name="AddInGroup"
+                name='AddInGroup'
                 component={AddInGroup}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Available Group", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Available Group',
+                  headerBackTitleVisible: false,
+                }}
               />
               <Stack.Screen
-                name="AddInGroupV2"
+                name='AddInGroupV2'
                 component={AddInGroupV2}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Available Group" }}
+                options={{ headerTitle: 'Available Group' }}
               />
               <Stack.Screen
-                name="GroupDetail"
+                name='GroupDetail'
                 component={GroupDetail}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Group Info", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Group Info',
+                  headerBackTitleVisible: false,
+                }}
               />
               <Stack.Screen
-                name="ViewRequestCreateRoom"
+                name='ViewRequestCreateRoom'
                 component={ViewRequestCreateRoom}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Member List", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Member List',
+                  headerBackTitleVisible: false,
+                }}
               />
               <Stack.Screen
-                name="GroupStats"
+                name='GroupStats'
                 component={GroupStats}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Group Statistics", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Group Statistics',
+                  headerBackTitleVisible: false,
+                }}
               />
             </Stack.Navigator>
           </NavigationContainer>
@@ -298,22 +335,28 @@ export class App extends Component {
       return (
         <Provider store={store}>
           <NavigationContainer>
-            <Stack.Navigator initialRouteName="Main3">
+            <Stack.Navigator initialRouteName='Main3'>
               <Stack.Screen
-                name="Main3"
+                name='Main3'
                 component={AdminMainScreen}
                 options={{ headerShown: false, headerBackTitleVisible: false }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="ViewDiscussion"
-                options={{ headerTitle: "Discussion", headerBackTitleVisible: false }}
+                name='ViewDiscussion'
+                options={{
+                  headerTitle: 'Discussion',
+                  headerBackTitleVisible: false,
+                }}
                 component={ViewDiscussion}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="ViewReply"
-                options={{ headerTitle: "Replies", headerBackTitleVisible: false}}
+                name='ViewReply'
+                options={{
+                  headerTitle: 'Replies',
+                  headerBackTitleVisible: false,
+                }}
                 component={ViewReply}
                 navigation={this.props.navigation}
               />
@@ -327,132 +370,168 @@ export class App extends Component {
       return (
         <Provider store={store}>
           <NavigationContainer>
-            <Stack.Navigator initialRouteName="StudentMain">
+            <Stack.Navigator initialRouteName='StudentMain'>
               <Stack.Screen
-                name="StudentMain"
+                name='StudentMain'
                 component={MainScreen}
                 options={{ headerShown: false, headerBackTitleVisible: false }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="Add Discussion"
+                name='Add Discussion'
                 component={AddScreen}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Created Discussions"
+                name='Created Discussions'
                 component={CreatedDiscussion}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Activity Tracking"
+                name='Activity Tracking'
                 component={ActivityTracking}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Filter Feed"
+                name='Filter Feed'
                 component={FilterFeed}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Favorite Discussion"
+                name='Favorite Discussion'
                 component={FavoriteDiscussion}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Discussion"
+                name='Discussion'
                 options={{ headerBackTitleVisible: false }} // add for everything to make ammend in ios
                 component={DiscussionTitle}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="Created Discussion"
-                options={{ headerTitle: "Discussion", headerBackTitleVisible: false }}
+                name='Created Discussion'
+                options={{
+                  headerTitle: 'Discussion',
+                  headerBackTitleVisible: false,
+                }}
                 component={EditDeleteDiscussion}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="Edit Discussion"
+                name='Edit Discussion'
                 component={EditDiscussion}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="EditProfile"
-                options={{ headerTitle: "Edit Profile", headerBackTitleVisible: false }}
+                name='EditProfile'
+                options={{
+                  headerTitle: 'Edit Profile',
+                  headerBackTitleVisible: false,
+                }}
                 component={EditProfile}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="EditComment"
+                name='EditComment'
                 component={EditComment}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Post Comment"
+                name='Post Comment'
                 component={PostComment}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Search Results"
+                name='Search Results'
                 component={Search}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Change Password"
+                name='Change Password'
                 component={EditPassword}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Reply Discussion"
+                name='Reply Discussion'
                 component={Reply}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="Choose"
+                name='Choose'
                 component={Choose}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="RequestForMentor"
+                name='RequestForMentor'
                 component={RequestForMentor}
-                options={{ headerTitle: "Request For Mentor", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Request For Mentor',
+                  headerBackTitleVisible: false,
+                }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="RequestToBeMentor"
+                name='RequestToBeMentor'
                 component={RequestToBeMentor}
-                options={{ headerTitle: "Request To Be Mentor", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Request To Be Mentor',
+                  headerBackTitleVisible: false,
+                }}
                 navigation={this.props.navigation}
               />
               <Stack.Screen
-                name="View Room"
+                name='View Room'
                 component={ViewRoom}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="RoomReplyComment"
+                name='RoomReplyComment'
                 component={RoomReplyComment}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Replies", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Replies',
+                  headerBackTitleVisible: false,
+                }}
               />
               <Stack.Screen
-                name="GroupDetail"
+                name='GroupDetail'
                 component={GroupDetail}
                 navigation={this.props.navigation}
-                options={{ headerTitle: "Group Info", headerBackTitleVisible: false }}
+                options={{
+                  headerTitle: 'Group Info',
+                  headerBackTitleVisible: false,
+                }}
+              />
+              <Stack.Screen
+                name='Contribution'
+                component={ContributionPoints}
+                options={{ headerTitle: 'Awards Received' }}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='AvailableAwards'
+                component={AvailableAwards}
+                options={{ headerTitle: 'Available Awards' }}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='LeaderBoard'
+                component={LeaderBoard}
+                options={{ headerTitle: 'LeaderBoard' }}
+                navigation={this.props.navigation}
               />
             </Stack.Navigator>
           </NavigationContainer>

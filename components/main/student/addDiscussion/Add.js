@@ -149,6 +149,7 @@ function Add(props) {
           image: currentUser.image,
           favBy: [],
           creation: firebase.firestore.FieldValue.serverTimestamp(),
+          noOfComments: 0 //change for contribution
         })
         .then(function () {
           setModalVisible(!isModalVisible);
@@ -171,6 +172,7 @@ function Add(props) {
         postedBy: currentUser.name,
         favBy: [],
         creation: firebase.firestore.FieldValue.serverTimestamp(),
+        noOfComments: 0 // changes for contribution
       })
       .then(function () {
         setModalVisible(!isModalVisible);

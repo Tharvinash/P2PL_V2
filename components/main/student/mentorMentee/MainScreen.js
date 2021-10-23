@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   Dimensions,
   RefreshControl,
-} from "react-native";
-import { SpeedDial } from "react-native-elements";
-import { connect } from "react-redux";
-import { timeDifference } from "../../../utils";
-import { Icon } from "react-native-elements";
-import firebase from "firebase";
-require("firebase/firestore");
+} from 'react-native';
+import { SpeedDial } from 'react-native-elements';
+import { connect } from 'react-redux';
+import { timeDifference } from '../../../utils';
+import { Icon } from 'react-native-elements';
+import firebase from 'firebase';
+require('firebase/firestore');
 
 function MainScreen(props) {
   const { discussionroom, currentUser } = props;
@@ -22,18 +22,16 @@ function MainScreen(props) {
   if (currentUser === null || currentUser.filteredFeed === null) {
     return <View />;
   }
-
-  const [post, setPost] = useState(discussionroom);
+  const userId = firebase.auth().currentUser.uid;
+  const [post, setPost] = useState([]);
   const [open, setOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-
+  useEffect(() => {
     firebase
       .firestore()
-      .collection("DiscussionRoom")
-      .orderBy("creation", "desc")
+      .collection('DiscussionRoom')
+      .orderBy('creation', 'desc')
       .get()
       .then((snapshot) => {
         let posts = snapshot.docs.map((doc) => {
@@ -41,32 +39,61 @@ function MainScreen(props) {
           const id = doc.id;
           return { id, ...data };
         });
-        setPost(posts);
-        setRefreshing(false);
-      });
 
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setCu(snapshot.data().filteredFeed);
-        } else {
-          console.log("does not exist");
+        //setPost(posts);
+        const x = [];
+        for (var i = 0; i < posts.length; i++) {
+          if (posts[i].groupMember.some((el) => el.userId === userId)) {
+            x.push(posts[i]);
+            setPost(x);
+            console.log(posts[i]);
+          } else {
+            console.log(25);
+          }
         }
       });
-    setRefreshing(false);
-  }, [refreshing]);
+  }, []);
+
+  // const onRefresh = useCallback(() => {
+  //   setRefreshing(true);
+
+  //   firebase
+  //     .firestore()
+  //     .collection('DiscussionRoom')
+  //     .orderBy('creation', 'desc')
+  //     .get()
+  //     .then((snapshot) => {
+  //       let posts = snapshot.docs.map((doc) => {
+  //         const data = doc.data();
+  //         const id = doc.id;
+  //         return { id, ...data };
+  //       });
+  //       setPost(posts);
+  //       setRefreshing(false);
+  //     });
+
+  //   firebase
+  //     .firestore()
+  //     .collection('users')
+  //     .doc(firebase.auth().currentUser.uid)
+  //     .get()
+  //     .then((snapshot) => {
+  //       if (snapshot.exists) {
+  //         setCu(snapshot.data().filteredFeed);
+  //       } else {
+  //         console.log('does not exist');
+  //       }
+  //     });
+  //   setRefreshing(false);
+  // }, [refreshing]);
 
   return (
     <View style={styles.container}>
       <View style={{ margin: 8 }}>
         <FlatList
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          // refreshControl={
+          //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          // }
           horizontal={false}
           data={post}
           renderItem={({ item }) => (
@@ -75,14 +102,14 @@ function MainScreen(props) {
                 <TouchableOpacity
                   style={{ flex: 1 }}
                   onPress={() =>
-                    props.navigation.navigate("View Room", {
+                    props.navigation.navigate('View Room', {
                       did: item.id,
                     })
                   }
                 >
-                  <View style={{ flexDirection: "row" }}>
-                    <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                      <View style={{ flexDirection: "row", width: "100%" }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+                      <View style={{ flexDirection: 'row', width: '100%' }}>
                         <View style={{ flex: 1 }}>
                           <Text numberOfLines={2} style={styles.title}>
                             {item.title}
@@ -104,8 +131,8 @@ function MainScreen(props) {
         />
         <SpeedDial
           isOpen={open}
-          icon={{ name: "edit", color: "#fff" }}
-          openIcon={{ name: "close", color: "#fff" }}
+          icon={{ name: 'edit', color: '#fff' }}
+          openIcon={{ name: 'close', color: '#fff' }}
           onOpen={() => setOpen(!open)}
           onClose={() => setOpen(!open)}
         >
@@ -113,25 +140,25 @@ function MainScreen(props) {
             icon={
               <Icon
                 reverse
-                name="chalkboard-teacher"
-                type="font-awesome-5"
-                color="#140F38"
+                name='chalkboard-teacher'
+                type='font-awesome-5'
+                color='#140F38'
               />
             }
-            title="Request To Be Mentor"
-            onPress={() => props.navigation.navigate("RequestToBeMentor")}
+            title='Request To Be Mentor'
+            onPress={() => props.navigation.navigate('RequestToBeMentor')}
           />
           <SpeedDial.Action
             icon={
               <Icon
                 reverse
-                name="user-graduate"
-                type="font-awesome-5"
-                color="#140F38"
+                name='user-graduate'
+                type='font-awesome-5'
+                color='#140F38'
               />
             }
-            title="Request For Mentor"
-            onPress={() => props.navigation.navigate("RequestForMentor")}
+            title='Request For Mentor'
+            onPress={() => props.navigation.navigate('RequestForMentor')}
           />
         </SpeedDial>
       </View>
@@ -142,9 +169,9 @@ function MainScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   image: {
@@ -152,29 +179,29 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 1,
   },
   postedTime: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   userName: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "PoppinsMedium",
+    fontFamily: 'PoppinsMedium',
   },
 
   card: {
     //16
-    borderRadius: Dimensions.get("window").width / 24.5,
+    borderRadius: Dimensions.get('window').width / 24.5,
     elevation: 5,
-    backgroundColor: "#003565",
+    backgroundColor: '#003565',
     shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.3,
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: Dimensions.get("window").width * 0.95,
+    width: Dimensions.get('window').width * 0.95,
   },
 
   cardContent: {
@@ -183,15 +210,15 @@ const styles = StyleSheet.create({
   },
 
   faculty: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   title: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 25,
-    fontFamily: "PoppinsSemiBold",
+    fontFamily: 'PoppinsSemiBold',
     lineHeight: 30,
   },
 });
