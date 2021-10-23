@@ -55,11 +55,12 @@ function requestformentor(props) {
         description: desc,
         problems: finalValue,
         image: user.image,
-        matricNumber: user.matricNumber,
+        //commenting out just for testing purpose
+        //matricNumber: user.matricNumber,
         userId,
       })
       .then(function () {
-        console.log("Done");
+        props.navigation.goBack();
       });
   };
 
