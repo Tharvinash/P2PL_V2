@@ -18,7 +18,7 @@ function Room(props) {
 
   const [data, setData] = useState(0);
   const { discussionroom } = props;
-  const [post, setPost] = useState(discussionroom);
+  const [post, setPost] = useState([]);
   const userId = firebase.auth().currentUser.uid;
 
   useFocusEffect(

@@ -9,7 +9,7 @@ function AddInGroupV2(props) {
   const [data, setData] = useState(0);
   const [info, setInfo] = useState([]);
   const { discussionroom } = props;
-  const [post, setPost] = useState(discussionroom);
+  const [post, setPost] = useState([]);
   const [added, setAdded] = useState(false);
   const userId = firebase.auth().currentUser.uid;
   const infoId = props.route.params.did;
