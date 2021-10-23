@@ -43,13 +43,13 @@ function requesttobementor(props) {
 
   const uploadDoc = async () => {
     if (name != null) {
-      if (name.contains('.docx')) {
-        const childPath = `doc/${1234}/${name}`;
-        console.log(childPath);
-      } else {
-        const childPath = `doc/${1234}/${Math.random().toString(36)}`;
-        console.log(childPath);
-      }
+      // if (name.includes('.docx')) {
+      //   const childPath = `doc/${1234}/${name}`;
+      //   console.log(childPath);
+      // } else {
+      const childPath = `doc/${1234}/${Math.random().toString(36)}`;
+      console.log(childPath);
+      //}
 
       const response = await fetch(Doc);
       const blob = await response.blob();
@@ -106,11 +106,12 @@ function requesttobementor(props) {
         qualification,
         problems: finalValue,
         image: user.image,
-        matricNumber: user.matricNumber,
+        //commented out for testing purpose
+        //matricNumber: user.matricNumber,
         userId,
       })
       .then(function () {
-        console.log('Done');
+        props.navigation.goBack();
       });
   };
 
@@ -124,7 +125,7 @@ function requesttobementor(props) {
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Matric NUmber: {user.matricNumber}</Text>
+            <Text style={styles.label}>Matric Number: {user.matricNumber}</Text>
           </View>
         </View>
         <View style={styles.form}>
@@ -213,6 +214,7 @@ function requesttobementor(props) {
             <Text style={styles.label}>Proves: </Text>
           </View>
         </View>
+        {name ? (<View style={styles.attachment}><Text>{name}</Text></View>) : null}
 
         <View
           style={{ justifyContent: 'center', marginLeft: 20, marginBottom: 10 }}
@@ -237,7 +239,7 @@ function requesttobementor(props) {
 
 const styles = StyleSheet.create({
   form: {
-    marginLeft: 20,
+    marginHorizontal: 20,
     marginVertical: 10,
   },
   formControl: {
@@ -264,6 +266,18 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
+  },
+
+  attachment: {
+    backgroundColor: "#808080",
+    height: 45,
+    marginHorizontal: 20,
+    borderColor: "#000",
+    borderRadius: 5,
+    justifyContent: "center",
+    paddingLeft: 10,
+    elevation: 2,
+    marginVertical: 3,
   },
 
   logout: {
