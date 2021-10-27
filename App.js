@@ -530,7 +530,7 @@ export class App extends Component {
               <Stack.Screen
                 name='LeaderBoard'
                 component={LeaderBoard}
-                options={{ headerTitle: 'LeaderBoard' }}
+                options={{ headerTitle: 'Leaderboard' }}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>

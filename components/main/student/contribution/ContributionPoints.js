@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
@@ -97,7 +98,24 @@ const ContributionPoints = (props) => {
     <View style={styles.screen}>
       <View style={styles.title}>
         <Text style={styles.titleText}>{title}</Text>
-				<View></View>
+        <Text style={styles.pointsText}>
+          {/* Total Points:{' '} */}
+          {isLoading ? (
+            <View style={styles.spinner}>
+              <ActivityIndicator size='small' color='orange' />
+            </View>
+          ) : (
+            <View style={{flexDirection:'row'}}>
+              <Text
+                style={{ fontSize: 23, fontWeight: 'bold', fontFamily: 'Poppins', color:'#fff'}}
+              >
+                {currentUserData.totalPoints} 
+              </Text>
+              <Text style={{ fontSize: 20,fontFamily: 'Poppins', color:'#fff'}}> points</Text>
+            </View>
+          )}
+        </Text>
+        <View></View>
       </View>
       <View style={styles.listContainer}>
         {isLoading ? (
@@ -124,23 +142,6 @@ const ContributionPoints = (props) => {
           />
         )}
       </View>
-      <View style={styles.points}>
-        <Text style={styles.pointsText}>
-          Total Points:{' '}
-          {isLoading ? (
-            <View style={styles.spinner}>
-              <ActivityIndicator size='small' color='orange' />
-            </View>
-          ) : (
-            <Text
-              numberOfLines={2}
-              style={{ fontSize: 18, fontWeight: 'bold' }}
-            >
-              {currentUserData.totalPoints}
-            </Text>
-          )}
-        </Text>
-      </View>
     </View>
   );
 };
@@ -153,21 +154,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#140F38',
   },
   title: {
-    marginBottom: 15,
-    marginTop: 10,
+    marginVertical: 10,
+    paddingVertical:40,
     backgroundColor: '#694fad',
-    paddingHorizontal: 15,
-    paddingBottom: 3,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    width: Dimensions.get('window').width * 0.7,
+    height: Dimensions.get('window').width * 0.15,
   },
   titleText: {
     fontFamily: 'Poppins',
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: '700',
     color: 'white',
-    textDecorationLine: 'underline',
+    // textDecorationLine: 'underline',
   },
   text: {
     fontFamily: 'Poppins',
@@ -202,13 +203,13 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   listContainer: {
-    height: '70%',
+    height: '80%',
     width: '100%',
-    borderRadius: 40,
+    borderRadius: 10,
     overflow: 'hidden',
     elevation: 20,
     backgroundColor: '#003565',
-    marginHorizontal: 5,
+    marginHorizontal: 10,
   },
   spinner: {
     flex: 1,
