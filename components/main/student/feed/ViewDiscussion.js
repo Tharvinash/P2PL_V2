@@ -1189,6 +1189,7 @@ function ViewDiscussion(props) {
               onSelect={() =>
                 props.navigation.navigate('Reply Discussion', {
                   cid: item.id,
+                  did : discussionId,
                   time: timeDifference(new Date(), item.creation.toDate()),
                   xxx: item.likeBy.includes(userId),
                   mainCommentAuthorName: item.postedBy,

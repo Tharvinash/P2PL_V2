@@ -28,6 +28,7 @@ import { ListItem, BottomSheet } from 'react-native-elements';
 
 function Reply(props) {
   const { currentUser } = props;
+  const discussionId = props.route.params.did;
   const [currentUserName, setCurrentUserName] = useState(currentUser.name);
   const [loginCurrentUser, setLoginCurrentUser] = useState(currentUser);
   const [mainCommentId, setMainCommentId] = useState(props.route.params.cid);
