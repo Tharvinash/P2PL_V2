@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "p2pl",
+    "name": "P2Pl",
     "slug": "p2pl",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,6 +20,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package":"p2pl.fyp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
