@@ -98,6 +98,7 @@ import StudentData from './components/main/admin/StudentDataHandle/StudentData';
 import LectureData from './components/main/admin/StudentDataHandle/LectureData';
 import ViewLectureDetail from './components/main/admin/StudentDataHandle/ViewLectureDetail';
 import ViewStudentDetail from './components/main/admin/StudentDataHandle/ViewStudentDetail';
+import UploadStudentEmail from './components/main/admin/StudentDataHandle/UploadStudentEmail';
 
 //Contribution
 import ContributionPoints from './components/main/student/contribution/ContributionPoints';
@@ -418,6 +419,15 @@ export class App extends Component {
                   headerBackTitleVisible: false,
                 }}
                 component={ViewStudentDetail}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='UploadStudentEmail'
+                options={{
+                  headerTitle: 'Upload Student Email',
+                  headerBackTitleVisible: false,
+                }}
+                component={UploadStudentEmail}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>

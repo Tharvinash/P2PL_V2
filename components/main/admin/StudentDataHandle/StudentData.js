@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Dimensions,
+  TextInput,
 } from 'react-native';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
@@ -55,8 +56,38 @@ function StudentData(props) {
     setFilter(id);
   };
 
+  const fetchUsers = (search) => {
+    firebase
+      .firestore()
+      .collection('users')
+      .where(
+        'name',
+        '>=',
+        search,
+        '&&',
+        'year',
+        '==',
+        filter,
+        '&&',
+        'faculty',
+        '==',
+        faculty
+      )
+      .get()
+      .then((snapshot) => {
+        let users = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        const updatedUser = users.filter((e) => e.faculty === faculty);
+        console.log(updatedUser);
+        setData(updatedUser);
+      });
+  };
+
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={list}
         horizontal
@@ -81,6 +112,17 @@ function StudentData(props) {
           </View>
         )}
       />
+      <View>
+        <TextInput
+          underlineColorAndroid='transparent'
+          placeholder='Search Discussion'
+          placeholderTextColor='#000'
+          autoCapitalize='none'
+          onChangeText={(search) => fetchUsers(search)}
+          style={{ paddingLeft: 10, fontSize: 18 }}
+        />
+      </View>
+
       <FlatList
         horizontal={false}
         extraData={data}
