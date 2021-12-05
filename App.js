@@ -92,6 +92,12 @@ import GroupStats from './components/main/lecture/MentorMentee/GroupStats';
 import AdminMainScreen from './components/AdminMain';
 import ViewDiscussion from './components/main/admin/ReportDiscussion/ViewDiscussion';
 import ViewReply from './components/main/admin/ReportDiscussion/ViewReply';
+import FacultyRoomStudent from './components/main/admin/StudentDataHandle/FacultyRoomStudent';
+import FacultyRoomLecture from './components/main/admin/StudentDataHandle/FacultyRoomLecture';
+import StudentData from './components/main/admin/StudentDataHandle/StudentData';
+import LectureData from './components/main/admin/StudentDataHandle/LectureData';
+import ViewLectureDetail from './components/main/admin/StudentDataHandle/ViewLectureDetail';
+import ViewStudentDetail from './components/main/admin/StudentDataHandle/ViewStudentDetail';
 
 //Contribution
 import ContributionPoints from './components/main/student/contribution/ContributionPoints';
@@ -358,6 +364,60 @@ export class App extends Component {
                   headerBackTitleVisible: false,
                 }}
                 component={ViewReply}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='FacultyRoomLecture'
+                options={{
+                  headerTitle: 'Faculty',
+                  headerBackTitleVisible: false,
+                }}
+                component={FacultyRoomLecture}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='FacultyRoomStudent'
+                options={{
+                  headerTitle: 'Faculty',
+                  headerBackTitleVisible: false,
+                }}
+                component={FacultyRoomStudent}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='LectureData'
+                options={{
+                  headerTitle: 'Lecture Data',
+                  headerBackTitleVisible: false,
+                }}
+                component={LectureData}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='StudentData'
+                options={{
+                  headerTitle: 'Student Data',
+                  headerBackTitleVisible: false,
+                }}
+                component={StudentData}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='ViewLectureDetail'
+                options={{
+                  headerTitle: 'Lecture Detail',
+                  headerBackTitleVisible: false,
+                }}
+                component={ViewLectureDetail}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='ViewStudentDetail'
+                options={{
+                  headerTitle: 'Student Detail',
+                  headerBackTitleVisible: false,
+                }}
+                component={ViewStudentDetail}
                 navigation={this.props.navigation}
               />
             </Stack.Navigator>

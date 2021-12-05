@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -9,24 +9,24 @@ import {
   Image,
   Dimensions,
   ScrollView,
-} from "react-native";
-import { Icon } from "react-native-elements";
-import { connect } from "react-redux";
-import firebase from "firebase";
-require("firebase/firestore");
-import DropDownPicker from "react-native-dropdown-picker";
+} from 'react-native';
+import { Icon } from 'react-native-elements';
+import { connect } from 'react-redux';
+import firebase from 'firebase';
+require('firebase/firestore');
+import DropDownPicker from 'react-native-dropdown-picker';
 
 function Profile(props) {
   const userId = firebase.auth().currentUser.uid;
   const { currentUser, posts } = props;
   const [refreshing, setRefreshing] = useState(false);
   const [user, setUser] = useState(currentUser);
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState('');
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
-    { label: "Edit Personal Info", value: "pi" },
-    { label: "Edit Password", value: "ep" },
+    { label: 'Edit Personal Info', value: 'pi' },
+    { label: 'Edit Password', value: 'ep' },
   ]);
 
   const onLogout = () => {
@@ -37,7 +37,7 @@ function Profile(props) {
     React.useCallback(() => {
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(firebase.auth().currentUser.uid)
         .get()
         .then((snapshot) => {
@@ -45,7 +45,7 @@ function Profile(props) {
             setUser(snapshot.data());
             //console.log(snapshot.data())
           } else {
-            console.log("does not exist");
+            console.log('does not exist');
           }
         });
     }, [])
@@ -56,17 +56,17 @@ function Profile(props) {
   }
 
   const xxx = (x) => {
-    if (x === "pi") {
-      props.navigation.navigate("EditProfile", { uid: userId });
+    if (x === 'pi') {
+      props.navigation.navigate('EditProfile', { uid: userId });
     }
-    if (x === "ep") {
-      props.navigation.navigate("Change Password");
+    if (x === 'ep') {
+      props.navigation.navigate('Change Password');
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={{ alignItems: "center", marginBottom: 20 }}>
+      <View style={{ alignItems: 'center', marginBottom: 20 }}>
         <Image
           style={{
             width: 140,
@@ -83,6 +83,32 @@ function Profile(props) {
       <View>
         <Text style={styles.us}>{user.name}</Text>
       </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => props.navigation.navigate('FacultyRoomStudent')}
+      >
+        <Text style={styles.text}>Student Details</Text>
+        <Icon
+          style={styles.arrow}
+          name='chevron-forward-outline'
+          type='ionicon'
+          size={20}
+          color='#3C3A36'
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => props.navigation.navigate('FacultyRoomLecture')}
+      >
+        <Text style={styles.text}>Staff Details</Text>
+        <Icon
+          style={styles.arrow}
+          name='chevron-forward-outline'
+          type='ionicon'
+          size={20}
+          color='#3C3A36'
+        />
+      </TouchableOpacity>
       {/* <View style={styles.bb}>
         <DropDownPicker
           placeholder="Edit"
@@ -118,14 +144,14 @@ function Profile(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   button: {
-    alignItems: "center",
-    backgroundColor: "#E3562A",
+    alignItems: 'center',
+    backgroundColor: '#E3562A',
     padding: 14,
     borderRadius: 20,
     width: 275,
@@ -133,43 +159,43 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   text: {
-    color: "white",
+    color: 'white',
     fontSize: 18,
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
-    alignItems: "flex-end",
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
+    alignItems: 'flex-end',
   },
 
   arrow: {
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
     left: 20,
   },
 
   logout: {
     width: 160,
     height: 40,
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E3562A",
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 20,
   },
 
   Ltext: {
-    color: "#000000",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#000000',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     paddingTop: 8,
   },
 
   title: {
     width: 160,
     height: 40,
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E3562A",
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 10,
     left: 100,
@@ -179,8 +205,8 @@ const styles = StyleSheet.create({
   edit: {
     width: 160,
     height: 40,
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E3562A",
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 10,
     marginHorizontal: 10,
@@ -190,39 +216,39 @@ const styles = StyleSheet.create({
     width: 160,
     height: 42,
     left: 20,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
 
     marginHorizontal: 110,
   },
 
   bb: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 40,
     marginVertical: 20,
   },
 
   image: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
 
   imageContainer: {
-    borderRadius: (Dimensions.get("window").width * 0.7) / 2,
-    borderColor: "black",
+    borderRadius: (Dimensions.get('window').width * 0.7) / 2,
+    borderColor: 'black',
     borderWidth: 3,
-    width: Dimensions.get("window").width * 0.3,
-    height: Dimensions.get("window").width * 0.3,
-    overflow: "hidden",
-    marginVertical: Dimensions.get("window").height / 30,
+    width: Dimensions.get('window').width * 0.3,
+    height: Dimensions.get('window').width * 0.3,
+    overflow: 'hidden',
+    marginVertical: Dimensions.get('window').height / 30,
   },
 
   us: {
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
-    color: "#fff",
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
+    color: '#fff',
     fontSize: 24,
     marginTop: -20,
   },
