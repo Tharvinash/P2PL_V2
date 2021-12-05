@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -6,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { FAB } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
@@ -15,22 +17,80 @@ require('firebase/firestore');
 function ViewStudentDetail(props) {
   const [info, setInfo] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [matricNum, setMatricNum] = useState('');
+  const [fac, setFac] = useState('');
+  const [year, setYear] = useState('');
+  const [data, setData] = useState(0);
   const infoId = props.route.params.did;
 
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row', paddingRight: 15 }}>
+          <TouchableOpacity>
+            <Icon
+              name='create-outline'
+              type='ionicon'
+              size={30}
+              color='#000'
+              onPress={() => {
+                setIsEdit(true);
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, []);
+
+
   useEffect(() => {
+    fetchData();
+  }, [data]);
+
+
+  const save = () => {
+    //console.log({ name, email, matricNum, fac, year });
     firebase
       .firestore()
       .collection('users')
       .doc(infoId)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setInfo(snapshot.data());
-        } else {
-          console.log('does not exist');
-        }
+      .update({
+        name: name,
+        creation: firebase.firestore.FieldValue.serverTimestamp(),
+        year: year,
+        email,
+        faculty: fac,
+        year: year,
+        matricNumber: matricNum,
+      })
+      .then(() => {
+        setIsEdit(false);
+        fetchData();
       });
-  }, []);
+  };
+
+  const fetchData = () =>{
+    firebase
+    .firestore()
+    .collection('users')
+    .doc(infoId)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.exists) {
+        setInfo(snapshot.data());
+        setName(snapshot.data().name);
+        setEmail(snapshot.data().email);
+        setMatricNum(snapshot.data().matricNumber);
+        setFac(snapshot.data().faculty);
+        setYear(snapshot.data().year);
+      } else {
+        console.log('does not exist');
+      }
+    });
+  }
 
   const OriData = () => {
     return (
@@ -70,84 +130,61 @@ function ViewStudentDetail(props) {
 
   const EditData = () => {
     return (
-      <View style={{ flex: 1 }}>
-        <ScrollView>
-          <View style={styles.form}>
-            <View style={styles.formControl}>
-              <Text style={styles.label}>Name: {info.name} </Text>
-            </View>
-          </View>
-          <View style={styles.form}>
-            <View style={styles.formControl}>
-              <Text style={styles.label}>
-                Matric Number: {info.matricNumber}{' '}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.form}>
-            <View style={styles.formControl}>
-              <Text style={styles.label}>Email: {info.email} </Text>
-            </View>
-          </View>
-          <View style={styles.form}>
-            <View style={styles.formControl}>
-              <Text style={styles.label}>Faculty: {info.faculty}</Text>
-            </View>
-          </View>
-          <View style={styles.form}>
-            <View style={styles.formControl}>
-              <Text style={styles.label}>Year: {info.year} </Text>
-            </View>
-          </View>
-        </ScrollView>
-      </View>
-    );
-  };
-
-  if (isEdit) {
-    return (
       <View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>User Id</Text>
+            <Text style={styles.label}>Name : </Text>
             <TextInput
               style={styles.input}
-              value={userId}
-              onChangeText={(userId) => setUserId(userId)}
+              value={name}
+              onChangeText={(name) => setName(name)}
             />
           </View>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Year of Study</Text>
-            <SelectPicker
-              placeholder={year}
-              placeholderStyle={{
-                fontFamily: 'Poppins',
-                fontSize: 15,
-                color: '#000',
-                marginTop: 5,
-              }}
-              onSelectedStyle={{
-                fontSize: 15,
-                color: '#000',
-              }}
+            <Text style={styles.label}>Matric Number :</Text>
+            <TextInput
               style={styles.input}
-              onValueChange={setYear}
-              selected={year}
-            >
-              {Object.values(options).map((val, index) => (
-                <SelectPicker.Item label={val} value={val} key={index} />
-              ))}
-            </SelectPicker>
+              value={matricNum}
+              onChangeText={(matricNum) => setMatricNum(matricNum)}
+            />
+          </View>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Email :</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={(email) => setEmail(email)}
+            />
+          </View>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Faculty :</Text>
+            <TextInput
+              style={styles.input}
+              value={fac}
+              onChangeText={(fac) => setFac(fac)}
+            />
+          </View>
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Year of Study :</Text>
+            <TextInput
+              style={styles.input}
+              value={year}
+              onChangeText={(year) => setYear(year)}
+            />
           </View>
         </View>
 
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity style={styles.logout} onPress={() => Save()}>
+          <TouchableOpacity style={styles.logout} onPress={() => save()}>
             <Text style={styles.Ltext}>Save Changes</Text>
           </TouchableOpacity>
         </View>
       </View>
     );
+  };
+
+  if (isEdit) {
+    return EditData();
   }
 
   return OriData();
