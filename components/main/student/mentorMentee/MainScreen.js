@@ -9,7 +9,7 @@ import {
   Dimensions,
   RefreshControl,
 } from 'react-native';
-import { SpeedDial } from 'react-native-elements';
+import { SpeedDial, FAB } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { timeDifference } from '../../../utils';
 import { Icon } from 'react-native-elements';
@@ -161,6 +161,7 @@ function MainScreen(props) {
             onPress={() => props.navigation.navigate('RequestForMentor')}
           />
         </SpeedDial>
+        
       </View>
     </View>
   );

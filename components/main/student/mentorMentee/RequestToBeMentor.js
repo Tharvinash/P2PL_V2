@@ -7,8 +7,8 @@ import {
   Dimensions,
   TouchableOpacity,
   ScrollView,
-  CheckBox,
 } from 'react-native';
+import CheckBox from 'expo-checkbox';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 require('firebase/firestore');
