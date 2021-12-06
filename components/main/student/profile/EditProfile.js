@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,16 @@ import {
   Dimensions,
   TouchableOpacity,
   ActivityIndicator,
-} from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { connect } from "react-redux";
-import firebase from "firebase";
-import SelectPicker from "react-native-form-select-picker";
-import * as ImagePicker from "expo-image-picker";
-import Modal from "react-native-modal";
-require("firebase/firestore");
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { connect } from 'react-redux';
+import firebase from 'firebase';
+import { Icon } from "react-native-elements";
+import { FAB } from "react-native-elements";
+import SelectPicker from 'react-native-form-select-picker';
+import * as ImagePicker from 'expo-image-picker';
+import Modal from 'react-native-modal';
+require('firebase/firestore');
 function EditProfile(props) {
   const { currentUser, comments, posts } = props;
   const [nameToBeEditted, setNameToBeEditted] = useState(
@@ -24,9 +26,13 @@ function EditProfile(props) {
   const [comment, setComment] = useState(comments);
   const [cntbu, setCntbu] = useState([]);
   const [discussion, setDiscussion] = useState(posts);
+  const [facultyData, setFacultyData] = useState([]);
   const [dntbc, setDntbc] = useState([]);
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState('');
+  const [status, setStatus] = useState(1);
   const [year, setYear] = useState(0);
+  const [matricNum, setMatricNum] = useState('');
+  const [fac, setFac] = useState('');
   const [image, setImage] = useState(null);
   const [imageChanged, setImageChanged] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -34,17 +40,32 @@ function EditProfile(props) {
   let options = [1, 2, 3, 4, 5];
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const defaultImage =
-    "https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/default%2FnewProfile.png?alt=media&token=b2e22482-506a-4e78-ae2e-e38c83ee7c27";
+    'https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/default%2FnewProfile.png?alt=media&token=b2e22482-506a-4e78-ae2e-e38c83ee7c27';
 
   useEffect(() => {
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(props.route.params.uid)
       .get()
       .then((snapshot) => {
         setUserId(snapshot.data().name);
         setYear(snapshot.data().year);
+        setFac(snapshot.data().faculty);
+        setStatus(snapshot.data().status);
+        setMatricNum(snapshot.data().matricNumber);
+      });
+    firebase
+      .firestore()
+      .collection('Faculty')
+      .get()
+      .then((snapshot) => {
+        let faculty = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setFacultyData(faculty);
       });
   }, []);
 
@@ -52,7 +73,7 @@ function EditProfile(props) {
     React.useCallback(() => {
       firebase
         .firestore()
-        .collection("Discussion")
+        .collection('Discussion')
         .get()
         .then((snapshot) => {
           let discussion = snapshot.docs.map((doc) => {
@@ -72,8 +93,8 @@ function EditProfile(props) {
 
       firebase
         .firestore()
-        .collection("Comment")
-        .orderBy("creation", "asc")
+        .collection('Comment')
+        .orderBy('creation', 'asc')
         .get()
         .then((snapshot) => {
           let comment = snapshot.docs.map((doc) => {
@@ -90,7 +111,7 @@ function EditProfile(props) {
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(props.route.params.uid)
         .get()
         .then((snapshot) => {
@@ -118,7 +139,7 @@ function EditProfile(props) {
         task.snapshot.ref.getDownloadURL().then((snapshot) => {
           firebase
             .firestore()
-            .collection("users")
+            .collection('users')
             .doc(props.route.params.uid)
             .update({
               name: userId,
@@ -136,11 +157,11 @@ function EditProfile(props) {
         console.log(snapshot);
       };
 
-      task.on("state_changed", taskProgress, taskError, taskCompleted);
+      task.on('state_changed', taskProgress, taskError, taskCompleted);
     } else {
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(props.route.params.uid)
         .update({
           name: userId,
@@ -157,20 +178,20 @@ function EditProfile(props) {
     for (var i = 0; i < cntbu.length; i++) {
       firebase
         .firestore()
-        .collection("Comment")
+        .collection('Comment')
         .doc(cntbu[i])
         .update({
           postedBy: newName,
         })
         .then(() => {
-          console.log("updated");
+          console.log('updated');
         });
     }
 
     for (var i = 0; i < dntbc.length; i++) {
       firebase
         .firestore()
-        .collection("Discussion")
+        .collection('Discussion')
         .doc(dntbc[i])
         .update({
           postedBy: newName,
@@ -185,7 +206,7 @@ function EditProfile(props) {
     for (var i = 0; i < cntbu.length; i++) {
       firebase
         .firestore()
-        .collection("Comment")
+        .collection('Comment')
         .doc(cntbu[i])
         .update({
           postedBy: newName,
@@ -196,7 +217,7 @@ function EditProfile(props) {
     for (var i = 0; i < dntbc.length; i++) {
       firebase
         .firestore()
-        .collection("Discussion")
+        .collection('Discussion')
         .doc(dntbc[i])
         .update({
           postedBy: newName,
@@ -228,7 +249,7 @@ function EditProfile(props) {
     setModalVisible(!isModalVisible);
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(nameToBeEditted)
       .update({
         image: defaultImage,
@@ -240,7 +261,7 @@ function EditProfile(props) {
   };
 
   return (
-    <View>
+    <View style={{flex:1}}>
       <View style={styles.form}>
         <View style={styles.formControl}>
           <Text style={styles.label}>User Id</Text>
@@ -250,32 +271,92 @@ function EditProfile(props) {
             onChangeText={(userId) => setUserId(userId)}
           />
         </View>
+        {status == 0 && (
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Matric Number: </Text>
+            <TextInput
+              style={styles.input}
+              value={matricNum}
+              onChangeText={(matricNum) => setMatricNum(matricNum)}
+            />
+          </View>
+        )}
+
+        {status == 0 && (
+          <View style={styles.formControl}>
+            <Text style={styles.label}>Year of Study</Text>
+            <SelectPicker
+              placeholder={year}
+              placeholderStyle={{
+                fontFamily: 'Poppins',
+                fontSize: 15,
+                color: '#000',
+                marginTop: 5,
+              }}
+              onSelectedStyle={{
+                fontSize: 15,
+                color: '#000',
+              }}
+              style={styles.input}
+              onValueChange={setYear}
+              selected={year}
+            >
+              {Object.values(options).map((val, index) => (
+                <SelectPicker.Item label={val} value={val} key={index} />
+              ))}
+            </SelectPicker>
+          </View>
+        )}
+
         <View style={styles.formControl}>
-          <Text style={styles.label}>Year of Study</Text>
+          <Text style={styles.label}>Faculty</Text>
+          <View>
+
+          </View>
           <SelectPicker
-            placeholder={year}
-            placeholderStyle={{
-              fontFamily: "Poppins",
-              fontSize: 15,
-              color: "#000",
-              marginTop: 5,
-            }}
-            onSelectedStyle={{
-              fontSize: 15,
-              color: "#000",
-            }}
-            style={styles.input}
-            onValueChange={setYear}
-            selected={year}
-          >
-            {Object.values(options).map((val, index) => (
-              <SelectPicker.Item label={val} value={val} key={index} />
-            ))}
-          </SelectPicker>
+              placeholder={fac}
+              placeholderStyle={{
+                fontFamily: "Poppins",
+                fontSize: 20,
+                color: "#000",
+              }}
+              onSelectedStyle={{
+                fontFamily: "Poppins",
+                fontSize: 15,
+                color: "#000",
+                ...Platform.select({
+                  ios: {
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingBottom: 0,
+                  },
+                }),
+              }}
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                ...styles.ui,
+              }}
+              style={styles.input}
+              onValueChange={setFac}
+              selected={fac}
+            >
+              {Object.values(facultyData).map((val) => (
+                <SelectPicker.Item
+                  label={val.faculty}
+                  value={val.faculty}
+                  key={val.id}
+                />
+              ))}
+            </SelectPicker>
         </View>
+
+        
+
         <View style={styles.formControl}>
           <Text style={styles.label}>Profile Picture</Text>
-          <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: 'row' }}>
             {cu.image != defaultImage ? (
               <TouchableOpacity
                 style={styles.logout}
@@ -290,21 +371,26 @@ function EditProfile(props) {
           </View>
         </View>
       </View>
-      <View style={{ alignItems: "center" }}>
+      <View style={{ alignItems: 'center' }}>
         {image && (
           <Image source={{ uri: image }} style={{ height: 200, width: 200 }} />
         )}
       </View>
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity style={styles.logout} onPress={() => Save()}>
-          <Text style={styles.Ltext}>Save Changes</Text>
-        </TouchableOpacity>
-      </View>
       <Modal isVisible={isModalVisible}>
-        <View style={{ justifyContent: "center", flex: 1 }}>
-          <ActivityIndicator size="large" color="#E3562A" />
+        <View style={{ justifyContent: 'center', flex: 1 }}>
+          <ActivityIndicator size='large' color='#E3562A' />
         </View>
       </Modal>
+      <FAB
+        placement="right"
+        color="#E3562A"
+        style={styles.floatButton}
+        onPress={() => Save()}
+        size="large"
+        icon={
+          <Icon name="save-outline" type="ionicon" size={25} color="#FFF" />
+        }
+      />
     </View>
   );
 }
@@ -314,18 +400,18 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   formControl: {
-    width: "100%",
+    width: '100%',
   },
   label: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     fontSize: 20,
     marginVertical: 8,
   },
   input: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingHorizontal: 2,
     paddingVertical: 5,
-    borderBottomColor: "#ccc",
+    borderBottomColor: '#ccc',
     borderBottomWidth: 1,
   },
 
@@ -333,21 +419,30 @@ const styles = StyleSheet.create({
     width: 160,
     height: 40,
     marginTop: 5,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
+    backgroundColor: '#E3562A',
+    borderColor: '#E3562A',
     borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
+  },
+
+  ui: {
+    marginVertical: 10,
+    width: Dimensions.get("window").width * 0.5,
+    height: Dimensions.get("window").width * 0.1,
+    backgroundColor: "#E3562A",
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
