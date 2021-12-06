@@ -27,6 +27,8 @@ function MainScreen(props) {
   const [open, setOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  console.log(props.route.params.age)
+
   useEffect(() => {
     firebase
       .firestore()
@@ -46,9 +48,9 @@ function MainScreen(props) {
           if (posts[i].groupMember.some((el) => el.userId === userId)) {
             x.push(posts[i]);
             setPost(x);
-            console.log(posts[i]);
+           // console.log(posts[i]);
           } else {
-            console.log(25);
+           // console.log(25);
           }
         }
       });

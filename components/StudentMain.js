@@ -21,7 +21,7 @@ require('firebase/firestore');
 import FeedScreen from './main/student/feed/Feed';
 import ProfileScreen from './main/student/profile/Profile';
 import InventoryScreen from './main/student/inventory/Inventory';
-import MainScreen from './main/student/mentorMentee/MainScreen';
+import MentorMenteeMainScreen from './main/student/mentorMentee/MainScreen';
 import { useNavigation } from '@react-navigation/native';
 
 const Tab = createMaterialBottomTabNavigator();
@@ -85,13 +85,14 @@ const InventoryStackScreen = () => {
 const MentorMenteeStackScreen = () => {
   const navigation = useNavigation();
   return (
-    <Stack.Navigator initialRouteName='MainScreen'>
+    <Stack.Navigator initialRouteName='MentorMenteeMainScreen'>
       <Stack.Screen
-        name='MainScreen'
-        component={MainScreen}
+        name='MentorMenteeMainScreen'
+        component={MentorMenteeMainScreen}
         options={{
           headerTitle: 'Mentor Mentee Rooms',
         }}
+        navigation={navigation}
       />
     </Stack.Navigator>
   );
@@ -171,7 +172,7 @@ export class StudentMain extends Component {
                     onPress={() => navigation.navigate('Search Results')}
                   />
                 </TouchableOpacity>
-  
+
                 <TouchableOpacity>
                   <Icon
                     name='notifications-outline'
@@ -192,7 +193,7 @@ export class StudentMain extends Component {
   render() {
     return (
       <Tab.Navigator
-        initialRouteName='Feed'
+        initialRouteName='FeedTab'
         activeColor='#f0edf6'
         inactiveColor='#3e2465'
         labeled={false}
@@ -202,7 +203,7 @@ export class StudentMain extends Component {
         lazy='true'
       >
         <Tab.Screen
-          name='Inventory'
+          name='InventoryTab'
           component={InventoryStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
@@ -212,8 +213,9 @@ export class StudentMain extends Component {
         />
 
         <Tab.Screen
-          name='MainScreen'
-          component={MentorMenteeStackScreen}
+          name='MentorMenteeMainScreenTab'
+          component={MentorMenteeMainScreen}
+          initialParams={{ age: 45 }}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name='school' color={color} size={26} />
@@ -222,7 +224,7 @@ export class StudentMain extends Component {
         />
 
         <Tab.Screen
-          name='Feed'
+          name='FeedTab'
           component={HomeStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
@@ -248,7 +250,7 @@ export class StudentMain extends Component {
         />
 
         <Tab.Screen
-          name='Profile'
+          name='ProfileTab'
           component={ProfileStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
