@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,20 +10,20 @@ import {
   Alert,
   ScrollView,
   ActivityIndicator,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import * as DocumentPicker from "expo-document-picker";
-import MainCommentCard from "../../component/mainCommentCard";
-import MMCommentCard from "../../component/mmCommentCard";
-import { connect } from "react-redux";
-import ReplyCommentCard from "../../component/replyCommentCard";
-import Modal from "react-native-modal";
-import firebase from "firebase";
-require("firebase/firestore");
-import { Icon } from "react-native-elements";
-import { useFocusEffect } from "@react-navigation/native";
-import { timeDifference } from "../../../utils";
-import { ListItem, BottomSheet } from "react-native-elements";
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import MainCommentCard from '../../component/mainCommentCard';
+import MMCommentCard from '../../component/mmCommentCard';
+import { connect } from 'react-redux';
+import ReplyCommentCard from '../../component/replyCommentCard';
+import Modal from 'react-native-modal';
+import firebase from 'firebase';
+require('firebase/firestore');
+import { Icon } from 'react-native-elements';
+import { useFocusEffect } from '@react-navigation/native';
+import { timeDifference } from '../../../utils';
+import { ListItem, BottomSheet } from 'react-native-elements';
 
 function RoomReplyComment(props) {
   const { currentUser } = props;
@@ -35,21 +35,21 @@ function RoomReplyComment(props) {
   const [mainComment, setMainComment] = useState([]);
   const [data, setData] = useState(0);
   const [datas, setDatas] = useState([]);
-  const [keyword, setKeyword] = useState("");
-  const [editComment, setEditComment] = useState("");
-  const [editReplyComment, setEditReplyComment] = useState("");
-  const [editReplyCommentId, setEditReplyCommentId] = useState("");
+  const [keyword, setKeyword] = useState('');
+  const [editComment, setEditComment] = useState('');
+  const [editReplyComment, setEditReplyComment] = useState('');
+  const [editReplyCommentId, setEditReplyCommentId] = useState('');
   const [authorOfRepliedSubComment, setAuthorOfRepliedSubComment] =
-    useState("");
-  const [idOfRepliedSubComment, setIdOfRepliedSubComment] = useState("");
-  const [replyOfSubComment, setReplyOfSubComment] = useState("");
-  const [newReply, setNewReply] = useState("");
+    useState('');
+  const [idOfRepliedSubComment, setIdOfRepliedSubComment] = useState('');
+  const [replyOfSubComment, setReplyOfSubComment] = useState('');
+  const [newReply, setNewReply] = useState('');
   const [replyComment, setReplyComment] = useState([]);
   const [likeBy, setLikeBy] = useState(props.route.params.xxx);
   const [isVisible, setIsVisible] = useState(false);
   const [isVisibleV2, setIsVisibleV2] = useState(false);
   const [temporaryId, setTemporaryId] = useState(null);
-  const [caption, setCaption] = useState("");
+  const [caption, setCaption] = useState('');
   const [image, setImage] = useState(null); //save local uri
   const [Doc, setDoc] = useState(null); //save local uri
   const [interactionPoint, setInteractionPoint] = useState([]);
@@ -72,62 +72,70 @@ function RoomReplyComment(props) {
   const [totalComment, setTotalComment] = useState(0);
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
 
+  const [
+    totalNumberOfAttachedDocument,
+    setTotalNumberOfAttachedDocumenInteraction,
+  ] = useState(0);
+  const [totalNumberOfAttachedImage, setTotalNumberOfAttachedImage] =
+    useState(0);
+  const [totalNumberOfReplyComment, setTotalNumberOfReplyComment] = useState(0);
+
   const userId = firebase.auth().currentUser.uid;
   const time = props.route.params.time;
 
   const list = [
     {
-      title: "Edit",
+      title: 'Edit',
       onPress: () => EditComment(temporaryId),
     },
     {
-      title: "Delete",
+      title: 'Delete',
       onPress: () => Delete(temporaryId),
     },
     {
-      title: "Cancel",
-      containerStyle: { backgroundColor: "red" },
-      titleStyle: { color: "white" },
+      title: 'Cancel',
+      containerStyle: { backgroundColor: 'red' },
+      titleStyle: { color: 'white' },
       onPress: () => setIsVisible(false),
     },
   ];
 
   const listV2 = [
     {
-      title: "Edit",
+      title: 'Edit',
       onPress: () => EditReplyComment(temporaryId),
     },
     {
-      title: "Delete",
+      title: 'Delete',
       onPress: () => DeleteReplyComment(temporaryId),
     },
     {
-      title: "Cancel",
-      containerStyle: { backgroundColor: "red" },
-      titleStyle: { color: "white" },
+      title: 'Cancel',
+      containerStyle: { backgroundColor: 'red' },
+      titleStyle: { color: 'white' },
       onPress: () => setIsVisibleV2(false),
     },
   ];
 
   useEffect(() => {
-    setCaption("");
+    setCaption('');
     firebase
       .firestore()
-      .collection("DiscussionRoomComment")
+      .collection('DiscussionRoomComment')
       .doc(mainCommentId)
       .get()
       .then((snapshot) => {
         setMainComment(snapshot.data());
-        setNumberOfReply(snapshot.data().numberOfReply)
-        console.log("Reply "+snapshot.data().numberOfReply)
+        setNumberOfReply(snapshot.data().numberOfReply);
+      //  console.log('Reply ' + snapshot.data().numberOfReply);
       });
 
     firebase
       .firestore()
-      .collection("DiscussionRoomComment")
+      .collection('DiscussionRoomComment')
       .doc(mainCommentId)
-      .collection("Reply")
-      .orderBy("creation", "asc")
+      .collection('Reply')
+      .orderBy('creation', 'asc')
       .get()
       .then((snapshot) => {
         let replyComment = snapshot.docs.map((doc) => {
@@ -140,10 +148,10 @@ function RoomReplyComment(props) {
 
     firebase
       .firestore()
-      .collection("DiscussionRoomComment")
+      .collection('DiscussionRoomComment')
       .doc(mainCommentId)
-      .collection("Reply")
-      .orderBy("creation", "asc")
+      .collection('Reply')
+      .orderBy('creation', 'asc')
       .limit(loadMore)
       .get()
       .then((snapshot) => {
@@ -157,13 +165,20 @@ function RoomReplyComment(props) {
 
     firebase
       .firestore()
-      .collection("DiscussionRoom")
+      .collection('DiscussionRoom')
       .doc(props.route.params.did)
       .get()
       .then((snapshot) => {
         setDate(snapshot.data().date);
         setMember(snapshot.data().groupMember);
         setInteractionPoint(snapshot.data().interaction);
+        setTotalNumberOfAttachedDocumenInteraction(
+          snapshot.data().totalNumberOfAttachedDocument
+        );
+        setTotalNumberOfAttachedImage(
+          snapshot.data().totalNumberOfAttachedImage
+        );
+        setTotalNumberOfReplyComment(snapshot.data().totalNumberOfReplyComment);
       });
     setTimeout(function () {
       setLoadMoreLoading(false);
@@ -174,7 +189,7 @@ function RoomReplyComment(props) {
     React.useCallback(() => {
       firebase
         .firestore()
-        .collection("DiscussionRoomComment")
+        .collection('DiscussionRoomComment')
         .doc(mainCommentId)
         .get()
         .then((snapshot) => {
@@ -183,10 +198,10 @@ function RoomReplyComment(props) {
 
       firebase
         .firestore()
-        .collection("DiscussionRoomComment")
+        .collection('DiscussionRoomComment')
         .doc(mainCommentId)
-        .collection("Reply")
-        .orderBy("creation", "asc")
+        .collection('Reply')
+        .orderBy('creation', 'asc')
         .limit(loadMore)
         .get()
         .then((snapshot) => {
@@ -202,12 +217,55 @@ function RoomReplyComment(props) {
     }, [data])
   );
 
+  const addImgPieChart = () => {
+    let u = totalNumberOfAttachedImage + 1;
+    firebase
+      .firestore()
+      .collection('DiscussionRoom')
+      .doc(discussionId)
+      .update({
+        totalNumberOfAttachedImage: u,
+      })
+      .then(() => {
+        console.log('done');
+      });
+  };
+
+  const addDocPieChart = () => {
+    let z = totalNumberOfAttachedDocument + 1;
+    firebase
+      .firestore()
+      .collection('DiscussionRoom')
+      .doc(discussionId)
+      .update({
+        totalNumberOfAttachedDocument: z,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    console.log('pie chart comment updated');
+  };
+
+  const addCommentPieChart = () => {
+    let y = totalNumberOfReplyComment + 1;
+    firebase
+      .firestore()
+      .collection('DiscussionRoom')
+      .doc(discussionId)
+      .update({
+        totalNumberOfReplyComment: y,
+      })
+      .then(() => {
+        console.log('done uploading number of comment');
+      });
+  };
+
   const addInteraction = () => {
     const today = new Date();
     const n = today.getMonth() + 1;
     const tomorrow = new Date(today);
     const createdDay = tomorrow.getDate();
-    const finalDate = createdDay + "/" + n;
+    const finalDate = createdDay + '/' + n;
 
     if (date.includes(finalDate)) {
       const index = date.indexOf(finalDate);
@@ -216,13 +274,13 @@ function RoomReplyComment(props) {
 
       firebase
         .firestore()
-        .collection("DiscussionRoom")
+        .collection('DiscussionRoom')
         .doc(discussionId)
         .update({
           interaction: interactionPoint,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
     } else {
       date.shift();
@@ -233,13 +291,13 @@ function RoomReplyComment(props) {
       interactionPoint[index] = interactionPoint[index] + 1;
       firebase
         .firestore()
-        .collection("DiscussionRoom")
+        .collection('DiscussionRoom')
         .doc(discussionId)
         .update({
           interaction: interactionPoint,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
     }
   };
@@ -266,41 +324,54 @@ function RoomReplyComment(props) {
   };
 
   const UploadComment = () => {
-    addInteraction();
+    addCommentPieChart();
+
     if (image == null && Doc == null) {
       ReplyComment(null, null);
     }
 
     if (image != null && Doc != null) {
       uploadDocV2();
+      addImgPieChart();
+      addDocPieChart();
     }
 
     if (image == null && Doc != null) {
       uploadDoc();
+      addDocPieChart();
     }
 
     if (image != null && Doc == null) {
       uploadImage();
+      addImgPieChart();
     }
+
+    addInteraction();
   };
 
   const UploadCommentV2 = () => {
-    addInteraction();
+    addCommentPieChart();
     if (image == null && Doc == null) {
       ReplySubComment(null, null);
     }
 
     if (image != null && Doc != null) {
       uploadDocV3();
+      addImgPieChart();
+      addDocPieChart();
     }
 
     if (image == null && Doc != null) {
       uploadDocV1();
+      addDocPieChart();
     }
 
     if (image != null && Doc == null) {
       uploadImageV1();
+      addImgPieChart();
     }
+
+    addInteraction();
   };
 
   const uploadDoc = async () => {
@@ -326,7 +397,7 @@ function RoomReplyComment(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadImage = async () => {
@@ -355,7 +426,7 @@ function RoomReplyComment(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadDocV2 = async () => {
@@ -381,7 +452,7 @@ function RoomReplyComment(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadImageV2 = async (docSnapshot) => {
@@ -410,7 +481,7 @@ function RoomReplyComment(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadDocV1 = async () => {
@@ -436,7 +507,7 @@ function RoomReplyComment(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadImageV1 = async () => {
@@ -465,7 +536,7 @@ function RoomReplyComment(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadDocV3 = async () => {
@@ -491,7 +562,7 @@ function RoomReplyComment(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const uploadImageV3 = async (docSnapshot) => {
@@ -520,7 +591,7 @@ function RoomReplyComment(props) {
       console.log(snapshot);
     };
 
-    task.on("state_changed", taskProgress, taskError, taskCompleted);
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
   const renderSuggestionsRow = ({ item }, hidePanel) => {
@@ -547,7 +618,7 @@ function RoomReplyComment(props) {
   const onSuggestionTap = (name, hidePanel) => {
     hidePanel();
     const comment = caption.slice(0, -keyword.length);
-    setCaption(comment + "@" + name + " ");
+    setCaption(comment + '@' + name + ' ');
   };
 
   const callback = (keyword) => {
@@ -567,7 +638,7 @@ function RoomReplyComment(props) {
 
     firebase
       .firestore()
-      .collection("DiscussionRoomComment")
+      .collection('DiscussionRoomComment')
       .doc(mainCommentId)
       .update({
         numOfLike: x,
@@ -588,7 +659,7 @@ function RoomReplyComment(props) {
 
     firebase
       .firestore()
-      .collection("DiscussionRoomComment")
+      .collection('DiscussionRoomComment')
       .doc(mainCommentId)
       .update({
         numOfLike: x,
@@ -606,16 +677,16 @@ function RoomReplyComment(props) {
     // props.navigation.goBack();
 
     return Alert.alert(
-      "Are your sure?",
-      "Are you sure you want to delete this comment ?",
+      'Are your sure?',
+      'Are you sure you want to delete this comment ?',
       [
         // The "Yes" button
         {
-          text: "Yes",
+          text: 'Yes',
           onPress: () => {
             firebase
               .firestore()
-              .collection("DiscussionRoomComment")
+              .collection('DiscussionRoomComment')
               .doc(mainCommentId)
               .delete();
 
@@ -625,7 +696,7 @@ function RoomReplyComment(props) {
         // The "No" button
         // Does nothing but dismiss the dialog when tapped
         {
-          text: "No",
+          text: 'No',
         },
       ]
     );
@@ -641,9 +712,9 @@ function RoomReplyComment(props) {
     setEditReplyCommentId(rcid);
     firebase
       .firestore()
-      .collection("DiscussionRoomComment")
+      .collection('DiscussionRoomComment')
       .doc(mainCommentId)
-      .collection("Reply")
+      .collection('Reply')
       .doc(rcid)
       .get()
       .then((snapshot) => {
@@ -669,19 +740,19 @@ function RoomReplyComment(props) {
 
   const uploadUpdatedComment = () => {
     if (!caption.trim()) {
-      alert("Please Enter Comment");
+      alert('Please Enter Comment');
       return;
     } else {
       firebase
         .firestore()
-        .collection("DiscussionRoomComment")
+        .collection('DiscussionRoomComment')
         .doc(mainCommentId)
         .update({
           comment: caption,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
-          console.log("save");
+          console.log('save');
         });
 
       setEditCommentModalVisible(!isEditCommentModalVisible);
@@ -706,14 +777,14 @@ function RoomReplyComment(props) {
 
   const ReplySubComment = (doc, img) => {
     if (!caption.trim()) {
-      alert("Please Enter Comment");
+      alert('Please Enter Comment');
       return;
     } else {
       firebase
         .firestore()
-        .collection("DiscussionRoomComment")
+        .collection('DiscussionRoomComment')
         .doc(mainCommentId)
-        .collection("Reply")
+        .collection('Reply')
         .add({
           comment: caption,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
@@ -729,9 +800,13 @@ function RoomReplyComment(props) {
         });
 
       const totalReply = numberOfReply + 1;
-      firebase.firestore().collection("DiscussionRoomComment").doc(mainCommentId).update({
-        numberOfReply: totalReply,
-      });
+      firebase
+        .firestore()
+        .collection('DiscussionRoomComment')
+        .doc(mainCommentId)
+        .update({
+          numberOfReply: totalReply,
+        });
       setReplySubCommentModalVisible(!isReplySubCommentModalVisible);
     }
 
@@ -740,14 +815,14 @@ function RoomReplyComment(props) {
 
   const ReplyComment = (doc, img) => {
     if (!caption.trim()) {
-      alert("Please Enter Comment");
+      alert('Please Enter Comment');
       return;
     } else {
       firebase
         .firestore()
-        .collection("DiscussionRoomComment")
+        .collection('DiscussionRoomComment')
         .doc(mainCommentId)
-        .collection("Reply")
+        .collection('Reply')
         .add({
           comment: caption,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
@@ -763,10 +838,14 @@ function RoomReplyComment(props) {
         });
 
       const totalReply = numberOfReply + 1;
-      console.log("totalReply " + totalReply)
-      firebase.firestore().collection("DiscussionRoomComment").doc(mainCommentId).update({
-        numberOfReply: totalReply,
-      });
+      console.log('totalReply ' + totalReply);
+      firebase
+        .firestore()
+        .collection('DiscussionRoomComment')
+        .doc(mainCommentId)
+        .update({
+          numberOfReply: totalReply,
+        });
       setReplyCommentModalVisible(!isReplyCommentModalVisible);
     }
 
@@ -776,25 +855,25 @@ function RoomReplyComment(props) {
   const DeleteReplyComment = (rcid) => {
     setIsVisibleV2(false);
     return Alert.alert(
-      "Are your sure?",
-      "Are you sure you want to delete this comment ?",
+      'Are your sure?',
+      'Are you sure you want to delete this comment ?',
       [
         // The "Yes" button
         {
-          text: "Yes",
+          text: 'Yes',
           onPress: () => {
             firebase
               .firestore()
-              .collection("DiscussionRoomComment")
+              .collection('DiscussionRoomComment')
               .doc(mainCommentId)
-              .collection("Reply")
+              .collection('Reply')
               .doc(rcid)
               .delete();
 
             const totalReply = numberOfReply - 1;
             firebase
               .firestore()
-              .collection("DiscussionRoomComment")
+              .collection('DiscussionRoomComment')
               .doc(mainCommentId)
               .update({
                 numberOfReply: totalReply,
@@ -806,7 +885,7 @@ function RoomReplyComment(props) {
         // The "No" button
         // Does nothing but dismiss the dialog when tapped
         {
-          text: "No",
+          text: 'No',
         },
       ]
     );
@@ -822,16 +901,16 @@ function RoomReplyComment(props) {
 
     firebase
       .firestore()
-      .collection("DiscussionRoomComment")
+      .collection('DiscussionRoomComment')
       .doc(mainCommentId)
-      .collection("Reply")
+      .collection('Reply')
       .doc(rcid)
       .update({
         numOfLike: x,
         likeBy: lb,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     setData(2);
   };
@@ -845,37 +924,37 @@ function RoomReplyComment(props) {
 
     firebase
       .firestore()
-      .collection("DiscussionRoomComment")
+      .collection('DiscussionRoomComment')
       .doc(mainCommentId)
-      .collection("Reply")
+      .collection('Reply')
       .doc(rcid)
       .update({
         numOfLike: x,
         likeBy: lb,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     setData(3);
   };
 
   const UploadEditSubComment = () => {
     if (!caption.trim()) {
-      alert("Please Enter Comment");
+      alert('Please Enter Comment');
       return;
     } else {
       firebase
         .firestore()
-        .collection("DiscussionRoomComment")
+        .collection('DiscussionRoomComment')
         .doc(mainCommentId)
-        .collection("Reply")
+        .collection('Reply')
         .doc(editReplyCommentId)
         .update({
           comment: caption,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
-          console.log("save");
+          console.log('save');
         });
 
       setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible);
@@ -963,11 +1042,11 @@ function RoomReplyComment(props) {
             {loadMoreLoading && (
               <View
                 style={{
-                  justifyContent: "center",
-                  alignItems: "center",
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
-                <ActivityIndicator size="large" color="#E3562A" />
+                <ActivityIndicator size='large' color='#E3562A' />
               </View>
             )}
             {replyComment.length != 0 &&
@@ -977,14 +1056,14 @@ function RoomReplyComment(props) {
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}
               >
-                <Text style={{ fontSize: 15, fontFamily: "Poppins" }}>
+                <Text style={{ fontSize: 15, fontFamily: 'Poppins' }}>
                   Load More ...
                 </Text>
               </TouchableOpacity>
             ) : null}
             <BottomSheet
               isVisible={isVisible}
-              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+              containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
             >
               {list.map((l, i) => (
                 <ListItem
@@ -1003,7 +1082,7 @@ function RoomReplyComment(props) {
 
             <BottomSheet
               isVisible={isVisibleV2}
-              containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
+              containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
             >
               {listV2.map((l, i) => (
                 <ListItem
@@ -1028,8 +1107,8 @@ function RoomReplyComment(props) {
                     style={{
                       flex: 1,
                       width: 200,
-                      justifyContent: "center",
-                      alignItems: "center",
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <ActivityIndicator />
@@ -1054,8 +1133,8 @@ function RoomReplyComment(props) {
                     style={{
                       flex: 1,
                       width: 200,
-                      justifyContent: "center",
-                      alignItems: "center",
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <ActivityIndicator />
@@ -1083,8 +1162,8 @@ function RoomReplyComment(props) {
                     style={{
                       flex: 1,
                       width: 200,
-                      justifyContent: "center",
-                      alignItems: "center",
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <ActivityIndicator />
@@ -1112,8 +1191,8 @@ function RoomReplyComment(props) {
                     style={{
                       flex: 1,
                       width: 200,
-                      justifyContent: "center",
-                      alignItems: "center",
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <ActivityIndicator />
@@ -1147,35 +1226,35 @@ const styles = StyleSheet.create({
   },
 
   titlex: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
 
   titley: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 25,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    fontWeight: "700",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    fontWeight: '700',
     marginBottom: 20,
   },
 
   card: {
     borderRadius: 16,
     elevation: 5,
-    backgroundColor: "#140F38",
+    backgroundColor: '#140F38',
     shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.3,
     shadowRadius: 2,
     marginHorizontal: 4,
@@ -1190,25 +1269,25 @@ const styles = StyleSheet.create({
 
   input: {
     height: 60,
-    borderColor: "#E3562A",
+    borderColor: '#E3562A',
     borderWidth: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     width: 340,
     borderRadius: 12,
     padding: 10,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   title: {
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     lineHeight: 20,
-    fontWeight: "700",
+    fontWeight: '700',
     marginBottom: 5,
   },
 
   commentCon: {
-    borderColor: "#E3562A",
+    borderColor: '#E3562A',
     borderBottomWidth: 5,
     width: 300,
     paddingVertical: 3,
@@ -1221,24 +1300,24 @@ const styles = StyleSheet.create({
   descT: {
     fontSize: 20,
     lineHeight: 25,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     marginTop: 10,
   },
 
   comT: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 18,
   },
 
   userT: {
-    fontFamily: "Poppins",
-    fontWeight: "600",
+    fontFamily: 'Poppins',
+    fontWeight: '600',
     fontSize: 15,
   },
 
   userC: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     lineHeight: 20,
     fontSize: 15,
   },
@@ -1246,24 +1325,24 @@ const styles = StyleSheet.create({
   blogout: {
     width: 140,
     height: 40,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
+    backgroundColor: '#E3562A',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 20,
   },
 
   Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     paddingTop: 8,
   },
 
   suggestionsRowContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   userAvatarBox: {
     width: 35,
@@ -1272,28 +1351,28 @@ const styles = StyleSheet.create({
   userIconBox: {
     height: 45,
     width: 45,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#54c19c",
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#54c19c',
   },
   usernameInitials: {
-    color: "#fff",
-    fontWeight: "800",
+    color: '#fff',
+    fontWeight: '800',
     fontSize: 14,
   },
   userDetailsBox: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingLeft: 10,
     paddingRight: 15,
   },
   displayNameText: {
     fontSize: 13,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   usernameText: {
     fontSize: 12,
-    color: "rgba(0,0,0,0.6)",
+    color: 'rgba(0,0,0,0.6)',
   },
 });
 

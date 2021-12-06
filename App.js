@@ -87,6 +87,7 @@ import AddInGroupV2 from './components/main/lecture/MentorMentee/AddInGroupV2';
 import GroupDetail from './components/main/lecture/MentorMentee/GroupDetail';
 import ViewRequestCreateRoom from './components/main/lecture/MentorMentee/ViewRequestCreateRoom';
 import GroupStats from './components/main/lecture/MentorMentee/GroupStats';
+import AddCommentScreen from './components/main/lecture/MentorMentee/AddCommentScreen';
 
 //Admin
 import AdminMainScreen from './components/AdminMain';
@@ -329,6 +330,15 @@ export class App extends Component {
                 navigation={this.props.navigation}
                 options={{
                   headerTitle: 'Group Statistics',
+                  headerBackTitleVisible: false,
+                }}
+              />
+              <Stack.Screen
+                name='AddCommentScreen'
+                component={AddCommentScreen}
+                navigation={this.props.navigation}
+                options={{
+                  headerTitle: 'Add Comment',
                   headerBackTitleVisible: false,
                 }}
               />

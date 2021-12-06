@@ -14,7 +14,9 @@ import {
   LogBox,
   ActivityIndicator,
 } from 'react-native';
-import MMCommentCard from '../../component/mmCommentCard';
+
+import MentionsTextInput from 'react-native-mentions';
+
 import CommentCard from '../../component/commentCard';
 import { Icon } from 'react-native-elements';
 import Modal from 'react-native-modal';
@@ -27,7 +29,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { FAB, ListItem, BottomSheet } from 'react-native-elements';
 require('firebase/firestore');
 
-function ViewRoom(props) {
+function AddCommentScreen(props) {
   const { currentUser } = props;
   const [isModalVisible, setModalVisible] = useState(false);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
@@ -59,7 +61,6 @@ function ViewRoom(props) {
   const [uuu, setuuu] = useState(0);
   const [totalComment, setTotalComment] = useState(0);
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
-
   //
   const [
     totalNumberOfAttachedDocument,
@@ -71,7 +72,6 @@ function ViewRoom(props) {
   const [totalNumberOfReplyComment, setTotalNumberOfReplyComment] = useState(0);
   const [totalNumberofComment, setTotalNumberofComment] = useState(0);
   //
-
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
   const [animatePress, setAnimatePress] = useState(new Animated.Value(1));
@@ -233,8 +233,36 @@ function ViewRoom(props) {
     return <View />;
   }
 
+	const addImgPieChart = () => {
+		let u = totalNumberOfAttachedImage + 1;
+    firebase
+      .firestore()
+      .collection('DiscussionRoom')
+      .doc(discussionId)
+      .update({
+        totalNumberOfAttachedImage: u,
+      })
+      .then(() => {
+        console.log('done');
+      });
+  };
+
+	const addDocPieChart = () => {
+		let z = totalNumberOfAttachedDocument + 1;
+    firebase
+      .firestore()
+      .collection('DiscussionRoom')
+      .doc(discussionId)
+      .update({
+        totalNumberOfAttachedDocument: z,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    console.log('pie chart comment updated');
+  };
+
   const addCommentPieChart = () => {
-    console.log('done uploading number of comment');
     let y = totalNumberofComment + 1;
     firebase
       .firestore()
@@ -245,20 +273,6 @@ function ViewRoom(props) {
       })
       .then(() => {
         console.log('done uploading number of comment');
-      });
-  };
-
-  const addLikePieChart = () => {
-    let x = totalNumberOfLike + 1;
-    firebase
-      .firestore()
-      .collection('DiscussionRoom')
-      .doc(discussionId)
-      .update({
-        totalNumberOfLike: x,
-      })
-      .then(() => {
-        console.log('Total Like Updated');
       });
   };
 
@@ -318,9 +332,8 @@ function ViewRoom(props) {
   };
 
   const toggleModal = () => {
-    //setModalVisible(!isModalVisible);
-    // setLoadMoreLoading(false);
-    props.navigation.navigate('AddCommentScreen', { did: discussionId });
+    setModalVisible(!isModalVisible);
+    setLoadMoreLoading(false);
   };
 
   const toggleVisibility = (cid) => {
@@ -329,7 +342,8 @@ function ViewRoom(props) {
   };
 
   const UploadComment = () => {
-  
+    addCommentPieChart();
+
     if (image == null && Doc == null) {
       finalCommentUpload(null, null);
     }
@@ -677,199 +691,89 @@ function ViewRoom(props) {
   };
 
   return (
-    <View style={{ flex: 1, margin: 10, marginBottom: 5 }}>
-      <FlatList
-        horizontal={false}
-        extraData={comment}
-        data={comment}
-        renderItem={({ item }) =>
-          item.discussionRoomId === discussionId ? (
-            <CommentCard
-              picture={item.image}
-              status={0}
-              verify={item.verify}
-              postedBy={item.postedBy}
-              creation={item.creation}
-              comment={item.comment}
-              attachedDocument={item.attachedDocument}
-              attachedImage={item.attachedImage}
-              numOfLike={item.numOfLike}
-              likeBy={item.likeBy.includes(userId)}
-              removeLike={() =>
-                removeLike(item.id, item.numOfLike, item.likeBy)
-              }
-              xxx={() => toggleVisibility(item.id)}
-              addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
-              firstUserId={item.userId}
-              secondUserId={userId}
-              delete={() => Delete(item.id)}
-              downlaodDoc={() => downlaodDoc()}
-              editComment={() => EditComment(item.id)}
-              numberOfReply={item.numberOfReply}
-              onSelect={() =>
-                props.navigation.navigate('RoomReplyComment', {
-                  cid: item.id,
-                  time: timeDifference(new Date(), item.creation.toDate()),
-                  xxx: item.likeBy.includes(userId),
-                  mainCommentAuthorName: item.postedBy,
-                  did: discussionId,
-                })
-              }
+    <View style={{ justifyContent: 'center' }}>
+      {/* style={styles.searchSection} */}
+      <View style={{ flexDirection: 'row' }}>
+        <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+          <View style={{ width: '100%' }}>
+            <MentionsTextInput
+              textInputStyle={styles.searchSection}
+              suggestionsPanelStyle={{
+                backgroundColor: '#fff',
+              }}
+              textInputMinHeight={30}
+              textInputMaxHeight={80}
+              trigger={'@'}
+              triggerLocation={'new-word-only'} // 'new-word-only', 'anywhere'
+              value={caption}
+              onChangeText={setCaption}
+              triggerCallback={callback}
+              renderSuggestionsRow={renderSuggestionsRow}
+              suggestionsData={datas}
+              keyExtractor={(item, index) => item.name}
+              suggestionRowHeight={45}
+              horizontal={false}
+              MaxVisibleRowCount={3}
             />
-          ) : null
-        }
-        ListHeaderComponent={
-          <View>
-            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-              <View style={{ flex: 1, justifyContent: 'flex-start' }}>
-                <View style={{ width: '100%' }}>
-                  <Text style={styles.title}>{userPosts.title}</Text>
-                </View>
-              </View>
-            </View>
-            {userPosts.downloadURL && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  paddingBottom: 10,
-                  justifyContent: 'center',
-                }}
-              >
-                {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
-                <Images
-                  width={Dimensions.get('window').width} // height will be calculated automatically
-                  source={{ uri: userPosts.downloadURL }}
-                />
-              </View>
-            )}
-
-            <View style={styles.desc}>
-              <Text style={styles.descT}>{userPosts.description}</Text>
-            </View>
-            <View style={{ paddingBottom: 10 }}>
-              <Text style={styles.comT}>Comments:</Text>
-            </View>
           </View>
-        }
-        ListFooterComponent={
-          <View>
-            {loadMoreLoading && (
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <ActivityIndicator size='large' color='#E3562A' />
-              </View>
-            )}
-            {comment.length != 0 &&
-            loadMore >= 8 &&
-            totalComment > loadMore &&
-            loadMoreLoading == false ? (
-              <TouchableOpacity
-                onPress={loadMoreComment}
-                style={{ marginLeft: 50, flex: 1 }}
-              >
-                <Text style={{ fontSize: 15, fontFamily: 'Poppins' }}>
-                  Load More ...
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-            <BottomSheet
-              isVisible={isVisible}
-              containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
-            >
-              {list.map((l, i) => (
-                <ListItem
-                  key={i}
-                  containerStyle={l.containerStyle}
-                  onPress={l.onPress}
-                >
-                  <ListItem.Content>
-                    <ListItem.Title style={l.titleStyle}>
-                      {l.title}
-                    </ListItem.Title>
-                  </ListItem.Content>
-                </ListItem>
-              ))}
-            </BottomSheet>
+        </View>
 
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              <Modal isVisible={isModalVisible}>
-                <MMCommentCard
-                  loadingComponent={() => (
-                    <View
-                      style={{
-                        flex: 1,
-                        width: 200,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <ActivityIndicator />
-                    </View>
-                  )}
-                  caption={caption}
-                  setCaption={setCaption}
-                  callback={callback.bind(this)}
-                  renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-                  datas={datas}
-                  keyExtractor={(item, index) => item.name}
-                  pickDocument={() => pickDocument()}
-                  pickImage={() => pickImage()}
-                  UploadComment={() => UploadComment()}
-                  toggleModal={() => toggleModal()}
-                />
-              </Modal>
-
-              <Modal isVisible={isEditCommentModalVisible}>
-                <MMCommentCard
-                  loadingComponent={() => (
-                    <View
-                      style={{
-                        flex: 1,
-                        width: 200,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <ActivityIndicator />
-                    </View>
-                  )}
-                  caption={caption}
-                  setCaption={setCaption}
-                  callback={callback.bind(this)}
-                  renderSuggestionsRow={renderSuggestionsRow.bind(this)}
-                  datas={datas}
-                  keyExtractor={(item, index) => item.name}
-                  UploadComment={() => uploadUpdatedComment()}
-                  toggleModal={() => toggleEditComment()}
-                />
-              </Modal>
-            </View>
-          </View>
-        }
-      />
-      <FAB
-        placement='right'
-        color='#E3562A'
-        onPress={toggleModal}
-        icon={
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
           <Icon
-            reverse
-            name='add-outline'
+            style={{ marginTop: 5 }}
+            name='attach-outline'
             type='ionicon'
-            color='#E3562A'
-            size={35}
-            containerStyle={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginLeft: 11,
-            }}
+            size={30}
+            color='#fff'
+            // onPress={() => {
+            //   pickDocument();
+            // }}
+            onPress={pickDocument}
           />
-        }
-      />
+          <Icon
+            style={styles.searchIcon}
+            name='image-outline'
+            type='ionicon'
+            size={30}
+            color='#fff'
+            // onPress={() => {
+            //   pickImage();
+            // }}
+            onPress={pickImage}
+          />
+        </View>
+      </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignContent: 'space-between',
+        }}
+      >
+        <View
+          style={{
+            paddingHorizontal: 20,
+          }}
+        >
+          <TouchableOpacity style={styles.blogout} onPress={UploadComment}>
+            <Text style={styles.Ltext}>Add Comment</Text>
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            paddingHorizontal: 20,
+          }}
+        >
+          <TouchableOpacity
+            style={styles.blogout}
+            //onPress={toggleModal}
+            onPress={toggleModal}
+          >
+            <Text style={styles.Ltext}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -1040,4 +944,4 @@ const mapStateToProps = (store) => ({
   comments: store.userState.comment,
 });
 
-export default connect(mapStateToProps, null)(ViewRoom);
+export default connect(mapStateToProps, null)(AddCommentScreen);
