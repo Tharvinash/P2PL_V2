@@ -172,6 +172,11 @@ function ViewRequestCreateRoom(props) {
         groupMember: a,
         createdBy: currentUser.name,
         createrId: userId,
+        totalNumberOfLike:0,
+        totalNumberofComment:0,
+        totalNumberOfReplyComment:0,
+        totalNumberOfAttachedDocument:0,
+        totalNumberOfAttachedImage:0,
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         date: [
           createdDay + '/' + n,

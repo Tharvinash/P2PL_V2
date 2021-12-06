@@ -1,20 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, StyleSheet } from "react-native";
-import { LineChart, PieChart } from "react-native-chart-kit";
-import firebase from "firebase";
-
+import React, { useEffect, useState } from 'react';
+import { View, Text, Dimensions, StyleSheet } from 'react-native';
+import { LineChart, PieChart } from 'react-native-chart-kit';
+import firebase from 'firebase';
 
 export default function GroupStats(props) {
   const [groupData, setGroupData] = useState([]);
   const [date, setDate] = useState([0]);
   const [interaction, setInteraction] = useState([0]);
-  const screenWidth = Dimensions.get("window").width;
+  const [
+    totalNumberOfAttachedDocument,
+    setTotalNumberOfAttachedDocumenInteraction,
+  ] = useState(0);
+  const [totalNumberOfAttachedImage, setTotalNumberOfAttachedImage] =
+    useState(0);
+  const [totalNumberOfLike, setTotalNumberOfLike] = useState(0);
+  const [totalNumberOfReplyComment, setTotalNumberOfReplyComment] = useState(0);
+  const [totalNumberofComment, setTotalNumberofComment] = useState(0);
+  const screenWidth = Dimensions.get('window').width;
   const roomId = props.route.params.did;
 
   useEffect(() => {
     firebase
       .firestore()
-      .collection("DiscussionRoom")
+      .collection('DiscussionRoom')
       .doc(roomId)
       .get()
       .then((snapshot) => {
@@ -22,8 +30,13 @@ export default function GroupStats(props) {
           setGroupData(snapshot.data());
           setDate(snapshot.data().date);
           setInteraction(snapshot.data().interaction);
+          setTotalNumberOfAttachedDocumenInteraction(snapshot.data().totalNumberOfAttachedDocument)
+          setTotalNumberOfAttachedImage(snapshot.data().totalNumberOfAttachedImage)
+          setTotalNumberOfLike(snapshot.data().totalNumberOfLike)
+          setTotalNumberOfReplyComment(snapshot.data().totalNumberOfReplyComment)
+          setTotalNumberofComment(snapshot.data().totalNumberofComment)
         } else {
-          console.log("does not exist");
+          console.log('does not exist');
         }
       });
   }, []);
@@ -38,12 +51,12 @@ export default function GroupStats(props) {
         strokeWidth: 2, // optional
       },
     ],
-    legend: ["Number of Interactions"], // optional
+    legend: ['Number of Interactions'], // optional
   };
   const chartConfig = {
-    backgroundColor: "#140F38",
-    backgroundGradientFrom: "#140F38",
-    backgroundGradientTo: "#140F38",
+    backgroundColor: '#140F38',
+    backgroundGradientFrom: '#140F38',
+    backgroundGradientTo: '#140F38',
     decimalPlaces: 0, // optional, defaults to 2dp
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -51,16 +64,16 @@ export default function GroupStats(props) {
       borderRadius: 16,
     },
     propsForDots: {
-      r: "6",
-      strokeWidth: "2",
-      stroke: "#fff",
+      r: '6',
+      strokeWidth: '2',
+      stroke: '#fff',
     },
   };
   // chartConfigs
   const chartConfigs = {
-    backgroundColor: "#140F38",
-    backgroundGradientFrom: "#140F38",
-    backgroundGradientTo: "#140F38",
+    backgroundColor: '#140F38',
+    backgroundGradientFrom: '#140F38',
+    backgroundGradientTo: '#140F38',
     decimalPlaces: 2, // optional, defaults to 2dp
     color: (opacity = 1) => `rgba(20, 15, 56, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(20, 15, 56, ${opacity})`,
@@ -68,9 +81,9 @@ export default function GroupStats(props) {
       borderRadius: 16,
     },
     propsForDots: {
-      r: "6",
-      strokeWidth: "2",
-      stroke: "#fff",
+      r: '6',
+      strokeWidth: '2',
+      stroke: '#fff',
     },
   };
 
@@ -78,38 +91,38 @@ export default function GroupStats(props) {
 
   const datas = [
     {
-      name: "Seoul",
-      population: 21500000,
-      color: "rgba(131, 167, 234, 1)",
-      legendFontColor: "#7F7F7F",
+      name: 'Like',
+      population: totalNumberOfLike,
+      color: 'rgba(131, 167, 234, 1)',
+      legendFontColor: '#7F7F7F',
       legendFontSize: 15,
     },
     {
-      name: "Toronto",
-      population: 2800000,
-      color: "#F00",
-      legendFontColor: "#7F7F7F",
+      name: 'Comment',
+      population: totalNumberofComment,
+      color: '#F00',
+      legendFontColor: '#7F7F7F',
       legendFontSize: 15,
     },
     {
-      name: "Beijing",
-      population: 527612,
-      color: "red",
-      legendFontColor: "#7F7F7F",
+      name: 'R Comment',
+      population: totalNumberOfReplyComment,
+      color: 'red',
+      legendFontColor: '#7F7F7F',
       legendFontSize: 15,
     },
     {
-      name: "New York",
-      population: 8538000,
-      color: "#ffffff",
-      legendFontColor: "#7F7F7F",
+      name: 'Attached Doc',
+      population: totalNumberOfAttachedDocument,
+      color: '#ffffff',
+      legendFontColor: '#7F7F7F',
       legendFontSize: 15,
     },
     {
-      name: "Moscow",
-      population: 11920000,
-      color: "rgb(0, 0, 255)",
-      legendFontColor: "#7F7F7F",
+      name: 'Attached Img',
+      population: totalNumberOfAttachedImage,
+      color: 'rgb(0, 0, 255)',
+      legendFontColor: '#7F7F7F',
       legendFontSize: 15,
     },
   ];
@@ -124,16 +137,16 @@ export default function GroupStats(props) {
         />
       </View>
 
-      <View style={{ backgroundColor: "#140F38" }}>
+      <View style={{ backgroundColor: '#140F38', paddingHorizontal: 10 }}>
         <PieChart
           data={datas}
           width={screenWidth}
           height={220}
           chartConfig={chartConfigs}
-          accessor={"population"}
-          backgroundColor={"transparent"}
-          paddingLeft={"15"}
-          bgColor={"#140F38"}
+          accessor={'population'}
+          backgroundColor={'transparent'}
+          paddingLeft={'15'}
+          bgColor={'#140F38'}
           //center={[10, 50]}
           //absolute
         />
@@ -145,8 +158,8 @@ export default function GroupStats(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

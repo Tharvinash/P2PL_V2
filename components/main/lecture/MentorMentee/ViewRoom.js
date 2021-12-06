@@ -245,6 +245,7 @@ function ViewRoom(props) {
         .doc(discussionId)
         .update({
           interaction: interactionPoint,
+          date
         })
         .then(() => {
           console.log('done');

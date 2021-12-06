@@ -171,7 +171,7 @@ export class Main extends Component {
         }}
       >
         <Tab.Screen
-          name="Room"
+          name="RoomTab"
           component={RoomStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
@@ -185,7 +185,7 @@ export class Main extends Component {
         />
 
         <Tab.Screen
-          name="Feed"
+          name="FeedTab"
           component={HomeStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
