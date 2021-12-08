@@ -613,6 +613,15 @@ export class App extends Component {
                 options={{ headerTitle: 'Leaderboard' }}
                 navigation={this.props.navigation}
               />
+              <Stack.Screen
+                name='AddCommentScreen'
+                component={AddCommentScreen}
+                navigation={this.props.navigation}
+                options={{
+                  headerTitle: 'Add Comment',
+                  headerBackTitleVisible: false,
+                }}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </Provider>

@@ -4,8 +4,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  FlatList,
   TouchableOpacity,
   Alert,
   Image,
@@ -13,20 +11,19 @@ import {
   Dimensions,
   LogBox,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 
 import MentionsTextInput from 'react-native-mentions';
 
-import CommentCard from '../../component/commentCard';
+import { WebView } from 'react-native-webview';
 import { Icon } from 'react-native-elements';
-import Modal from 'react-native-modal';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 import Images from 'react-native-scalable-image';
-import { timeDifference } from '../../../utils';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
-import { FAB, ListItem, BottomSheet } from 'react-native-elements';
+import { FAB } from 'react-native-elements';
 require('firebase/firestore');
 
 function AddCommentScreen(props) {
@@ -36,8 +33,8 @@ function AddCommentScreen(props) {
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
   const [commentId, setCommentId] = useState(null);
-  const [isReportVisible, setReportVisible] = useState(false);
-  const [newComment, setNewComment] = useState('');
+  const [web, setWeb] = useState(false);
+  const [name, setName] = useState('');
   const [editComment, setEditComment] = useState('');
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
@@ -58,7 +55,6 @@ function AddCommentScreen(props) {
   const [date, setDate] = useState([]);
   const [userStatus, setUserStatus] = useState(0);
   const [loadMore, setLoadMore] = useState(12);
-  const [uuu, setuuu] = useState(0);
   const [totalComment, setTotalComment] = useState(0);
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
   //
@@ -92,40 +88,6 @@ function AddCommentScreen(props) {
       onPress: () => setIsVisible(false),
     },
   ];
-
-  useLayoutEffect(() => {
-    props.navigation.setOptions({
-      headerRight: () => (
-        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-          {userStatus == 1 ? (
-            <TouchableOpacity style={{ marginHorizontal: 5 }}>
-              <Icon
-                name='stats-chart-outline'
-                type='ionicon'
-                size={30}
-                color='#000'
-                onPress={() => {
-                  navtostats();
-                }}
-              />
-            </TouchableOpacity>
-          ) : null}
-
-          <TouchableOpacity style={{ marginHorizontal: 5, marginBottom: -5 }}>
-            <Icon
-              name='information-circle-outline'
-              type='ionicon'
-              size={33}
-              color='#000'
-              onPress={() => {
-                navtodetail();
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-      ),
-    });
-  }, [data]);
 
   useEffect(() => {
     LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
@@ -233,8 +195,8 @@ function AddCommentScreen(props) {
     return <View />;
   }
 
-	const addImgPieChart = () => {
-		let u = totalNumberOfAttachedImage + 1;
+  const addImgPieChart = () => {
+    let u = totalNumberOfAttachedImage + 1;
     firebase
       .firestore()
       .collection('DiscussionRoom')
@@ -247,8 +209,8 @@ function AddCommentScreen(props) {
       });
   };
 
-	const addDocPieChart = () => {
-		let z = totalNumberOfAttachedDocument + 1;
+  const addDocPieChart = () => {
+    let z = totalNumberOfAttachedDocument + 1;
     firebase
       .firestore()
       .collection('DiscussionRoom')
@@ -368,6 +330,14 @@ function AddCommentScreen(props) {
     }
 
     addInteraction();
+  };
+
+  const removeImage = () => {
+    setImage(null);
+  };
+
+  const removeDoc = () => {
+    setDoc(null);
   };
 
   const pickDocument = async () => {
@@ -691,18 +661,24 @@ function AddCommentScreen(props) {
   };
 
   return (
-    <View style={{ justifyContent: 'center' }}>
-      {/* style={styles.searchSection} */}
+    <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row' }}>
         <View style={{ flex: 1, justifyContent: 'flex-start' }}>
           <View style={{ width: '100%' }}>
             <MentionsTextInput
-              textInputStyle={styles.searchSection}
+              textInputStyle={{
+                borderColor: '#E3562A',
+                borderWidth: 1,
+                padding: 5,
+                fontSize: 15,
+                fontFamily: 'Poppins',
+                margin: 20,
+              }}
               suggestionsPanelStyle={{
                 backgroundColor: '#fff',
               }}
-              textInputMinHeight={30}
-              textInputMaxHeight={80}
+              textInputMinHeight={50}
+              textInputMaxHeight={800}
               trigger={'@'}
               triggerLocation={'new-word-only'} // 'new-word-only', 'anywhere'
               value={caption}
@@ -715,179 +691,135 @@ function AddCommentScreen(props) {
               horizontal={false}
               MaxVisibleRowCount={3}
             />
-          </View>
-        </View>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <Icon
-            style={{ marginTop: 5 }}
-            name='attach-outline'
-            type='ionicon'
-            size={30}
-            color='#fff'
-            // onPress={() => {
-            //   pickDocument();
-            // }}
-            onPress={pickDocument}
-          />
-          <Icon
-            style={styles.searchIcon}
-            name='image-outline'
-            type='ionicon'
-            size={30}
-            color='#fff'
-            // onPress={() => {
-            //   pickImage();
-            // }}
-            onPress={pickImage}
-          />
+            {/* <TextInput
+              style={styles.desc}
+              placeholder='Type here'
+              multiline={true}
+              defaultValue={description}
+             onChangeText={(description) => setDescription(description)}
+            /> */}
+          </View>
         </View>
       </View>
 
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignContent: 'space-between',
+          paddingHorizontal: 20,
+          marginBottom: 10,
         }}
       >
-        <View
-          style={{
-            paddingHorizontal: 20,
-          }}
-        >
-          <TouchableOpacity style={styles.blogout} onPress={UploadComment}>
-            <Text style={styles.Ltext}>Add Comment</Text>
+        {image == null ? (
+          <TouchableOpacity style={styles.blogout} onPress={pickImage}>
+            <Text style={styles.Ltext}>Attach Image</Text>
           </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            paddingHorizontal: 20,
-          }}
-        >
-          <TouchableOpacity
-            style={styles.blogout}
-            //onPress={toggleModal}
-            onPress={toggleModal}
-          >
-            <Text style={styles.Ltext}>Cancel</Text>
+        ) : (
+          <TouchableOpacity style={styles.blogout} onPress={removeImage}>
+            <Text style={styles.Ltext}>Remove Image</Text>
           </TouchableOpacity>
-        </View>
+        )}
       </View>
+
+      <View style={{ alignItems: 'center' }}>
+        {image && (
+          <Images
+            width={Dimensions.get('window').width} // height will be calculated automatically
+            source={{ uri: image }}
+          />
+        )}
+      </View>
+
+      <View
+        style={{
+          paddingHorizontal: 20,
+        }}
+      >
+        {Doc == null ? (
+          <TouchableOpacity style={styles.blogout} onPress={pickDocument}>
+            <Text style={styles.Ltext}>Attach Document</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.blogout} onPress={removeDoc}>
+            <Text style={styles.Ltext}>Remove Document</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View>
+        {Doc && (
+          <View style={styles.attachment}>
+            <TouchableOpacity style={styles.icon} onPress={() => setWeb(true)}>
+              <Text
+                style={{
+                  fontFamily: 'Poppins',
+                }}
+              >
+                {name}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      {web ? <WebView source={{ uri: Doc }} /> : null}
+
+      <FAB
+        placement='right'
+        color='#E3562A'
+        onPress={UploadComment}
+        icon={
+          <Icon
+            reverse
+            name='add-outline'
+            type='ionicon'
+            color='#E3562A'
+            size={35}
+            containerStyle={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: 11,
+            }}
+          />
+        }
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  desc: {
+    color: '#000',
     margin: 20,
-    // marginTop: 20,
-    marginBottom: 5,
-    // marginLeft: 20,
-    // marginLeft:20
-  },
-
-  titlex: {
-    color: '#fff',
-    fontSize: 20,
-    fontFamily: 'Poppins',
-    paddingVertical: 0,
-    //  marginVertical: -5,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-
-  titley: {
-    color: '#fff',
-    fontSize: 25,
-    fontFamily: 'Poppins',
-    paddingVertical: 0,
-    //  marginVertical: -5,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    fontWeight: '700',
-    marginBottom: 20,
-  },
-
-  card: {
-    borderRadius: 16,
-    elevation: 5,
-    backgroundColor: '#140F38',
-    shadowOffset: { width: 1, height: 1 },
-    shadowColor: '#333',
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    marginHorizontal: 4,
-    marginVertical: 6,
-    width: 340,
-  },
-
-  cardContent: {
-    marginVertical: 10,
-    marginHorizontal: 18,
-  },
-
-  input: {
-    height: 60,
+    height: 250,
     borderColor: '#E3562A',
     borderWidth: 1,
     backgroundColor: '#FFF',
-    width: 340,
+    width: 350,
     borderRadius: 12,
     padding: 10,
     fontFamily: 'Poppins',
   },
 
-  title: {
-    fontSize: 20,
-    fontFamily: 'Poppins',
-    lineHeight: 20,
-    fontWeight: '700',
-    marginBottom: 5,
+  attachment: {
+    backgroundColor: '#808080',
+    height: 45,
+    margin: 20,
+    borderColor: '#000',
+    borderRadius: 5,
+    justifyContent: 'center',
+    elevation: 2,
+    paddingLeft: 10,
   },
 
-  commentCon: {
-    borderColor: '#E3562A',
-    borderBottomWidth: 5,
-    width: 300,
-    paddingVertical: 3,
-  },
-
-  desc: {
-    fontSize: 14,
-  },
-
-  descT: {
-    fontSize: 20,
-    lineHeight: 25,
-    fontFamily: 'Poppins',
-    marginTop: 10,
-  },
-
-  comT: {
-    fontFamily: 'Poppins',
-    fontWeight: '700',
-    fontSize: 18,
-  },
-
-  userT: {
-    fontFamily: 'Poppins',
-    fontWeight: '600',
-    fontSize: 15,
-  },
-
-  userC: {
-    fontFamily: 'Poppins',
-    lineHeight: 20,
-    fontSize: 15,
+  icon: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingRight: 5,
   },
 
   blogout: {
-    width: 140,
-    height: 40,
+    width: Dimensions.get('window').width * 0.5,
+    height: Dimensions.get('window').width * 0.12,
     backgroundColor: '#E3562A',
     borderColor: '#E3562A',
     borderRadius: 16,
@@ -899,7 +831,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Poppins',
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: 20,
     justifyContent: 'space-between',
     paddingTop: 8,
   },
