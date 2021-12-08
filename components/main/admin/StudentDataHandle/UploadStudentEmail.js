@@ -11,30 +11,52 @@ import {
 } from 'react-native';
 import { FAB } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
+import { RadioButton } from 'react-native-paper';
 import firebase from 'firebase';
 require('firebase/firestore');
 
 function UploadStudentEmail(props) {
   const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   const [email, setEmail] = useState('');
+  const [checked, setChecked] = useState('first');
 
   const uploadEmail = () => {
-    if (!email.match(mailformat)) {
-      return Alert.alert('Invalid Email Format', 'Enter valid email', [
-        {
-          text: 'Retry',
-        },
-      ]);
+    if ((checked = first)) {
+      if (!email.match(mailformat)) {
+        return Alert.alert('Invalid Email Format', 'Enter valid email', [
+          {
+            text: 'Retry',
+          },
+        ]);
+      } else {
+        firebase
+          .firestore()
+          .collection('Student')
+          .add({
+            email,
+          })
+          .then(function () {
+            props.navigation.goBack();
+          });
+      }
     } else {
-      firebase
-        .firestore()
-        .collection('Student')
-        .add({
-          email,
-        })
-        .then(function () {
-          props.navigation.goBack();
-        });
+      if (!email.match(mailformat)) {
+        return Alert.alert('Invalid Email Format', 'Enter valid email', [
+          {
+            text: 'Retry',
+          },
+        ]);
+      } else {
+        firebase
+          .firestore()
+          .collection('Lecture')
+          .add({
+            email,
+          })
+          .then(function () {
+            props.navigation.goBack();
+          });
+      }
     }
   };
 
@@ -48,6 +70,28 @@ function UploadStudentEmail(props) {
             value={email}
             onChangeText={(email) => setEmail(email)}
           />
+        </View>
+      </View>
+      <View style={styles.form}>
+        <View style={{ flexDirection: 'row' }}>
+          <RadioButton
+            value='first'
+            status={checked === 'first' ? 'checked' : 'unchecked'}
+            onPress={() => setChecked('first')}
+          />
+          <View style={{ marginTop: 4 }}>
+            <Text style={styles.label}>Student</Text>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <RadioButton
+            value='second'
+            status={checked === 'second' ? 'checked' : 'unchecked'}
+            onPress={() => setChecked('second')}
+          />
+          <View style={{ marginTop: 4 }}>
+            <Text style={styles.label}>Lecture</Text>
+          </View>
         </View>
       </View>
       <FAB

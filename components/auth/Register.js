@@ -20,6 +20,7 @@ export class Register extends Component {
     this.state = {
       email: '',
       password: '',
+      Rpassword: '',
       name: '',
       faculty: null,
       year: null,
@@ -70,7 +71,7 @@ export class Register extends Component {
             const id = doc.id;
             return { id, ...data };
           });
-          console.log(faculty);
+          //   console.log(faculty);
           this.setState({
             fac: faculty,
           });
@@ -84,7 +85,8 @@ export class Register extends Component {
   }
 
   validate() {
-    const { email, password, name, faculty, year, data } = this.state;
+    const { email, password, Rpassword, name, faculty, year, data } =
+      this.state;
     const found = data.some((el) => el.email === email);
     const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     // ------------------------------------------------------------------------ //
@@ -167,6 +169,15 @@ export class Register extends Component {
       }
     }
 
+
+    if( password != Rpassword){
+      return Alert.alert('Password does not match ', 'Please retry', [
+        {
+          text: 'Retry',
+        },
+      ]);
+    }
+
     if (faculty == null) {
       return Alert.alert('Invalid faculty input', 'Please choose a faculty', [
         {
@@ -201,6 +212,7 @@ export class Register extends Component {
           .collection('users')
           .doc(firebase.auth().currentUser.uid)
           .set({
+            realName:name,
             name,
             email,
             matricNumber: mc,
@@ -253,7 +265,7 @@ export class Register extends Component {
             awards: [],
             //change for contribution
           });
-        console.log(result);
+        //console.log(result);
       })
       .catch((error) => {
         console.log(error);
@@ -298,11 +310,21 @@ export class Register extends Component {
         <TextInput
           style={styles.input}
           underlineColorAndroid='transparent'
-          placeholder='Passowrd'
+          placeholder='Password'
           placeholderTextColor='#000'
           autoCapitalize='none'
           secureTextEntry={true}
           onChangeText={(password) => this.setState({ password })}
+        />
+
+        <TextInput
+          style={styles.input}
+          underlineColorAndroid='transparent'
+          placeholder='Re-Type Password'
+          placeholderTextColor='#000'
+          autoCapitalize='none'
+          secureTextEntry={true}
+          onChangeText={(Rpassword) => this.setState({ Rpassword })}
         />
 
         <SelectPicker

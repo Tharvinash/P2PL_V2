@@ -434,7 +434,7 @@ export class App extends Component {
               <Stack.Screen
                 name='UploadStudentEmail'
                 options={{
-                  headerTitle: 'Upload Student Email',
+                  headerTitle: 'Upload Email',
                   headerBackTitleVisible: false,
                 }}
                 component={UploadStudentEmail}

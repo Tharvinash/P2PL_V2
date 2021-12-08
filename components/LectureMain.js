@@ -160,7 +160,7 @@ export class Main extends Component {
     //current user data
     return (
       <Tab.Navigator
-        initialRouteName="Feed"
+        initialRouteName="FeedTab"
         activeColor="#f0edf6"
         inactiveColor="#3e2465"
         labeled={false}

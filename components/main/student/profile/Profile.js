@@ -20,12 +20,13 @@ function Profile(props) {
   const userId = firebase.auth().currentUser.uid;
   const { currentUser, posts } = props;
   const [user, setUser] = useState(currentUser);
+  const [faculty, setFaculty] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
   const list = [
     {
       title: 'Edit Personal Info',
-      onPress: () => props.navigation.navigate('EditProfile', { uid: userId }),
+      onPress: () => props.navigation.navigate('EditProfile', { uid: userId, facId: faculty }),
     },
     {
       title: 'Edit Password',
@@ -50,6 +51,7 @@ function Profile(props) {
         .then((snapshot) => {
           if (snapshot.exists) {
             setUser(snapshot.data());
+            setFaculty(snapshot.data().faculty);
             //console.log(snapshot.data())
           } else {
             console.log('does not exist');

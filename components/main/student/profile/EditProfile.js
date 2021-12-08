@@ -12,8 +12,8 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
-import { Icon } from "react-native-elements";
-import { FAB } from "react-native-elements";
+import { Icon } from 'react-native-elements';
+import { FAB } from 'react-native-elements';
 import SelectPicker from 'react-native-form-select-picker';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
@@ -37,6 +37,7 @@ function EditProfile(props) {
   const [imageChanged, setImageChanged] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [cu, setCu] = useState(currentUser);
+  const [rn, setRn] = useState('');
   let options = [1, 2, 3, 4, 5];
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const defaultImage =
@@ -54,6 +55,7 @@ function EditProfile(props) {
         setFac(snapshot.data().faculty);
         setStatus(snapshot.data().status);
         setMatricNum(snapshot.data().matricNumber);
+        setRn(snapshot.data().realName);
       });
     firebase
       .firestore()
@@ -261,8 +263,12 @@ function EditProfile(props) {
   };
 
   return (
-    <View style={{flex:1}}>
+    <View style={{ flex: 1 }}>
       <View style={styles.form}>
+        <View style={styles.formControl}>
+          <Text style={styles.label}>Full Name</Text>
+          <Text style={styles.input}>{rn}</Text>
+        </View>
         <View style={styles.formControl}>
           <Text style={styles.label}>User Id</Text>
           <TextInput
@@ -273,7 +279,7 @@ function EditProfile(props) {
         </View>
         {status == 0 && (
           <View style={styles.formControl}>
-            <Text style={styles.label}>Matric Number: </Text>
+            <Text style={styles.label}>Matric Number </Text>
             <TextInput
               style={styles.input}
               value={matricNum}
@@ -310,49 +316,45 @@ function EditProfile(props) {
 
         <View style={styles.formControl}>
           <Text style={styles.label}>Faculty</Text>
-          <View>
-
-          </View>
+          <View></View>
           <SelectPicker
-              placeholder={fac}
-              placeholderStyle={{
-                fontFamily: "Poppins",
-                fontSize: 20,
-                color: "#000",
-              }}
-              onSelectedStyle={{
-                fontFamily: "Poppins",
-                fontSize: 15,
-                color: "#000",
-                ...Platform.select({
-                  ios: {
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    paddingBottom: 0,
-                  },
-                }),
-              }}
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                ...styles.ui,
-              }}
-              style={styles.input}
-              onValueChange={setFac}
-              selected={fac}
-            >
-              {Object.values(facultyData).map((val) => (
-                <SelectPicker.Item
-                  label={val.faculty}
-                  value={val.faculty}
-                  key={val.id}
-                />
-              ))}
-            </SelectPicker>
+            placeholder={fac}
+            placeholderStyle={{
+              fontFamily: 'Poppins',
+              fontSize: 20,
+              color: '#000',
+            }}
+            onSelectedStyle={{
+              fontFamily: 'Poppins',
+              fontSize: 15,
+              color: '#000',
+              ...Platform.select({
+                ios: {
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingBottom: 0,
+                },
+              }),
+            }}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              ...styles.ui,
+            }}
+            style={styles.input}
+            onValueChange={setFac}
+            selected={fac}
+          >
+            {Object.values(facultyData).map((val) => (
+              <SelectPicker.Item
+                label={val.faculty}
+                value={val.faculty}
+                key={val.id}
+              />
+            ))}
+          </SelectPicker>
         </View>
-
-        
 
         <View style={styles.formControl}>
           <Text style={styles.label}>Profile Picture</Text>
@@ -382,13 +384,13 @@ function EditProfile(props) {
         </View>
       </Modal>
       <FAB
-        placement="right"
-        color="#E3562A"
+        placement='right'
+        color='#E3562A'
         style={styles.floatButton}
         onPress={() => Save()}
-        size="large"
+        size='large'
         icon={
-          <Icon name="save-outline" type="ionicon" size={25} color="#FFF" />
+          <Icon name='save-outline' type='ionicon' size={25} color='#FFF' />
         }
       />
     </View>
@@ -437,12 +439,12 @@ const styles = StyleSheet.create({
 
   ui: {
     marginVertical: 10,
-    width: Dimensions.get("window").width * 0.5,
-    height: Dimensions.get("window").width * 0.1,
-    backgroundColor: "#E3562A",
+    width: Dimensions.get('window').width * 0.5,
+    height: Dimensions.get('window').width * 0.1,
+    backgroundColor: '#E3562A',
     borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

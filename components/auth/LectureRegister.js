@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Text,
   View,
@@ -7,20 +7,21 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-} from "react-native";
-import SelectPicker from "react-native-form-select-picker";
-import validator from "validator";
-import firebase from "firebase";
-import "firebase/firestore";
+} from 'react-native';
+import SelectPicker from 'react-native-form-select-picker';
+import validator from 'validator';
+import firebase from 'firebase';
+import 'firebase/firestore';
 
 export class Register extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      email: "",
-      password: "",
-      name: "",
+      email: '',
+      password: '',
+      Rpassword: '',
+      name: '',
       faculty: null,
       data: [],
       fac: [],
@@ -41,7 +42,7 @@ export class Register extends Component {
     setTimeout(() => {
       firebase
         .firestore()
-        .collection("Lecture")
+        .collection('Lecture')
         .get()
         .then((snapshot) => {
           let lectureEmail = snapshot.docs.map((doc) => {
@@ -59,7 +60,7 @@ export class Register extends Component {
     setTimeout(() => {
       firebase
         .firestore()
-        .collection("Faculty")
+        .collection('Faculty')
         .get()
         .then((snapshot) => {
           let faculty = snapshot.docs.map((doc) => {
@@ -67,7 +68,7 @@ export class Register extends Component {
             const id = doc.id;
             return { id, ...data };
           });
-          console.log(faculty);
+          // console.log(faculty);
           this.setState({
             fac: faculty,
           });
@@ -81,15 +82,15 @@ export class Register extends Component {
   }
 
   validate() {
-    const { email, password, name, faculty, data } = this.state;
+    const { email, password, Rpassword, name, faculty, data } = this.state;
     const found = data.some((el) => el.email === email);
     const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     // ------------------------------------------------------------------------ //
 
     if (!name.trim()) {
-      return Alert.alert("Invalid Name", "Please enter a valid user name", [
+      return Alert.alert('Invalid Name', 'Please enter a valid user name', [
         {
-          text: "Retry",
+          text: 'Retry',
         },
       ]);
     }
@@ -98,11 +99,11 @@ export class Register extends Component {
       if (!found) {
         return Alert.alert(
           "Email doesn't exsist",
-          "Contact admin for further details",
+          'Contact admin for further details',
           [
             // The "Yes" button
             {
-              text: "Contact Admin",
+              text: 'Contact Admin',
               // onPress: () => {
               //   firebase
               //     .firestore()
@@ -113,18 +114,18 @@ export class Register extends Component {
               // },
             },
             {
-              text: "Retry",
+              text: 'Retry',
             },
           ]
         );
       }
     } else {
       return Alert.alert(
-        "Invalid Email Address",
-        "You have entered and invalid email address",
+        'Invalid Email Address',
+        'You have entered and invalid email address',
         [
           {
-            text: "Retry",
+            text: 'Retry',
           },
         ]
       );
@@ -132,11 +133,11 @@ export class Register extends Component {
 
     if (!password.trim()) {
       return Alert.alert(
-        "Invalid password",
-        "The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ",
+        'Invalid password',
+        'The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ',
         [
           {
-            text: "Retry",
+            text: 'Retry',
           },
         ]
       );
@@ -150,24 +151,32 @@ export class Register extends Component {
           minSymbols: 1,
         })
       ) {
-        console.log("Is Strong Password");
+        console.log('Is Strong Password');
       } else {
         return Alert.alert(
-          "Invalid password",
-          "The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ",
+          'Invalid password',
+          'The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ',
           [
             {
-              text: "Retry",
+              text: 'Retry',
             },
           ]
         );
       }
     }
 
-    if (faculty == null) {
-      return Alert.alert("Invalid faculty input", "Please choose a faculty", [
+    if (password != Rpassword) {
+      return Alert.alert('Password does not match ', 'Please retry', [
         {
-          text: "Retry",
+          text: 'Retry',
+        },
+      ]);
+    }
+
+    if (faculty == null) {
+      return Alert.alert('Invalid faculty input', 'Please choose a faculty', [
+        {
+          text: 'Retry',
         },
       ]);
     }
@@ -183,7 +192,7 @@ export class Register extends Component {
       .then((result) => {
         firebase
           .firestore()
-          .collection("users")
+          .collection('users')
           .doc(firebase.auth().currentUser.uid)
           .set({
             name,
@@ -207,27 +216,27 @@ export class Register extends Component {
             aois: true,
             aoms: true,
             image:
-              "https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/default%2FnewProfile.png?alt=media&token=b2e22482-506a-4e78-ae2e-e38c83ee7c27",
+              'https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/default%2FnewProfile.png?alt=media&token=b2e22482-506a-4e78-ae2e-e38c83ee7c27',
             filteredFeed: [
-              "FACULTY OF SCIENCE",
-              "FACULTY OF CREATIVE ARTS",
-              "FACULTY OF PHARMACY",
-              "FACULTY OF LAW",
-              "FACULTY OF EDUCATION",
-              "FACULTY OF DENTISTRY",
-              "FACULTY OF ENGINEERING",
-              "FACULTY OF MEDICINE",
-              "FACULTY OF ARTS AND SOCIAL SCIENCE",
-              "FACULTY OF BUSINESS AND ACCOUNTANCY",
-              "FACULTY OF ECONOMICS AND ADMINISTRATION",
-              "FACULTY OF LANGUAGE AND LINGUISTICS",
-              "FACULTY OF BUILT ENVIRONMENT",
-              "FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY",
-              "ACADEMY OF ISLAMIC STUDIES",
-              "ACADEMY OF MALAY STUDIES",
+              'FACULTY OF SCIENCE',
+              'FACULTY OF CREATIVE ARTS',
+              'FACULTY OF PHARMACY',
+              'FACULTY OF LAW',
+              'FACULTY OF EDUCATION',
+              'FACULTY OF DENTISTRY',
+              'FACULTY OF ENGINEERING',
+              'FACULTY OF MEDICINE',
+              'FACULTY OF ARTS AND SOCIAL SCIENCE',
+              'FACULTY OF BUSINESS AND ACCOUNTANCY',
+              'FACULTY OF ECONOMICS AND ADMINISTRATION',
+              'FACULTY OF LANGUAGE AND LINGUISTICS',
+              'FACULTY OF BUILT ENVIRONMENT',
+              'FACULTY OF COMPUTER SCIENCE AND INFORMATION TECHNOLOGY',
+              'ACADEMY OF ISLAMIC STUDIES',
+              'ACADEMY OF MALAY STUDIES',
             ],
           });
-        console.log(result);
+        // console.log(result);
       })
       .catch((error) => {
         console.log(error);
@@ -244,43 +253,53 @@ export class Register extends Component {
 
         <TextInput
           style={styles.input}
-          underlineColorAndroid="transparent"
-          placeholder="Full Name"
-          placeholderTextColor="#000"
-          autoCapitalize="none"
+          underlineColorAndroid='transparent'
+          placeholder='Full Name'
+          placeholderTextColor='#000'
+          autoCapitalize='none'
           onChangeText={(name) => this.setState({ name })}
         />
 
         <TextInput
           style={styles.input}
-          underlineColorAndroid="transparent"
-          placeholder="E-mail"
-          placeholderTextColor="#000"
-          autoCapitalize="none"
+          underlineColorAndroid='transparent'
+          placeholder='E-mail'
+          placeholderTextColor='#000'
+          autoCapitalize='none'
           onChangeText={(email) => this.setState({ email })}
         />
 
         <TextInput
           style={styles.input}
-          underlineColorAndroid="transparent"
-          placeholder="Passowrd"
-          placeholderTextColor="#000"
-          autoCapitalize="none"
+          underlineColorAndroid='transparent'
+          placeholder='Passowrd'
+          placeholderTextColor='#000'
+          autoCapitalize='none'
           secureTextEntry={true}
           onChangeText={(password) => this.setState({ password })}
         />
 
+        <TextInput
+          style={styles.input}
+          underlineColorAndroid='transparent'
+          placeholder='Re-Type Password'
+          placeholderTextColor='#000'
+          autoCapitalize='none'
+          secureTextEntry={true}
+          onChangeText={(Rpassword) => this.setState({ Rpassword })}
+        />
+
         <SelectPicker
-          placeholder="Faculty"
+          placeholder='Faculty'
           placeholderStyle={{
-            fontFamily: "Poppins",
+            fontFamily: 'Poppins',
             fontSize: 15,
-            color: "#000",
+            color: '#000',
             marginTop: 5,
           }}
           onSelectedStyle={{
             fontSize: 15,
-            color: "#000",
+            color: '#000',
           }}
           style={styles.input}
           onValueChange={this.updateFaculty}
@@ -306,47 +325,47 @@ export class Register extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   ui: {
     marginVertical: 10,
-    width: Dimensions.get("window").width * 0.8,
-    height: Dimensions.get("window").width * 0.1,
-    backgroundColor: "#E3562A",
+    width: Dimensions.get('window').width * 0.8,
+    height: Dimensions.get('window').width * 0.1,
+    backgroundColor: '#E3562A',
     borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   title: {
-    color: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "white",
+    color: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
     fontSize: 30,
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
   },
 
   title2: {
-    color: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "white",
+    color: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
     fontSize: 20,
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     marginBottom: 20,
   },
 
   button: {
-    alignItems: "center",
-    backgroundColor: "#E3562A",
+    alignItems: 'center',
+    backgroundColor: '#E3562A',
     padding: 14,
     borderRadius: 20,
     width: 275,
@@ -354,19 +373,19 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   text: {
-    color: "white",
+    color: 'white',
     fontSize: 18,
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
   },
 
   input: {
     margin: 5,
     height: 53,
-    borderColor: "#E3562A",
+    borderColor: '#E3562A',
     borderWidth: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     width: 275,
     borderRadius: 12,
     padding: 10,

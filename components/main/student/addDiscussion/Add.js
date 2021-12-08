@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   ui: {
     marginVertical: 10,
     width: Dimensions.get("window").width * 0.5,
-    height: Dimensions.get("window").width * 0.1,
+    height: Dimensions.get("window").width * 0.12,
     backgroundColor: "#E3562A",
     borderRadius: 16,
     justifyContent: "center",

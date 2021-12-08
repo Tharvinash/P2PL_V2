@@ -99,7 +99,7 @@ export default function Search(props) {
           }}
           onSelectedStyle={{
             fontFamily: "Poppins",
-            fontSize: 15,
+            fontSize: 20,
             color: "#fff",
           }}
           style={{
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   ui: {
     marginVertical: 10,
     width: Dimensions.get("window").width * 0.8,
-    height: Dimensions.get("window").width * 0.1,
+    height: Dimensions.get("window").width * 0.12,
     backgroundColor: "#E3562A",
     borderRadius: 16,
     justifyContent: "center",
