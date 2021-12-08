@@ -127,7 +127,7 @@ function RoomReplyComment(props) {
       .then((snapshot) => {
         setMainComment(snapshot.data());
         setNumberOfReply(snapshot.data().numberOfReply);
-      //  console.log('Reply ' + snapshot.data().numberOfReply);
+        //  console.log('Reply ' + snapshot.data().numberOfReply);
       });
 
     firebase
@@ -979,6 +979,7 @@ function RoomReplyComment(props) {
         renderItem={({ item }) => (
           <View style={{ marginLeft: 30, marginTop: 5 }}>
             <ReplyCommentCard
+              componentStatus={0}
               removeVerifyReplyComment={() => removeVerifyReplyComment(item.id)}
               verifyReplyComment={() => verifyReplyComment(item.id)}
               image={item.image}
@@ -1013,6 +1014,7 @@ function RoomReplyComment(props) {
         ListHeaderComponent={
           <View>
             <MainCommentCard
+              componentStatus={0}
               picture={mainComment.image}
               time={time}
               status={loginCurrentUser.status}

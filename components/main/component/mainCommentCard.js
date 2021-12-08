@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,13 @@ import {
   Image,
   TouchableOpacity,
   Alert,
-} from "react-native";
-import { Icon } from "react-native-elements";
-import { timeDifference } from "../../utils";
-import ImageView from "react-native-image-viewing";
-import { WebView } from "react-native-webview";
-import ParsedText from "react-native-parsed-text";
-import * as Linking from "expo-linking";
+} from 'react-native';
+import { Icon } from 'react-native-elements';
+import { timeDifference } from '../../utils';
+import ImageView from 'react-native-image-viewing';
+import { WebView } from 'react-native-webview';
+import ParsedText from 'react-native-parsed-text';
+import * as Linking from 'expo-linking';
 
 const mainCommentCard = (props) => {
   const a = props.verify;
@@ -51,7 +51,7 @@ const mainCommentCard = (props) => {
 
   return (
     <View>
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: 'row' }}>
         <View>
           <Image
             style={{
@@ -64,48 +64,49 @@ const mainCommentCard = (props) => {
               uri: props.picture,
             }}
           />
+          {props.componentStatus == 1 && (
+            <View
+              style={{
+                marginRight: 10,
+                paddingTop: 10,
+              }}
+            >
+              {props.status == 1 ? (
+                <View>
+                  {props.verify ? (
+                    <Icon
+                      name='checkmark-circle'
+                      type='ionicon'
+                      size={25}
+                      color='#140F38'
+                      onPress={props.removeVerifyComment}
+                    />
+                  ) : (
+                    <Icon
+                      name='checkmark-circle-outline'
+                      type='ionicon'
+                      size={25}
+                      color='#140F38'
+                      onPress={props.verifyComment}
+                    />
+                  )}
+                </View>
+              ) : null}
 
-          <View
-            style={{
-              marginRight: 10,
-              paddingTop: 10,
-            }}
-          >
-            {props.status == 1 ? (
-              <View>
-                {props.verify ? (
-                  <Icon
-                    name="checkmark-circle"
-                    type="ionicon"
-                    size={25}
-                    color="#140F38"
-                    onPress={props.removeVerifyComment}
-                  />
-                ) : (
-                  <Icon
-                    name="checkmark-circle-outline"
-                    type="ionicon"
-                    size={25}
-                    color="#140F38"
-                    onPress={props.verifyComment}
-                  />
-                )}
-              </View>
-            ) : null}
-
-            {props.status == 0 ? (
-              <View>
-                {props.verify ? (
-                  <Icon
-                    name="checkmark-circle"
-                    type="ionicon"
-                    size={20}
-                    color="#140F38"
-                  />
-                ) : null}
-              </View>
-            ) : null}
-          </View>
+              {props.status == 0 ? (
+                <View>
+                  {props.verify ? (
+                    <Icon
+                      name='checkmark-circle'
+                      type='ionicon'
+                      size={20}
+                      color='#140F38'
+                    />
+                  ) : null}
+                </View>
+              ) : null}
+            </View>
+          )}
         </View>
         {props.firstUserId === props.secondUserId ? (
           <TouchableOpacity
@@ -116,8 +117,8 @@ const mainCommentCard = (props) => {
           >
             <View
               style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}
             >
               <Text style={styles.userName}>{props.postedBy} </Text>
@@ -131,25 +132,25 @@ const mainCommentCard = (props) => {
             </View>
             <View
               style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}
             >
               <ParsedText
                 style={styles.userC}
                 parse={[
                   {
-                    type: "url",
+                    type: 'url',
                     style: styles.url,
                     onPress: handleUrlPress,
                   },
                   {
-                    type: "phone",
+                    type: 'phone',
                     style: styles.phone,
                     onPress: handlePhonePress,
                   },
                   {
-                    type: "email",
+                    type: 'email',
                     style: styles.email,
                     onPress: handleEmailPress,
                   },
@@ -174,16 +175,16 @@ const mainCommentCard = (props) => {
                 >
                   <Text
                     style={{
-                      fontFamily: "Poppins",
+                      fontFamily: 'Poppins',
                     }}
                   >
                     Image
                   </Text>
                   <Icon
-                    name="download-outline"
-                    type="ionicon"
+                    name='download-outline'
+                    type='ionicon'
                     size={25}
-                    color="#000"
+                    color='#000'
                   />
                 </TouchableOpacity>
               </View>
@@ -197,27 +198,27 @@ const mainCommentCard = (props) => {
                 >
                   <Text
                     style={{
-                      fontFamily: "Poppins",
+                      fontFamily: 'Poppins',
                     }}
                   >
                     Doc
                   </Text>
                   <Icon
-                    name="download-outline"
-                    type="ionicon"
+                    name='download-outline'
+                    type='ionicon'
                     size={25}
-                    color="#000"
+                    color='#000'
                   />
                 </TouchableOpacity>
               </View>
             ) : null}
 
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: 'row' }}>
               <Text
                 style={{
                   fontSize: 15,
                   marginRight: 3,
-                  fontFamily: "Poppins",
+                  fontFamily: 'Poppins',
                 }}
               >
                 {props.numOfLike}
@@ -227,10 +228,10 @@ const mainCommentCard = (props) => {
                   style={{
                     paddingLeft: 10,
                   }}
-                  name="heart"
-                  type="ionicon"
+                  name='heart'
+                  type='ionicon'
                   size={20}
-                  color="#000"
+                  color='#000'
                   onPress={props.removeLike}
                 />
               ) : (
@@ -238,10 +239,10 @@ const mainCommentCard = (props) => {
                   style={{
                     paddingLeft: 10,
                   }}
-                  name="heart-outline"
-                  type="ionicon"
+                  name='heart-outline'
+                  type='ionicon'
                   size={20}
-                  color="#000"
+                  color='#000'
                   onPress={props.addLike}
                 />
               )}
@@ -249,10 +250,10 @@ const mainCommentCard = (props) => {
                 style={{
                   paddingLeft: 10,
                 }}
-                name="arrow-redo-outline"
-                type="ionicon"
+                name='arrow-redo-outline'
+                type='ionicon'
                 size={20}
-                color="#000"
+                color='#000'
                 onPress={props.toggleReplyComment}
               />
             </View>
@@ -260,148 +261,148 @@ const mainCommentCard = (props) => {
         ) : (
           <View style={styles.mainBubble}>
             <View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={styles.userName}>{props.postedBy} </Text>
-              {props.creation === null ? (
-                <Text style={(styles.userC, { marginRight: 10 })}>Now</Text>
-              ) : (
-                <Text style={(styles.userC, { marginRight: 10 })}>
-                  {props.time}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text style={styles.userName}>{props.postedBy} </Text>
+                {props.creation === null ? (
+                  <Text style={(styles.userC, { marginRight: 10 })}>Now</Text>
+                ) : (
+                  <Text style={(styles.userC, { marginRight: 10 })}>
+                    {props.time}
+                  </Text>
+                )}
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <ParsedText
+                  style={styles.userC}
+                  parse={[
+                    {
+                      type: 'url',
+                      style: styles.url,
+                      onPress: handleUrlPress,
+                    },
+                    {
+                      type: 'phone',
+                      style: styles.phone,
+                      onPress: handlePhonePress,
+                    },
+                    {
+                      type: 'email',
+                      style: styles.email,
+                      onPress: handleEmailPress,
+                    },
+                    {
+                      pattern: /\[(@[^:]+):([^\]]+)\]/i,
+                      style: styles.username,
+                      onPress: handleNamePress,
+                      renderText: renderText,
+                    },
+                    { pattern: /#(\w+)/, style: styles.hashTag },
+                  ]}
+                  childrenProps={{ allowFontScaling: false }}
+                >
+                  {props.comment}
+                </ParsedText>
+              </View>
+              {props.attachedImage != null ? (
+                <View style={styles.attachment}>
+                  <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setData(true)}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: 'Poppins',
+                      }}
+                    >
+                      Image
+                    </Text>
+                    <Icon
+                      name='download-outline'
+                      type='ionicon'
+                      size={25}
+                      color='#000'
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+
+              {props.attachedDocument != null ? (
+                <View style={styles.attachment}>
+                  <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setWeb(true)}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: 'Poppins',
+                      }}
+                    >
+                      Doc
+                    </Text>
+                    <Icon
+                      name='download-outline'
+                      type='ionicon'
+                      size={25}
+                      color='#000'
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+
+              <View style={{ flexDirection: 'row' }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    marginRight: 3,
+                    fontFamily: 'Poppins',
+                  }}
+                >
+                  {props.numOfLike}
                 </Text>
-              )}
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <ParsedText
-                style={styles.userC}
-                parse={[
-                  {
-                    type: "url",
-                    style: styles.url,
-                    onPress: handleUrlPress,
-                  },
-                  {
-                    type: "phone",
-                    style: styles.phone,
-                    onPress: handlePhonePress,
-                  },
-                  {
-                    type: "email",
-                    style: styles.email,
-                    onPress: handleEmailPress,
-                  },
-                  {
-                    pattern: /\[(@[^:]+):([^\]]+)\]/i,
-                    style: styles.username,
-                    onPress: handleNamePress,
-                    renderText: renderText,
-                  },
-                  { pattern: /#(\w+)/, style: styles.hashTag },
-                ]}
-                childrenProps={{ allowFontScaling: false }}
-              >
-                {props.comment}
-              </ParsedText>
-            </View>
-            {props.attachedImage != null ? (
-              <View style={styles.attachment}>
-                <TouchableOpacity
-                  style={styles.icon}
-                  onPress={() => setData(true)}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Poppins",
-                    }}
-                  >
-                    Image
-                  </Text>
+                {props.likeBy ? (
                   <Icon
-                    name="download-outline"
-                    type="ionicon"
-                    size={25}
-                    color="#000"
-                  />
-                </TouchableOpacity>
-              </View>
-            ) : null}
-
-            {props.attachedDocument != null ? (
-              <View style={styles.attachment}>
-                <TouchableOpacity
-                  style={styles.icon}
-                  onPress={() => setWeb(true)}
-                >
-                  <Text
                     style={{
-                      fontFamily: "Poppins",
+                      paddingLeft: 10,
                     }}
-                  >
-                    Doc
-                  </Text>
-                  <Icon
-                    name="download-outline"
-                    type="ionicon"
-                    size={25}
-                    color="#000"
+                    name='heart'
+                    type='ionicon'
+                    size={20}
+                    color='#000'
+                    onPress={props.removeLike}
                   />
-                </TouchableOpacity>
-              </View>
-            ) : null}
-
-            <View style={{ flexDirection: "row" }}>
-              <Text
-                style={{
-                  fontSize: 15,
-                  marginRight: 3,
-                  fontFamily: "Poppins",
-                }}
-              >
-                {props.numOfLike}
-              </Text>
-              {props.likeBy ? (
+                ) : (
+                  <Icon
+                    style={{
+                      paddingLeft: 10,
+                    }}
+                    name='heart-outline'
+                    type='ionicon'
+                    size={20}
+                    color='#000'
+                    onPress={props.addLike}
+                  />
+                )}
                 <Icon
                   style={{
                     paddingLeft: 10,
                   }}
-                  name="heart"
-                  type="ionicon"
+                  name='arrow-redo-outline'
+                  type='ionicon'
                   size={20}
-                  color="#000"
-                  onPress={props.removeLike}
+                  color='#000'
+                  onPress={props.toggleReplyComment}
                 />
-              ) : (
-                <Icon
-                  style={{
-                    paddingLeft: 10,
-                  }}
-                  name="heart-outline"
-                  type="ionicon"
-                  size={20}
-                  color="#000"
-                  onPress={props.addLike}
-                />
-              )}
-              <Icon
-                style={{
-                  paddingLeft: 10,
-                }}
-                name="arrow-redo-outline"
-                type="ionicon"
-                size={20}
-                color="#000"
-                onPress={props.toggleReplyComment}
-              />
-            </View>
+              </View>
             </View>
           </View>
         )}
@@ -421,28 +422,28 @@ const mainCommentCard = (props) => {
 
 const styles = StyleSheet.create({
   mainBubble: {
-    borderColor: "#E3562A",
+    borderColor: '#E3562A',
     borderBottomWidth: 5,
-    width: "85 %",
+    width: '85 %',
     padding: 5,
-    backgroundColor: "#D3D3D3",
+    backgroundColor: '#D3D3D3',
     borderRadius: 10,
     marginBottom: 5,
   },
 
   icon: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingRight: 5,
   },
 
   attachment: {
-    backgroundColor: "#808080",
+    backgroundColor: '#808080',
     height: 45,
     marginRight: 5,
-    borderColor: "#000",
+    borderColor: '#000',
     borderRadius: 5,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingLeft: 10,
     elevation: 2,
     marginVertical: 3,
@@ -454,47 +455,47 @@ const styles = StyleSheet.create({
   },
 
   userName: {
-    fontFamily: "Poppins",
-    fontWeight: "bold",
+    fontFamily: 'Poppins',
+    fontWeight: 'bold',
     fontSize: 17,
   },
 
   userC: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     lineHeight: 20,
     fontSize: 15,
   },
 
   url: {
-    color: "red",
-    textDecorationLine: "underline",
+    color: 'red',
+    textDecorationLine: 'underline',
   },
 
   email: {
-    textDecorationLine: "underline",
+    textDecorationLine: 'underline',
   },
 
   text: {
-    color: "black",
+    color: 'black',
     fontSize: 15,
   },
 
   phone: {
-    color: "blue",
-    textDecorationLine: "underline",
+    color: 'blue',
+    textDecorationLine: 'underline',
   },
 
   name: {
-    color: "red",
+    color: 'red',
   },
 
   username: {
-    color: "green",
-    fontWeight: "bold",
+    color: 'green',
+    fontWeight: 'bold',
   },
 
   hashTag: {
-    fontStyle: "italic",
+    fontStyle: 'italic',
   },
 });
 export default mainCommentCard;

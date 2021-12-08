@@ -1808,6 +1808,7 @@ function Reply(props) {
         renderItem={({ item }) => (
           <View style={{ marginLeft: 30, marginTop: 5 }}>
             <ReplyCommentCard
+              componentStatus={1}
               removeVerifyReplyComment={() => removeVerifyReplyComment(item.id)}
               verifyReplyComment={() => verifyReplyComment(item.id)}
               image={item.image}
@@ -1852,6 +1853,7 @@ function Reply(props) {
         ListHeaderComponent={
           <View>
             <MainCommentCard
+              componentStatus={1}
               picture={mainComment.image}
               time={time}
               status={loginCurrentUser.status}
