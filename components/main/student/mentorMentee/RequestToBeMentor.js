@@ -78,26 +78,26 @@ function requesttobementor(props) {
 
   const savePostDoc = (downloadURL) => {
     if (problem1 === true) {
-      finalValue.push('Problem 1');
+      finalValue.push('Academic');
     }
     if (problem2 === true) {
-      finalValue.push('Problem 2');
+      finalValue.push('Internship');
     }
     if (problem3 === true) {
-      finalValue.push('Problem 3');
+      finalValue.push('Subject Registration');
     }
     if (problem4 === true) {
-      finalValue.push('Problem 4');
+      finalValue.push('Club Activities');
     }
     if (problem5 === true) {
-      finalValue.push('Problem 5');
+      finalValue.push('Personal Projects');
     }
 
     firebase
       .firestore()
       .collection('RequestToBeMentor')
       .add({
-        name: user.name,
+        name: user.realName,
         faculty: user.faculty,
         year: user.year,
         qualificationProof: downloadURL,
@@ -120,7 +120,7 @@ function requesttobementor(props) {
       <ScrollView>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Name: {user.name}</Text>
+            <Text style={styles.label}>Name: {user.realName}</Text>
           </View>
         </View>
         <View style={styles.form}>
@@ -140,14 +140,14 @@ function requesttobementor(props) {
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Issue can handle: </Text>
+            <Text style={{paddingBottom:10,...styles.label}}>Issue can handle: </Text>
             <View style={styles.row}>
               <CheckBox
                 value={problem1}
                 onValueChange={setProblem1}
                 //onChange={() => xxx()}
               />
-              <Text style={styles.label2}>Problem 1</Text>
+              <Text style={styles.label2}>Academic</Text>
             </View>
             <View style={styles.row}>
               <CheckBox
@@ -155,7 +155,7 @@ function requesttobementor(props) {
                 onValueChange={setProblem2}
                 // onChange={() => xxx()}
               />
-              <Text style={styles.label2}>Problem 2</Text>
+              <Text style={styles.label2}>Internship</Text>
             </View>
             <View style={styles.row}>
               <CheckBox
@@ -163,7 +163,7 @@ function requesttobementor(props) {
                 onValueChange={setProblem3}
                 // onChange={() => xxx()}
               />
-              <Text style={styles.label2}>Problem 3</Text>
+              <Text style={styles.label2}>Subject Registration</Text>
             </View>
             <View style={styles.row}>
               <CheckBox
@@ -171,7 +171,7 @@ function requesttobementor(props) {
                 onValueChange={setProblem4}
                 //onChange={() => xxx()}
               />
-              <Text style={styles.label2}>Problem 4</Text>
+              <Text style={styles.label2}>Club Activities</Text>
             </View>
             <View style={styles.row}>
               <CheckBox
@@ -179,7 +179,7 @@ function requesttobementor(props) {
                 onValueChange={setProblem5}
                 //onChange={() => xxx()}
               />
-              <Text style={styles.label2}>Problem 5</Text>
+              <Text style={styles.label2}>Personal Projects</Text>
             </View>
           </View>
         </View>
@@ -253,7 +253,8 @@ const styles = StyleSheet.create({
   label2: {
     fontFamily: 'Poppins',
     fontSize: 16,
-    marginTop: 5,
+    marginLeft:5,
+    marginBottom:10,
   },
 
   row: {
