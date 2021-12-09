@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, FlatList, StyleSheet, StatusBar } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  StatusBar,
+  TouchableOpacity,
+} from 'react-native';
 import { Tab, TabView } from 'react-native-elements';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
+import { Icon } from 'react-native-elements';
 import DiscussinCard from '../../component/discussionCard';
 
 function ViewRequest(props) {
@@ -11,6 +19,26 @@ function ViewRequest(props) {
   const [index, setIndex] = React.useState(0);
   const [menteeArray, setMenteeArray] = useState([]);
   const [mentorArray, setMentorArray] = useState([]);
+
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row', paddingRight: 15 }}>
+          <TouchableOpacity>
+            <Icon
+              name='filter-outline'
+              type='ionicon'
+              size={30}
+              color='#000'
+              // onPress={() => {
+              //   createRoom();
+              // }}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [index]);
 
   useFocusEffect(
     React.useCallback(() => {

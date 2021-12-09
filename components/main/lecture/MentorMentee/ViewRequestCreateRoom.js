@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  TextInput,
 } from 'react-native';
 import firebase from 'firebase';
 import { connect } from 'react-redux';
@@ -21,7 +22,7 @@ function ViewRequestCreateRoom(props) {
   const [mentee, setMentee] = useState([]);
   const [mentor, setMentor] = useState([]);
   const [update, setUpdate] = useState(0);
-  const [date, setDate] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [studentId, setStudentId] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const userId = firebase.auth().currentUser.uid;
@@ -52,6 +53,10 @@ function ViewRequestCreateRoom(props) {
     {
       title: 'Year 4',
       id: 4,
+    },
+    {
+      title: 'Lecture',
+      id: 7,
     },
   ];
 
@@ -115,6 +120,26 @@ function ViewRequestCreateRoom(props) {
           });
           setData(rfam);
         });
+    } else if (filter == 7) {
+      firebase
+        .firestore()
+        .collection('users')
+        .where('faculty', '==', currentUser.faculty, '&&', 'status', '==', 1)
+        .get()
+        .then((snapshot) => {
+          let user = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          const updatedUser = user.filter((e) => e.status === 1);
+
+          const updatedUser2 = updatedUser.filter(
+            (e) => e.name != currentUser.name
+          );
+
+          setData(updatedUser2);
+        });
     } else {
       firebase
         .firestore()
@@ -132,9 +157,98 @@ function ViewRequestCreateRoom(props) {
             (e) => e.faculty === currentUser.faculty
           );
           setData(updatedUser);
+          console.log('updated from search function');
         });
     }
   }, [filter, update]);
+
+  const xxx = () => {
+    if (filter == 5) {
+      firebase
+        .firestore()
+        .collection('RequestToBeMentor')
+        .where(
+          'faculty',
+          '==',
+          currentUser.faculty,
+          '&&',
+          'name',
+          '>=',
+          searchQuery
+        )
+        .get()
+        .then((snapshot) => {
+          let rtbam = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setData(rtbam);
+        });
+    } else if (filter == 6) {
+      firebase
+        .firestore()
+        .collection('RequestForMentor')
+        .where(
+          'faculty',
+          '==',
+          currentUser.faculty,
+          '&&',
+          'name',
+          '>=',
+          searchQuery
+        )
+        .get()
+        .then((snapshot) => {
+          let rfam = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setData(rfam);
+        });
+    } else if (filter == 7) {
+      firebase
+        .firestore()
+        .collection('users')
+        .where('name', '>=', searchQuery, '&&', 'status', '==', 1)
+        .get()
+        .then((snapshot) => {
+          let user = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          const updatedUser = user.filter((e) => e.status === 1);
+
+          const updatedUser2 = updatedUser.filter(
+            (e) => e.faculty != currentUser.faculty
+          );
+
+          setData(updatedUser2);
+        });
+    } else {
+      firebase
+        .firestore()
+        .collection('users')
+        .where('name', '>=', searchQuery)
+        //'year', '==', filter, '&&', 'name', '>=', searchQuery
+        .get()
+        .then((snapshot) => {
+          let user = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+
+          const updatedUser = user.filter(
+            (e) => e.faculty === currentUser.faculty
+          );
+          const updatedUserV2 = updatedUser.filter((e) => e.year === filter);
+          setData(updatedUserV2);
+        });
+    }
+  };
 
   const createRoom = () => {
     let a = mentee;
@@ -172,11 +286,11 @@ function ViewRequestCreateRoom(props) {
         groupMember: a,
         createdBy: currentUser.name,
         createrId: userId,
-        totalNumberOfLike:0,
-        totalNumberofComment:0,
-        totalNumberOfReplyComment:0,
-        totalNumberOfAttachedDocument:0,
-        totalNumberOfAttachedImage:0,
+        totalNumberOfLike: 0,
+        totalNumberofComment: 0,
+        totalNumberOfReplyComment: 0,
+        totalNumberOfAttachedDocument: 0,
+        totalNumberOfAttachedImage: 0,
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         date: [
           createdDay + '/' + n,
@@ -253,6 +367,67 @@ function ViewRequestCreateRoom(props) {
           </View>
         )}
       />
+      {filter == 5 || filter == 6 ? (
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+            <View style={{ width: '100%' }}>
+              <View style={styles.input}>
+                <Icon
+                  name='ios-search'
+                  type='ionicon'
+                  size={25}
+                  color='#3C3A36'
+                  onPress={() => xxx()}
+                />
+                <TextInput
+                  underlineColorAndroid='transparent'
+                  placeholder='Search Discussion'
+                  placeholderTextColor='#000'
+                  autoCapitalize='none'
+                  onChangeText={(searchQuery) => setSearchQuery(searchQuery)}
+                  style={{ flex: 1, paddingLeft: 10, fontSize: 18 }}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              marginRight: 10,
+              marginTop: 18,
+            }}
+          >
+            <Icon
+              name='filter-outline'
+              type='ionicon'
+              size={30}
+              color='#000'
+              // onPress={props.removeLike}
+            />
+          </View>
+        </View>
+      ) : (
+        <View style={styles.input}>
+          <Icon
+            name='ios-search'
+            type='ionicon'
+            size={25}
+            color='#3C3A36'
+            onPress={() => xxx()}
+          />
+          <TextInput
+            underlineColorAndroid='transparent'
+            placeholder='Search Discussion'
+            placeholderTextColor='#000'
+            autoCapitalize='none'
+            onChangeText={(searchQuery) => setSearchQuery(searchQuery)}
+            style={{ flex: 1, paddingLeft: 10, fontSize: 18 }}
+          />
+        </View>
+      )}
+
       <FlatList
         horizontal={false}
         extraData={data}
@@ -418,7 +593,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     elevation: 5,
     backgroundColor: '#003565',
-    shadowOffset: { width: 1, height: 1 }, 
+    shadowOffset: { width: 1, height: 1 },
     shadowColor: '#333',
     shadowOpacity: 0.3,
     shadowRadius: 2,
@@ -472,6 +647,21 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     fontWeight: '700',
     alignItems: 'flex-end',
+  },
+
+  input: {
+    margin: 10,
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    height: Dimensions.get('window').height / 15,
+    backgroundColor: '#FFF',
+    // width: 370,
+    borderRadius: 12,
+    fontFamily: 'Poppins',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: 10,
   },
 });
 

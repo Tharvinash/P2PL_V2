@@ -150,20 +150,6 @@ function LectureProfile(props) {
           color='#3C3A36'
         />
       </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => props.navigation.navigate('User Engagement')}
-      >
-        <Text style={styles.text}>User Engagement</Text>
-        <Icon
-          style={styles.arrow}
-          name='chevron-forward-outline'
-          type='ionicon'
-          size={20}
-          color='#3C3A36'
-        />
-      </TouchableOpacity>
       <TouchableOpacity
         style={styles.button}
         onPress={() => props.navigation.navigate('Filter Feed')}
