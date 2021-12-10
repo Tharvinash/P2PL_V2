@@ -545,7 +545,11 @@ function ViewRequestCreateRoom(props) {
                     <Text numberOfLines={2} style={styles.title}>
                       {item.name}
                     </Text>
-                    <Text style={styles.faculty}>{item.matricNumber}</Text>
+                    {filter == 5 || filter == 6 ? (
+                      <Text style={styles.faculty}>{item.description}</Text>
+                    ) : (
+                      <Text style={styles.faculty}>{item.matricNumber}</Text>
+                    )}
                   </View>
                 </View>
                 {filter == 5 || filter == 6 ? (
@@ -560,7 +564,7 @@ function ViewRequestCreateRoom(props) {
                             mc: item.matricNumber,
                             image: item.image,
                             reqId: item.id,
-                            year: item.year
+                            year: item.year,
                           })
                         }
                       >
@@ -581,7 +585,7 @@ function ViewRequestCreateRoom(props) {
                             mc: item.matricNumber,
                             image: item.image,
                             reqId: item.id,
-                            year: item.year
+                            year: item.year,
                           })
                         }
                       >
@@ -605,7 +609,7 @@ function ViewRequestCreateRoom(props) {
                             name: item.name,
                             mc: item.matricNumber,
                             image: item.image,
-                            year: item.year
+                            year: item.year,
                           })
                         }
                       >
@@ -624,8 +628,8 @@ function ViewRequestCreateRoom(props) {
                             userId: item.id,
                             name: item.name,
                             mc: item.matricNumber,
-                            image:item.image,
-                            year: item.year
+                            image: item.image,
+                            year: item.year,
                           })
                         }
                       >
