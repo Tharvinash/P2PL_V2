@@ -12,6 +12,7 @@ import { Tab, TabView } from 'react-native-elements';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
 import DiscussinCard from '../../component/discussionCard';
 
 function ViewRequest(props) {
@@ -19,6 +20,7 @@ function ViewRequest(props) {
   const [index, setIndex] = React.useState(0);
   const [menteeArray, setMenteeArray] = useState([]);
   const [mentorArray, setMentorArray] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -30,9 +32,9 @@ function ViewRequest(props) {
               type='ionicon'
               size={30}
               color='#000'
-              // onPress={() => {
-              //   createRoom();
-              // }}
+              onPress={() => {
+                toggleModal();
+              }}
             />
           </TouchableOpacity>
         </View>
@@ -76,6 +78,10 @@ function ViewRequest(props) {
   );
 
   useEffect(() => {
+    universalRequest();
+  }, []);
+
+  const universalRequest = () => {
     firebase
       .firestore()
       .collection('RequestForMentor')
@@ -106,7 +112,66 @@ function ViewRequest(props) {
         ); // CHANGES
         setMentorArray(mentorArray);
       });
-  }, []);
+  };
+
+  const toggleModal = () => {
+    universalRequest();
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const FilterRequest = (query) => {
+    firebase
+      .firestore()
+      .collection('RequestForMentor')
+      .get()
+      .then((snapshot) => {
+        let rfam = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        const menteeArray = [...rfam].filter(
+          (el) => el.faculty === currentUser.faculty
+        ); // CHANGES
+
+        let filterRequest = [];
+        for (var i = 0; i < menteeArray.length; i++) {
+          for (var j = 0; j < menteeArray[i].problems.length; j++) {
+            if (menteeArray[i].problems[j] === query) {
+              filterRequest.push(menteeArray[i]);
+            }
+          }
+        }
+        setMenteeArray(filterRequest);
+        setIsModalVisible(!isModalVisible);
+      });
+
+    firebase
+      .firestore()
+      .collection('RequestToBeMentor')
+      .get()
+      .then((snapshot) => {
+        let rtbam = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        const mentorArray = [...rtbam].filter(
+          (el) => el.faculty === currentUser.faculty
+        ); // CHANGES
+
+        let filterRequest = [];
+        for (var i = 0; i < mentorArray.length; i++) {
+          for (var j = 0; j < mentorArray[i].problems.length; j++) {
+            if (mentorArray[i].problems[j] === query) {
+              filterRequest.push(mentorArray[i]);
+            }
+          }
+        }
+        setMentorArray(filterRequest);
+        setIsModalVisible(!isModalVisible);
+      });
+  };
 
   const renderItem = ({ item }) => <Item title={item.title} />;
   return (
@@ -168,6 +233,44 @@ function ViewRequest(props) {
           </View>
         </TabView.Item>
       </TabView>
+      <Modal isVisible={isModalVisible}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Academic')}
+          >
+            <Text style={styles.text}>Academic</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Internship')}
+          >
+            <Text style={styles.text}>Internship</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Subject Registration')}
+          >
+            <Text style={styles.text}>Subject Registration</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Club Activities')}
+          >
+            <Text style={styles.text}>Club Activities</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Personal Projects')}
+          >
+            <Text style={styles.text}>Personal Projects</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={() => toggleModal()}>
+            <Text style={styles.text}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </>
   );
 }
@@ -185,6 +288,26 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
+  },
+
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E3562A',
+    padding: 14,
+    borderRadius: 20,
+    width: 275,
+    height: 56,
+    margin: 10,
+  },
+
+  text: {
+    color: 'white',
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
+    alignItems: 'flex-end',
   },
 });
 
