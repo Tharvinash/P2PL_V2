@@ -25,6 +25,7 @@ function ViewRequestCreateRoom(props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [studentId, setStudentId] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const userId = firebase.auth().currentUser.uid;
   const title = props.route.params.title;
   const desc = props.route.params.desc;
@@ -91,6 +92,10 @@ function ViewRequestCreateRoom(props) {
   }, [data]);
 
   useEffect(() => {
+    universalRequest();
+  }, [filter, update]);
+
+  const universalRequest = () => {
     setUpdate(99);
     if (filter == 5) {
       firebase
@@ -160,7 +165,7 @@ function ViewRequestCreateRoom(props) {
           console.log('updated from search function');
         });
     }
-  }, [filter, update]);
+  };
 
   const xxx = () => {
     if (filter == 5) {
@@ -341,6 +346,62 @@ function ViewRequestCreateRoom(props) {
     setStudentId(id);
   };
 
+  const FilterRequest = (query) => {
+    if (filter == 5) {
+      firebase
+        .firestore()
+        .collection('RequestToBeMentor')
+        .where('faculty', '==', currentUser.faculty)
+        .get()
+        .then((snapshot) => {
+          let rtbam = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          let filterRequest = [];
+          for (var i = 0; i < rtbam.length; i++) {
+            for (var j = 0; j < rtbam[i].problems.length; j++) {
+              if (rtbam[i].problems[j] === query) {
+                filterRequest.push(rtbam[i]);
+              }
+            }
+          }
+
+          setData(filterRequest);
+          setIsFilterVisible(!isFilterVisible);
+        });
+    } else if (filter == 6) {
+      firebase
+        .firestore()
+        .collection('RequestForMentor')
+        .where('faculty', '==', currentUser.faculty)
+        .get()
+        .then((snapshot) => {
+          let rfam = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          let filterRequest = [];
+          for (var i = 0; i < rfam.length; i++) {
+            for (var j = 0; j < rfam[i].problems.length; j++) {
+              if (rfam[i].problems[j] === query) {
+                filterRequest.push(rfam[i]);
+              }
+            }
+          }
+          setData(filterRequest);
+          setIsFilterVisible(!isFilterVisible);
+        });
+    }
+  };
+
+  const toggleModalV2 = () => {
+    universalRequest();
+    setIsFilterVisible(!isFilterVisible);
+  };
+
   return (
     <View>
       <FlatList
@@ -404,7 +465,7 @@ function ViewRequestCreateRoom(props) {
               type='ionicon'
               size={30}
               color='#000'
-              // onPress={props.removeLike}
+              onPress={FilterRequest}
             />
           </View>
         </View>
@@ -573,6 +634,47 @@ function ViewRequestCreateRoom(props) {
           ) : null}
 
           <TouchableOpacity style={styles.button} onPress={() => addInGroup()}>
+            <Text style={styles.text}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+      <Modal isVisible={isFilterVisible}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Academic')}
+          >
+            <Text style={styles.text}>Academic</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Internship')}
+          >
+            <Text style={styles.text}>Internship</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Subject Registration')}
+          >
+            <Text style={styles.text}>Subject Registration</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Club Activities')}
+          >
+            <Text style={styles.text}>Club Activities</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => FilterRequest('Personal Projects')}
+          >
+            <Text style={styles.text}>Personal Projects</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => toggleModalV2()}
+          >
             <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
         </View>
