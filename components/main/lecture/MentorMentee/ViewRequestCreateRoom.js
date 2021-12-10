@@ -11,7 +11,7 @@ import {
 import firebase from 'firebase';
 import { connect } from 'react-redux';
 import { Icon } from 'react-native-elements';
-import DiscussinCard from '../../component/discussionCard';
+import { FAB } from 'react-native-elements';
 import ViewAvailableGroup from '../../component/viewAvailableGroup';
 import Modal from 'react-native-modal';
 
@@ -26,6 +26,7 @@ function ViewRequestCreateRoom(props) {
   const [studentId, setStudentId] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [isAddTrue, setIsAddTrue] = useState(false);
   const userId = firebase.auth().currentUser.uid;
   const title = props.route.params.title;
   const desc = props.route.params.desc;
@@ -162,7 +163,6 @@ function ViewRequestCreateRoom(props) {
             (e) => e.faculty === currentUser.faculty
           );
           setData(updatedUser);
-          console.log('updated from search function');
         });
     }
   };
@@ -331,6 +331,44 @@ function ViewRequestCreateRoom(props) {
     setUpdate(1);
   };
 
+  const addAll = () => {
+    firebase
+      .firestore()
+      .collection('users')
+      .where('year', '==', filter, '&&', 'faculty', '==', currentUser.faculty)
+      .get()
+      .then((snapshot) => {
+        let user = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+
+        const updatedUser = user.filter(
+          (e) => e.faculty === currentUser.faculty
+        );
+
+        let filterRequest = [];
+        for (var i = 0; i < updatedUser.length; i++) {
+          filterRequest.push({
+            name: updatedUser[i].name,
+            status: 1,
+            image: updatedUser[i].image,
+            userId: updatedUser[i].id,
+            mc: updatedUser[i].matricNumber,
+          });
+        }
+        setMentee(filterRequest);
+        setIsAddTrue(true);
+      });
+  };
+
+  const removeAll = () => {
+    const updatedUser = mentee.filter((e) => e.year === filter);
+    setMentee(updatedUser);
+    setIsAddTrue(false);
+  };
+
   const addAsMentor = () => {
     let a = mentee;
     a.push({ ...studentId, status: 1 });
@@ -407,282 +445,340 @@ function ViewRequestCreateRoom(props) {
   };
 
   return (
-    <View>
-      <FlatList
-        data={list}
-        horizontal
-        keyExtractor={(list) => list.id.toString()}
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View style={{ flex: 1, marginVertical: 10 }}>
-            <TouchableOpacity
-              onPress={() => chageList(item.id)}
+    <View style={{ flex: 1 }}>
+      <View>
+        <FlatList
+          data={list}
+          horizontal
+          keyExtractor={(list) => list.id.toString()}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View style={{ flex: 1, marginVertical: 10 }}>
+              <TouchableOpacity
+                onPress={() => chageList(item.id)}
+                style={{
+                  backgroundColor: item.id == filter ? '#003565' : '#140F38',
+                  marginHorizontal: 5,
+                  width: Dimensions.get('window').width * 0.5,
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 16,
+                }}
+              >
+                <Text style={{ color: '#fff' }}>{item.title}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+        {filter == 5 || filter == 6 ? (
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+              <View style={{ width: '100%' }}>
+                <View style={styles.input}>
+                  <Icon
+                    name='ios-search'
+                    type='ionicon'
+                    size={25}
+                    color='#3C3A36'
+                    onPress={() => xxx()}
+                  />
+                  <TextInput
+                    underlineColorAndroid='transparent'
+                    placeholder='Search Discussion'
+                    placeholderTextColor='#000'
+                    autoCapitalize='none'
+                    onChangeText={(searchQuery) => setSearchQuery(searchQuery)}
+                    style={{ flex: 1, paddingLeft: 10, fontSize: 18 }}
+                  />
+                </View>
+              </View>
+            </View>
+
+            <View
               style={{
-                backgroundColor: item.id == filter ? '#003565' : '#140F38',
-                marginHorizontal: 5,
-                width: Dimensions.get('window').width * 0.5,
-                height: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 16,
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                marginRight: 10,
+                marginTop: 18,
               }}
             >
-              <Text style={{ color: '#fff' }}>{item.title}</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-      {filter == 5 || filter == 6 ? (
-        <View style={{ flexDirection: 'row' }}>
-          <View style={{ flex: 1, justifyContent: 'flex-start' }}>
-            <View style={{ width: '100%' }}>
-              <View style={styles.input}>
-                <Icon
-                  name='ios-search'
-                  type='ionicon'
-                  size={25}
-                  color='#3C3A36'
-                  onPress={() => xxx()}
-                />
-                <TextInput
-                  underlineColorAndroid='transparent'
-                  placeholder='Search Discussion'
-                  placeholderTextColor='#000'
-                  autoCapitalize='none'
-                  onChangeText={(searchQuery) => setSearchQuery(searchQuery)}
-                  style={{ flex: 1, paddingLeft: 10, fontSize: 18 }}
-                />
-              </View>
+              <Icon
+                name='filter-outline'
+                type='ionicon'
+                size={30}
+                color='#000'
+                onPress={FilterRequest}
+              />
             </View>
           </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              marginRight: 10,
-              marginTop: 18,
-            }}
-          >
+        ) : (
+          <View style={styles.input}>
             <Icon
-              name='filter-outline'
+              name='ios-search'
               type='ionicon'
-              size={30}
-              color='#000'
-              onPress={FilterRequest}
+              size={25}
+              color='#3C3A36'
+              onPress={() => xxx()}
+            />
+            <TextInput
+              underlineColorAndroid='transparent'
+              placeholder='Search Discussion'
+              placeholderTextColor='#000'
+              autoCapitalize='none'
+              onChangeText={(searchQuery) => setSearchQuery(searchQuery)}
+              style={{ flex: 1, paddingLeft: 10, fontSize: 18 }}
             />
           </View>
-        </View>
-      ) : (
-        <View style={styles.input}>
-          <Icon
-            name='ios-search'
-            type='ionicon'
-            size={25}
-            color='#3C3A36'
-            onPress={() => xxx()}
-          />
-          <TextInput
-            underlineColorAndroid='transparent'
-            placeholder='Search Discussion'
-            placeholderTextColor='#000'
-            autoCapitalize='none'
-            onChangeText={(searchQuery) => setSearchQuery(searchQuery)}
-            style={{ flex: 1, paddingLeft: 10, fontSize: 18 }}
-          />
-        </View>
-      )}
-
-      <FlatList
-        horizontal={false}
-        extraData={data}
-        data={data}
-        keyExtractor={(data) => data.id}
-        renderItem={({ item }) => (
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <View style={styles.card}>
-              <View style={styles.cardContent}>
-                <View style={{ flex: 1 }}>
-                  <Text numberOfLines={2} style={styles.title}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.faculty}>{item.matricNumber}</Text>
-                </View>
-              </View>
-              {filter == 5 || filter == 6 ? (
-                <View>
-                  {mentor.some((el) => el.userId === item.userId) ||
-                  mentee.some((el) => el.userId === item.userId) ? (
-                    <TouchableOpacity
-                      onPress={() =>
-                        addInGroup({
-                          userId: item.userId,
-                          name: item.name,
-                          mc: item.matricNumber,
-                          image: 'image',
-                          reqId: item.id,
-                        })
-                      }
-                    >
-                      <Icon
-                        name='remove-outline'
-                        type='ionicon'
-                        size={30}
-                        color='#fff'
-                        onPress={() => removeMember(item.userId)}
-                      />
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      onPress={() =>
-                        addInGroup({
-                          userId: item.userId,
-                          name: item.name,
-                          mc: item.matricNumber,
-                          image: 'image',
-                          reqId: item.id,
-                        })
-                      }
-                    >
-                      <Icon
-                        name='add-outline'
-                        type='ionicon'
-                        size={30}
-                        color='#fff'
-                      />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              ) : (
-                <View>
-                  {mentor.some((el) => el.userId === item.id) ||
-                  mentee.some((el) => el.userId === item.id) ? (
-                    <TouchableOpacity
-                      onPress={() =>
-                        addInGroup({
-                          userId: item.id,
-                          name: item.name,
-                          mc: item.matricNumber,
-                          image: 'image',
-                        })
-                      }
-                    >
-                      <Icon
-                        name='remove-outline'
-                        type='ionicon'
-                        size={30}
-                        color='#fff'
-                        onPress={() => removeMember(item.id)}
-                      />
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      onPress={() =>
-                        addInGroup({
-                          userId: item.id,
-                          name: item.name,
-                          mc: item.matricNumber,
-                          image: 'image',
-                        })
-                      }
-                    >
-                      <Icon
-                        name='add-outline'
-                        type='ionicon'
-                        size={30}
-                        color='#fff'
-                      />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
-            </View>
-          </View>
         )}
-      />
-      <Modal isVisible={isModalVisible}>
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          {filter == 5 ? (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => addAsMentor()}
-            >
-              <Text style={styles.text}>Add As Mentor</Text>
-            </TouchableOpacity>
-          ) : null}
 
-          {filter == 6 ? (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => addAsMentee()}
-            >
-              <Text style={styles.text}>Add As Mentee</Text>
-            </TouchableOpacity>
-          ) : null}
-
-          {filter != 6 && filter != 5 ? (
-            <View>
+        <FlatList
+          horizontal={false}
+          extraData={data}
+          data={data}
+          keyExtractor={(data) => data.id}
+          renderItem={({ item }) => (
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+              <View style={styles.card}>
+                <View style={styles.cardContent}>
+                  <View style={{ flex: 1 }}>
+                    <Text numberOfLines={2} style={styles.title}>
+                      {item.name}
+                    </Text>
+                    <Text style={styles.faculty}>{item.matricNumber}</Text>
+                  </View>
+                </View>
+                {filter == 5 || filter == 6 ? (
+                  <View>
+                    {mentor.some((el) => el.userId === item.userId) ||
+                    mentee.some((el) => el.userId === item.userId) ? (
+                      <TouchableOpacity
+                        onPress={() =>
+                          addInGroup({
+                            userId: item.userId,
+                            name: item.name,
+                            mc: item.matricNumber,
+                            image: item.image,
+                            reqId: item.id,
+                            year: item.year
+                          })
+                        }
+                      >
+                        <Icon
+                          name='remove-outline'
+                          type='ionicon'
+                          size={30}
+                          color='#fff'
+                          onPress={() => removeMember(item.userId)}
+                        />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={() =>
+                          addInGroup({
+                            userId: item.userId,
+                            name: item.name,
+                            mc: item.matricNumber,
+                            image: item.image,
+                            reqId: item.id,
+                            year: item.year
+                          })
+                        }
+                      >
+                        <Icon
+                          name='add-outline'
+                          type='ionicon'
+                          size={30}
+                          color='#fff'
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ) : (
+                  <View>
+                    {mentor.some((el) => el.userId === item.id) ||
+                    mentee.some((el) => el.userId === item.id) ? (
+                      <TouchableOpacity
+                        onPress={() =>
+                          addInGroup({
+                            userId: item.id,
+                            name: item.name,
+                            mc: item.matricNumber,
+                            image: item.image,
+                            year: item.year
+                          })
+                        }
+                      >
+                        <Icon
+                          name='remove-outline'
+                          type='ionicon'
+                          size={30}
+                          color='#fff'
+                          onPress={() => removeMember(item.id)}
+                        />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={() =>
+                          addInGroup({
+                            userId: item.id,
+                            name: item.name,
+                            mc: item.matricNumber,
+                            image:item.image,
+                            year: item.year
+                          })
+                        }
+                      >
+                        <Icon
+                          name='add-outline'
+                          type='ionicon'
+                          size={30}
+                          color='#fff'
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
+        />
+        <Modal isVisible={isModalVisible}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            {filter == 5 ? (
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => addAsMentor()}
               >
                 <Text style={styles.text}>Add As Mentor</Text>
               </TouchableOpacity>
+            ) : null}
+
+            {filter == 6 ? (
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => addAsMentee()}
               >
                 <Text style={styles.text}>Add As Mentee</Text>
               </TouchableOpacity>
-            </View>
-          ) : null}
+            ) : null}
 
-          <TouchableOpacity style={styles.button} onPress={() => addInGroup()}>
-            <Text style={styles.text}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-      <Modal isVisible={isFilterVisible}>
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => FilterRequest('Academic')}
-          >
-            <Text style={styles.text}>Academic</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => FilterRequest('Internship')}
-          >
-            <Text style={styles.text}>Internship</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => FilterRequest('Subject Registration')}
-          >
-            <Text style={styles.text}>Subject Registration</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => FilterRequest('Club Activities')}
-          >
-            <Text style={styles.text}>Club Activities</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => FilterRequest('Personal Projects')}
-          >
-            <Text style={styles.text}>Personal Projects</Text>
-          </TouchableOpacity>
+            {filter != 6 && filter != 5 ? (
+              <View>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => addAsMentor()}
+                >
+                  <Text style={styles.text}>Add As Mentor</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => addAsMentee()}
+                >
+                  <Text style={styles.text}>Add As Mentee</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => toggleModalV2()}
-          >
-            <Text style={styles.text}>Cancel</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => addInGroup()}
+            >
+              <Text style={styles.text}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+        <Modal isVisible={isFilterVisible}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => FilterRequest('Academic')}
+            >
+              <Text style={styles.text}>Academic</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => FilterRequest('Internship')}
+            >
+              <Text style={styles.text}>Internship</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => FilterRequest('Subject Registration')}
+            >
+              <Text style={styles.text}>Subject Registration</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => FilterRequest('Club Activities')}
+            >
+              <Text style={styles.text}>Club Activities</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => FilterRequest('Personal Projects')}
+            >
+              <Text style={styles.text}>Personal Projects</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => toggleModalV2()}
+            >
+              <Text style={styles.text}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </View>
+      {isAddTrue ? (
+        <View style={{ flex: 1 }}>
+          {filter != 5 && filter != 6 && (
+            <FAB
+              placement='right'
+              color='#E3562A'
+              onPress={removeAll}
+              icon={
+                <Icon
+                  reverse
+                  name='remove-outline'
+                  type='ionicon'
+                  color='#E3562A'
+                  size={35}
+                  containerStyle={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 11,
+                  }}
+                />
+              }
+            />
+          )}
         </View>
-      </Modal>
+      ) : (
+        <View style={{ flex: 1 }}>
+          {filter != 5 && filter != 6 && (
+            <FAB
+              placement='right'
+              color='#E3562A'
+              onPress={addAll}
+              icon={
+                <Icon
+                  reverse
+                  name='add-outline'
+                  type='ionicon'
+                  color='#E3562A'
+                  size={35}
+                  containerStyle={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 11,
+                  }}
+                />
+              }
+            />
+          )}
+        </View>
+      )}
     </View>
   );
 }
