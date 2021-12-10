@@ -216,7 +216,7 @@ function ViewRequestCreateRoom(props) {
       firebase
         .firestore()
         .collection('users')
-        .where('name', '>=', searchQuery, '&&', 'status', '==', 1)
+        .where('name', '>=', searchQuery)
         .get()
         .then((snapshot) => {
           let user = snapshot.docs.map((doc) => {
@@ -227,10 +227,14 @@ function ViewRequestCreateRoom(props) {
           const updatedUser = user.filter((e) => e.status === 1);
 
           const updatedUser2 = updatedUser.filter(
-            (e) => e.faculty != currentUser.faculty
+            (e) => e.faculty == currentUser.faculty
           );
 
-          setData(updatedUser2);
+          const updatedUser3 = updatedUser2.filter(
+            (e) => e.name != currentUser.name
+          );
+
+          setData(updatedUser3);
         });
     } else {
       firebase
