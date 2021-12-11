@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
+    width: 370,
   },
 
   cardContent: {
