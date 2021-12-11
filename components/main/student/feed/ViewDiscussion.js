@@ -421,6 +421,9 @@ function ViewDiscussion(props) {
         .then(function () {
           setLoading1(false);
           setModalVisible(!isModalVisible);
+        })
+        .catch((error) => {
+          this.errorMessage = 'Error - ' + error.message;
         });
       setData(7);
     }

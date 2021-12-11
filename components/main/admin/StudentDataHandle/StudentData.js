@@ -81,13 +81,13 @@ function StudentData(props) {
           return { id, ...data };
         });
         const updatedUser = users.filter((e) => e.faculty === faculty);
-        console.log(updatedUser);
+        //console.log(updatedUser);
         setData(updatedUser);
       });
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View>
       <FlatList
         data={list}
         horizontal
@@ -112,10 +112,10 @@ function StudentData(props) {
           </View>
         )}
       />
-      <View>
+      <View style={styles.input}>
         <TextInput
           underlineColorAndroid='transparent'
-          placeholder='Search Discussion'
+          placeholder='Search Student'
           placeholderTextColor='#000'
           autoCapitalize='none'
           onChangeText={(search) => fetchUsers(search)}
@@ -160,6 +160,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#140F38',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  input: {
+    margin: 10,
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    height: Dimensions.get('window').height / 15,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    fontFamily: 'Poppins',
+    flexDirection: 'row',
+    paddingLeft: 10,
   },
 
   card: {

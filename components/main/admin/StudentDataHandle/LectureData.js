@@ -63,7 +63,7 @@ function LectureData(props) {
 
   return (
     <View style={{ flex: 1 }}>
-      <View>
+      <View style={styles.input}>
         <TextInput
           underlineColorAndroid='transparent'
           placeholder='Search Discussion'
@@ -171,6 +171,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     fontWeight: '700',
     alignItems: 'flex-end',
+  },
+  input: {
+    margin: 10,
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    height: Dimensions.get('window').height / 15,
+    backgroundColor: '#FFF',
+    // width: 370,
+    borderRadius: 12,
+    fontFamily: 'Poppins',
+    flexDirection: 'row',
+    paddingLeft: 10,
   },
 });
 

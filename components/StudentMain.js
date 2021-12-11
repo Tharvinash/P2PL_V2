@@ -214,7 +214,7 @@ export class StudentMain extends Component {
 
         <Tab.Screen
           name='MentorMenteeMainScreenTab'
-          component={MentorMenteeMainScreen}
+          component={MentorMenteeStackScreen}
           initialParams={{ age: 45 }}
           options={{
             tabBarIcon: ({ color, size }) => (
