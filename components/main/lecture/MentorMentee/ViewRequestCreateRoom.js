@@ -261,13 +261,15 @@ function ViewRequestCreateRoom(props) {
 
   const createRoom = () => {
     let a = mentee;
+
+    //adding creator
     a.push({
       userId: userId,
       name: currentUser.name,
       image: 'image',
       status: 0,
     });
-
+    //remove req id from request database
     const newArray = mentee.filter((element) => element.reqId != null);
 
     for (var i = 0; i < newArray.length; i++) {
@@ -285,7 +287,10 @@ function ViewRequestCreateRoom(props) {
           .delete();
       }
     }
+    //
 
+    console.log(a);
+    
     firebase
       .firestore()
       .collection('DiscussionRoom')
