@@ -31,6 +31,7 @@ function Reply(props) {
   const discussionId = props.route.params.did;
   const [currentUserName, setCurrentUserName] = useState(currentUser.name);
   const [loginCurrentUser, setLoginCurrentUser] = useState(currentUser);
+  const [cu, setCu] = useState(currentUser);
   const [mainCommentId, setMainCommentId] = useState(props.route.params.cid);
   const [mainComment, setMainComment] = useState([]);
   const [data, setData] = useState(0);
