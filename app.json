@@ -22,7 +22,7 @@
     "android": {
       "package":"p2pl.fyp",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-icon1.png",
         "backgroundColor": "#140F38"
       }
     },
