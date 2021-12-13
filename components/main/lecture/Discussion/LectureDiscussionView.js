@@ -1,69 +1,85 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   FlatList,
   TouchableOpacity,
   Alert,
-  Image,
   Share,
   ScrollView,
   Dimensions,
-} from "react-native";
+} from 'react-native';
 //---------reusable component-----------//
-import Report from "../../component/report";
-import AddComment from "../../component/addComment";
-import EditCommentCom from "../../component/editComment";
-
-import { FAB, ListItem, BottomSheet } from "react-native-elements";
-import { useFocusEffect } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
-import Modal from "react-native-modal";
-import { connect } from "react-redux";
-import firebase from "firebase";
-import * as Linking from "expo-linking";
-import Images from "react-native-scalable-image";
-import { timeDifference } from "../../../utils";
-import CommentCard from "../../component/commentCard";
-require("firebase/firestore");
+import Report from '../../component/report';
+import AddComment from '../../component/addComment';
+import EditCommentCom from '../../component/editComment';
+import CommentCard from '../../component/commentCard';
+//----------------------------------------------
+import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
+import { connect } from 'react-redux';
+import firebase from 'firebase';
+import * as Linking from 'expo-linking';
+import Images from 'react-native-scalable-image';
+import { timeDifference } from '../../../utils';
+import { FAB, ListItem, BottomSheet } from 'react-native-elements';
+import { ActivityIndicator } from 'react-native-paper';
+require('firebase/firestore');
 
 function LectureDiscussionView(props) {
-  const { currentUser, options } = props;
-  const [commentId, setCommentId] = useState(null);
-  const [newOption, setOption] = useState(options);
+  const { currentUser, options, fullComments, report } = props;
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
+  const [commentId, setCommentId] = useState(null);
   const [isReportVisible, setReportVisible] = useState(false);
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState('');
+  const [newOption, setOption] = useState(options);
+  const [editComment, setEditComment] = useState('');
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
-  const [comment, setComment] = useState(null);
+  const [comment, setComment] = useState('');
   const [data, setData] = useState(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [temporaryId, setTemporaryId] = useState(null);
-  const [editComment, setEditComment] = useState("");
   const [cu, setCu] = useState(currentUser);
   const [discussionId, setDiscussionId] = useState(props.route.params.did);
-  // const discussionId = props.route.params.did;
+  const [isVisible, setIsVisible] = useState(false);
+  const [temporaryId, setTemporaryId] = useState(null);
+  const [image, setImage] = useState(null); //save local uri
+  const [Doc, setDoc] = useState(null); //save local uri
+  const [name, setName] = useState(null);
+  const [imageURI, setImageURI] = useState(null);
+  const [docURI, setDocURI] = useState(null);
+  const [loading1, setLoading1] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const [loadMore, setLoadMore] = useState(11);
+  const [totalComment, setTotalComment] = useState(0);
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+  //changes for reported discussion
+  const [reportData, setReportData] = useState(report);
+  const [admin, setAdmin] = useState([]);
+  //changes for reported discussion
+
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
 
   const list = [
     {
-      title: "Edit",
+      title: 'Edit',
       onPress: () => EditComment(temporaryId),
     },
     {
-      title: "Delete",
+      title: 'Delete',
       onPress: () => Delete(temporaryId),
     },
     {
-      title: "Cancel",
-      containerStyle: { backgroundColor: "red" },
-      titleStyle: { color: "white" },
+      title: 'Cancel',
+      containerStyle: { backgroundColor: 'red' },
+      titleStyle: { color: 'white' },
       onPress: () => setIsVisible(false),
     },
   ];
@@ -71,58 +87,289 @@ function LectureDiscussionView(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+        <View style={{ flexDirection: 'row', paddingRight: 15 }}>
           <TouchableOpacity>
             <Icon
-              name="alert-circle-outline"
-              type="ionicon"
+              name='alert-circle-outline'
+              type='ionicon'
               size={30}
-              color="#000"
+              color='#000'
               onPress={() => {
                 toggleReport();
               }}
             />
           </TouchableOpacity>
-          <Icon
-            name="share-social-outline"
-            type="ionicon"
-            size={30}
-            color="#000"
-            onPress={() => onShare()}
-          />
+
+          <TouchableOpacity>
+            <Icon
+              name='share-social-outline'
+              type='ionicon'
+              size={30}
+              color='#000'
+              onPress={() => {
+                onShare();
+              }}
+            />
+          </TouchableOpacity>
         </View>
       ),
     });
-  }, []);
+  }, [data]);
 
-  const sendReport = (rid) => {
+  useEffect(() => {
+    const { currentUser, comments } = props;
+    setDoc(null);
+    setImage(null);
+    (async () => {
+      // const cameraStatus = await Camera.requestPermissionsAsync();
+      // setHasCameraPermission(cameraStatus.status === 'granted');
+
+      const galleryStatus =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasGalleryPermission(galleryStatus.status === 'granted');
+    })();
+
+    if (currentUser.FavDiscussion !== null) {
+      setUser(currentUser);
+    }
+    setUser(currentUser);
+    if (props.route.params.did) {
+      setDiscussionId(props.route.params.did);
+    }
+
     firebase
       .firestore()
-      .collection("ReportedDiscussion")
-      .add({
-        reportedBy: userId,
-        Reason: rid,
-        reportedDiscussion: discussionId,
-        discussionTitle: userPosts.title,
-        timeReported: firebase.firestore.FieldValue.serverTimestamp(),
-        discussionPostedBy: userPosts.userId,
-      })
-      .then(function () {
-        setReportVisible(!isReportVisible);
-        Alert.alert(
-          "Done",
-          "Your report has been received and will be reviewed",
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-        );
+      .collection('Discussion')
+      .doc(props.route.params.did)
+      .get()
+      .then((snapshot) => {
+        setUserPosts(snapshot.data());
       });
-  };
+
+    firebase
+      .firestore()
+      .collection('Comment')
+      .orderBy('creation', 'desc')
+      .get()
+      .then((snapshot) => {
+        let comment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        const newArray2 = comment.filter(
+          (e) => e.discussionId === discussionId
+        );
+        setTotalComment(newArray2.length);
+      });
+
+    //changes for reported discussion
+    firebase
+      .firestore()
+      .collection('ReportedDiscussion')
+      .get()
+      .then((snapshot) => {
+        let report2 = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setReportData(report2);
+      });
+
+    firebase
+      .firestore()
+      .collection('users')
+      .get()
+      .then((snapshot) => {
+        let adminToken = [];
+        snapshot.docs.map((doc) => {
+          if (doc.data().status === 2) {
+            const token = doc.data().pushToken;
+            adminToken.push({ token });
+          }
+        });
+
+        setAdmin(adminToken);
+      });
+    //changes for reported discussion
+
+    firebase
+      .firestore()
+      .collection('Comment')
+      .orderBy('creation', 'desc')
+      .limit(loadMore)
+      .get()
+      .then((snapshot) => {
+        let comment = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        const newArray2 = comment.filter(
+          (e) => e.discussionId === discussionId
+        );
+        setComment(newArray2);
+      });
+    setTimeout(function () {
+      setLoadMoreLoading(false);
+    }, 2000);
+
+    setData(5);
+  }, [props.currentUser, props.route.params.did, data]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      firebase
+        .firestore()
+        .collection('Comment')
+        .orderBy('creation', 'desc')
+        .limit(loadMore)
+        .get()
+        .then((snapshot) => {
+          let comment = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          const newArray2 = comment.filter(
+            (e) => e.discussionId === discussionId
+          );
+          setComment(newArray2);
+        });
+      setData(6);
+      firebase
+        .firestore()
+        .collection('users')
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setCu(snapshot.data());
+          } else {
+            console.log('does not exist');
+          }
+        });
+    }, [])
+  );
+
+  if (user === null) {
+    return <View />;
+  }
 
   const xxx = () => {
     console.log(24);
   };
 
+  const sendReport = (rid) => {
+    //change for reported Discussion
+    console.log(reportData);
+    const alert = () => {
+      setReportVisible(!isReportVisible);
+      Alert.alert(
+        'Done',
+        'Your report has been received and will be reviewed',
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+      );
+    };
+
+    if (reportData.length > 0) {
+      const foundElement = reportData.find(
+        (el) => el.reportedDiscussion === discussionId
+      );
+      if (foundElement) {
+        if (foundElement.Reason.find((el) => el === rid)) {
+          const rB = foundElement.reportedBy;
+          if (rB.includes(userId)) {
+            console.log('Already reported');
+            alert();
+          } else {
+            rB.push(userId);
+            // console.log(rB)
+            firebase
+              .firestore()
+              .collection('ReportedDiscussion')
+              .doc(foundElement.id)
+              .update({
+                reportedBy: rB,
+              })
+              .then(() => {
+                alert();
+              });
+          }
+        } else {
+          const rB = foundElement.reportedBy;
+          const reason = foundElement.Reason;
+          if (rB.includes(userId)) {
+            console.log('Name already in reportedBy list');
+            reason.push(rid);
+            firebase
+              .firestore()
+              .collection('ReportedDiscussion')
+              .doc(foundElement.id)
+              .update({
+                Reason: reason,
+              })
+              .then(() => {
+                alert();
+              });
+          } else {
+            rB.push(userId);
+            reason.push(rid);
+            firebase
+              .firestore()
+              .collection('ReportedDiscussion')
+              .doc(foundElement.id)
+              .update({
+                reportedBy: rB,
+                Reason: reason,
+              })
+              .then(() => {
+                alert();
+              });
+          }
+        }
+      } else {
+        firebase
+          .firestore()
+          .collection('ReportedDiscussion')
+          .add({
+            reportedBy: [userId],
+            Reason: [rid],
+            reportedDiscussion: discussionId,
+            discussionTitle: userPosts.title,
+            timeReported: firebase.firestore.FieldValue.serverTimestamp(),
+            discussionPostedBy: userPosts.userId,
+          })
+          .then(() => {
+            alert();
+          });
+      }
+    } else {
+      firebase
+        .firestore()
+        .collection('ReportedDiscussion')
+        .add({
+          reportedBy: [userId],
+          Reason: [rid],
+          reportedDiscussion: discussionId,
+          discussionTitle: userPosts.title,
+          timeReported: firebase.firestore.FieldValue.serverTimestamp(),
+          discussionPostedBy: userPosts.userId,
+        })
+        .then(() => {
+          alert();
+        });
+    }
+    setData(71);
+    //change for reported Discussion
+  };
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
+  };
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
   };
 
   const toggleReport = () => {
@@ -134,87 +381,42 @@ function LectureDiscussionView(props) {
     setTemporaryId(cid);
   };
 
-  useEffect(() => {
-    const { currentUser, comments } = props;
-    setUser(currentUser);
-
-    if (props.route.params.did) {
-      setDiscussionId(props.route.params.did);
-    }
-
+  const verifyComment = (cid) => {
     firebase
       .firestore()
-      .collection("Discussion")
-      .doc(props.route.params.did)
-      .get()
-      .then((snapshot) => {
-        setUserPosts(snapshot.data());
+      .collection('Comment')
+      .doc(cid)
+      .update({
+        verify: true,
+      })
+      .then(() => {
+        console.log('done');
       });
-
-    firebase
-      .firestore()
-      .collection("Comment")
-      .orderBy("creation", "asc")
-      .get()
-      .then((snapshot) => {
-        let comment = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data };
-        });
-        setComment(comment);
-      });
-
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setCu(snapshot.data());
-        } else {
-          console.log("does not exist");
-        }
-      });
-
     setData(11);
-  }, [props.currentUser, props.route.params.did, data]);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      firebase
-        .firestore()
-        .collection("Comment")
-        .orderBy("creation", "asc")
-        .get()
-        .then((snapshot) => {
-          let comment = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            const id = doc.id;
-            return { id, ...data };
-          });
-          setComment(comment);
-        });
-    }, [])
-  );
-
-  if (user === null) {
-    return <View />;
-  }
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
   };
 
-  const UploadComment = () => {
+  const removeVerifyComment = (cid) => {
+    firebase
+      .firestore()
+      .collection('Comment')
+      .doc(cid)
+      .update({
+        verify: false,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    setData(6);
+  };
+
+  const finalCommentUpload = (doc, img) => {
     if (!newComment.trim()) {
-      alert("Please Enter Comment");
+      alert('Please Enter Comment');
       return;
     } else {
       firebase
         .firestore()
-        .collection("Comment")
+        .collection('Comment')
         .add({
           userId,
           postedBy: cu.name,
@@ -225,34 +427,250 @@ function LectureDiscussionView(props) {
           likeBy: [],
           numOfLike: 0,
           numberOfReply: 0,
+          attachedDocument: doc,
+          attachedImage: img,
         })
         .then(function () {
+          setLoading1(false);
           setModalVisible(!isModalVisible);
+        })
+        .catch((error) => {
+          this.errorMessage = 'Error - ' + error.message;
         });
-      setData(57);
+      setData(7);
     }
   };
 
-  const uploadUpdatedComment = () => {
-    if (!editComment.trim()) {
-      alert("Please Enter Comment");
-      return;
-    } else {
-      firebase
-        .firestore()
-        .collection("Comment")
-        .doc(commentId)
-        .update({
-          comment: editComment,
-          creation: firebase.firestore.FieldValue.serverTimestamp(),
-        })
-        .then(() => {
-          console.log("save");
-        });
-      setEditCommentModalVisible(!isEditCommentModalVisible);
+  const UploadComment = () => {
+    setLoading1(true);
+    if (image == null && Doc == null) {
+      finalCommentUpload(null, null);
     }
 
-    setData(88);
+    if (image != null && Doc != null) {
+      uploadDocV2();
+    }
+
+    if (image == null && Doc != null) {
+      uploadDoc();
+    }
+
+    if (image != null && Doc == null) {
+      uploadImage();
+    }
+  };
+
+  const pickDocument = async () => {
+    let result = await DocumentPicker.getDocumentAsync({});
+    if (!result.cancelled) {
+      setDoc(result.uri);
+      setName(result.name);
+      console.log(result.name);
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      // aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  const uploadDoc = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(snapshot, null);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImage = async () => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(null, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadDocV2 = async () => {
+    const childPath = `attchedDoc/${1234}/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(Doc);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        uploadImageV2(snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
+  };
+
+  const uploadImageV2 = async (docSnapshot) => {
+    //const uri = props.route.params.image;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
+    console.log(childPath);
+
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const task = firebase.storage().ref().child(childPath).put(blob);
+
+    const taskProgress = (snapshot) => {
+      console.log(`transferred: ${snapshot.bytesTransferred}`);
+    };
+
+    const taskCompleted = () => {
+      task.snapshot.ref.getDownloadURL().then((snapshot) => {
+        finalCommentUpload(docSnapshot, snapshot);
+      });
+    };
+
+    const taskError = (snapshot) => {
+      console.log(snapshot);
+    };
+
+    task.on('state_changed', taskProgress, taskError, taskCompleted);
+  };
+
+  if (hasGalleryPermission === false) {
+    return <View />;
+  }
+  if (hasGalleryPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+  const AddFavDiscussion = () => {
+    const FD = user.FavDiscussion;
+
+    if (FD.includes(discussionId)) {
+      console.log('already added to fav');
+    } else {
+      FD.push(discussionId);
+    }
+
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        FavDiscussion: FD,
+      })
+      .then(() => {
+        console.log('done');
+      });
+
+    const FB = userPosts.favBy;
+    FB.push(userId);
+    firebase
+      .firestore()
+      .collection('Discussion')
+      .doc(discussionId)
+      .update({
+        favBy: FB,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    setData(1);
+  };
+
+  const RemoveFavDiscussion = () => {
+    const FD = user.FavDiscussion;
+
+    const index = FD.indexOf(discussionId);
+    if (index > -1) {
+      FD.splice(index, 1);
+    }
+
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        FavDiscussion: FD,
+      })
+      .then(() => {
+        console.log('done');
+      });
+
+    const FB = userPosts.favBy;
+
+    const indexx = FB.indexOf(userId);
+    if (indexx > -1) {
+      FB.splice(indexx, 1);
+    }
+
+    firebase
+      .firestore()
+      .collection('Discussion')
+      .doc(discussionId)
+      .update({
+        favBy: FB,
+      })
+      .then(() => {
+        console.log('done');
+      });
+    setData(0);
   };
 
   const onShare = async () => {
@@ -275,69 +693,24 @@ function LectureDiscussionView(props) {
     }
   };
 
-  const verifyComment = (cid) => {
-    firebase
-      .firestore()
-      .collection("Comment")
-      .doc(cid)
-      .update({
-        verify: true,
-      })
-      .then(() => {
-        console.log("done");
-      });
-    setData(5);
-  };
-
-  const EditComment = (cid) => {
-    setIsVisible(false)
-    setCommentId(cid);
-    firebase
-      .firestore()
-      .collection("Comment")
-      .doc(cid)
-      .get()
-      .then((snapshot) => {
-        setEditComment(snapshot.data().comment);
-      });
-    setEditCommentModalVisible(!isEditCommentModalVisible);
-  };
-
-  const removeVerifyComment = (cid) => {
-    firebase
-      .firestore()
-      .collection("Comment")
-      .doc(cid)
-      .update({
-        verify: false,
-      })
-      .then(() => {
-        console.log("done");
-      });
-    setData(6);
-  };
-
   const Delete = (cid) => {
-    // firebase.firestore().collection("Comment").doc(cid).delete();
-    // console.log("delete");
-    // props.navigation.goBack();
-    setIsVisible(false)
+    setIsVisible(false);
     return Alert.alert(
-      "Are your sure?",
-      "Are you sure you want to delete this comment ?",
+      'Are your sure?',
+      'Are you sure you want to delete this comment ?',
       [
         // The "Yes" button
         {
-          text: "Yes",
+          text: 'Yes',
           onPress: () => {
-            firebase.firestore().collection("Comment").doc(cid).delete();
+            firebase.firestore().collection('Comment').doc(cid).delete();
             setData(4);
           },
         },
         // The "No" button
         // Does nothing but dismiss the dialog when tapped
         {
-          text: "No",
+          text: 'No',
         },
       ]
     );
@@ -352,14 +725,14 @@ function LectureDiscussionView(props) {
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(cid)
       .update({
         numOfLike: x,
         likeBy: lb,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     setData(2);
   };
@@ -373,16 +746,65 @@ function LectureDiscussionView(props) {
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(cid)
       .update({
         numOfLike: x,
         likeBy: lb,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     setData(3);
+  };
+
+  const EditComment = (cid) => {
+    setIsVisible(false);
+    setCommentId(cid);
+    firebase
+      .firestore()
+      .collection('Comment')
+      .doc(cid)
+      .get()
+      .then((snapshot) => {
+        setEditComment(snapshot.data().comment);
+      });
+    setEditCommentModalVisible(!isEditCommentModalVisible);
+  };
+
+  const uploadUpdatedComment = () => {
+    setLoading2(true);
+    if (!editComment.trim()) {
+      alert('Please Enter Comment');
+      return;
+    } else {
+      firebase
+        .firestore()
+        .collection('Comment')
+        .doc(commentId)
+        .update({
+          comment: editComment,
+          //creation: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          console.log('save');
+        });
+      setLoading2(false);
+      setEditCommentModalVisible(!isEditCommentModalVisible);
+    }
+
+    setData(8);
+  };
+
+  const downlaodDoc = () => {
+    console.log(36);
+  };
+
+  const loadMoreComment = () => {
+    setLoadMoreLoading(true);
+    let x = 8;
+    setLoadMore(loadMore + x);
+    setData(9);
   };
 
   return (
@@ -418,8 +840,9 @@ function LectureDiscussionView(props) {
               removeVerifyComment={() => removeVerifyComment(item.id)}
               verifyComment={() => verifyComment(item.id)}
               onSelect={() =>
-                props.navigation.navigate("Reply Discussion", {
+                props.navigation.navigate('Reply Discussion', {
                   cid: item.id,
+                  id: discussionId,
                   time: timeDifference(new Date(), item.creation.toDate()),
                   xxx: item.likeBy.includes(userId),
                   mainCommentAuthorName: item.postedBy,
@@ -430,9 +853,9 @@ function LectureDiscussionView(props) {
         }
         ListHeaderComponent={
           <View>
-            <View style={{ flexDirection: "row", marginTop: 10 }}>
-              <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                <View style={{ width: "100%" }}>
+            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+              <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+                <View style={{ width: '100%' }}>
                   <Text style={styles.title}>{userPosts.title}</Text>
                 </View>
               </View>
@@ -441,14 +864,14 @@ function LectureDiscussionView(props) {
             {userPosts.downloadURL && (
               <View
                 style={{
-                  flexDirection: "row",
+                  flexDirection: 'row',
                   paddingBottom: 10,
-                  justifyContent: "center",
+                  justifyContent: 'center',
                 }}
               >
                 {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
                 <Images
-                  width={Dimensions.get("window").width} // height will be calculated automatically
+                  width={Dimensions.get('window').width} // height will be calculated automatically
                   source={{ uri: userPosts.downloadURL }}
                 />
               </View>
@@ -464,65 +887,102 @@ function LectureDiscussionView(props) {
         }
         ListFooterComponent={
           <View>
-      <BottomSheet
-        isVisible={isVisible}
-        containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.2)" }}
-      >
-        {list.map((l, i) => (
-          <ListItem
-            key={i}
-            containerStyle={l.containerStyle}
-            onPress={l.onPress}
-          >
-            <ListItem.Content>
-              <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-            </ListItem.Content>
-          </ListItem>
-        ))}
-      </BottomSheet>
+            {loadMoreLoading && (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <ActivityIndicator size='large' color='#E3562A' />
+              </View>
+            )}
+            {comment.length != 0 &&
+            loadMore >= 8 &&
+            totalComment > loadMore &&
+            loadMoreLoading == false ? (
+              <TouchableOpacity
+                onPress={loadMoreComment}
+                style={{ marginLeft: 50, flex: 1 }}
+              >
+                <Text style={{ fontSize: 15, fontFamily: 'Poppins' }}>
+                  Load More ...
+                </Text>
+              </TouchableOpacity>
+            ) : null}
 
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <Modal isVisible={isEditCommentModalVisible}>
-          <EditCommentCom
-            editComment={editComment}
-            setEditComment={(editComment) => setEditComment(editComment)}
-            uploadUpdatedComment={() => uploadUpdatedComment()}
-            toggleEditComment={() => toggleEditComment()}
-          />
-        </Modal>
+            <BottomSheet
+              isVisible={isVisible}
+              containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
+            >
+              {list.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
+                >
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>
+                      {l.title}
+                    </ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
 
-        <Modal isVisible={isReportVisible}>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text style={styles.titley}>Why are you reporting this post</Text>
-            <FlatList
-              horizontal={false}
-              extraData={newOption}
-              data={newOption}
-              renderItem={({ item }) => (
-                <Report
-                  Option={item.Option}
-                  sendReport={() => sendReport(item.Option)}
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+              <Modal isVisible={isModalVisible}>
+                <AddComment
+                  setNewComment={(newComment) => setNewComment(newComment)}
+                  pickDocument={() => pickDocument()}
+                  pickImage={() => pickImage()}
+                  UploadComment={() => UploadComment()}
+                  toggleModal={() => toggleModal()}
+                  loading={loading1}
                 />
-              )}
-            />
-          </View>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <TouchableOpacity style={styles.blogout} onPress={toggleReport}>
-              <Text style={styles.Ltext}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
+              </Modal>
 
-        <Modal isVisible={isModalVisible}>
-          <AddComment
-            setNewComment={(newComment) => setNewComment(newComment)}
-            pickDocument={() => pickDocument()}
-            pickImage={() => pickImage()}
-            UploadComment={() => UploadComment()}
-            toggleModal={() => toggleModal()}
-          />
-        </Modal>
-      </View>
+              <Modal isVisible={isEditCommentModalVisible}>
+                <EditCommentCom
+                  editComment={editComment}
+                  setEditComment={(editComment) => setEditComment(editComment)}
+                  uploadUpdatedComment={() => uploadUpdatedComment()}
+                  toggleEditComment={() => toggleEditComment()}
+                  loading={loading2}
+                />
+              </Modal>
+
+              <Modal isVisible={isReportVisible}>
+                <View
+                  style={{ justifyContent: 'center', alignItems: 'center' }}
+                >
+                  <Text style={styles.titley}>
+                    Why are you reporting this post
+                  </Text>
+                  <FlatList
+                    horizontal={false}
+                    extraData={newOption}
+                    data={newOption}
+                    renderItem={({ item }) => (
+                      <Report
+                        Option={item.Option}
+                        sendReport={() => sendReport(item.Option)}
+                      />
+                    )}
+                  />
+                </View>
+                <View
+                  style={{ justifyContent: 'center', alignItems: 'center' }}
+                >
+                  <TouchableOpacity
+                    style={styles.blogout}
+                    onPress={toggleReport}
+                  >
+                    <Text style={styles.Ltext}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </Modal>
+            </View>
           </View>
         }
       />
@@ -549,156 +1009,75 @@ function LectureDiscussionView(props) {
   );
 }
 
-////(credits < 30) ? "freshman" : (credits >= 30 && credits < 60) ?"sophomore" : (credits >= 60 && credits < 90) ? "junior" : "senior"
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
-    // marginTop: 20,
+    margin: 10,
     marginBottom: 5,
-    // marginLeft: 20,
-    // marginLeft:20
   },
-  container3: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  titlex: {
-    color: "#fff",
-    fontSize: 20,
-    fontFamily: "Poppins",
-    paddingVertical: 0,
-    //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+
+  floatButton: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
   },
 
   titley: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 25,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    fontWeight: "700",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    fontWeight: '700',
     marginBottom: 20,
   },
-  card: {
-    borderRadius: 16,
-    elevation: 5,
-    backgroundColor: "#140F38",
-    shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    marginHorizontal: 4,
-    marginVertical: 6,
-    width: 340,
-  },
 
-  cardContent: {
-    marginVertical: 10,
-    marginHorizontal: 18,
-  },
-
-  input: {
-    height: 60,
-    borderColor: "#E3562A",
-    borderWidth: 1,
-    backgroundColor: "#FFF",
-    width: 340,
-    borderRadius: 12,
-    padding: 10,
-    fontFamily: "Poppins",
-  },
-
-  logo: {
-    width: 300,
-    height: 400,
-  },
   title: {
     fontSize: 20,
-    fontFamily: "Poppins",
-    lineHeight: 20,
-    fontWeight: "700",
+    fontFamily: 'PoppinsMedium',
     marginBottom: 5,
-  },
-  image: {
-    flex: 1,
-    //aspectRatio: 3 / 1,
-    alignItems: "center",
-    justifyContent: "center",
-    width: 300,
-    height: 300,
-    resizeMode: "contain",
-  },
-
-  commentCon: {
-    borderColor: "#E3562A",
-    borderBottomWidth: 5,
-    width: 300,
-    paddingVertical: 3,
-  },
-
-  desc: {
-    fontSize: 14,
   },
 
   descT: {
     fontSize: 20,
-    fontFamily: "Poppins",
+    lineHeight: 25,
+    fontFamily: 'Poppins',
+    marginTop: 10,
   },
 
   comT: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: 'PoppinsSemiBold',
     fontSize: 18,
-  },
-
-  userT: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
-    fontSize: 15,
-  },
-
-  userC: {
-    fontFamily: "Poppins",
-    lineHeight: 20,
-    fontSize: 15,
-  },
-
-  userT: {
-    fontFamily: "Poppins",
-    fontSize: 15,
   },
 
   blogout: {
     width: 140,
     height: 40,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
+    backgroundColor: '#E3562A',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 20,
   },
 
   Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     paddingTop: 8,
   },
 });
 
 const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
-  comments: store.userState.comment,
+  fullComments: store.userState.comment,
   options: store.userState.option,
+  report: store.userState.reportedDiscussion,
 });
 
 export default connect(mapStateToProps, null)(LectureDiscussionView);
