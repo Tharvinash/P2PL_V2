@@ -19,9 +19,54 @@ function UploadStudentEmail(props) {
   const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   const [email, setEmail] = useState('');
   const [checked, setChecked] = useState('first');
+  const [student, setStudent] = useState([]);
+  const [lecture, setLecture] = useState([]);
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .collection('Student')
+      .get()
+      .then((snapshot) => {
+        let student = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        // console.log(student);
+        setStudent(student);
+      });
+    firebase
+      .firestore()
+      .collection('Lecture')
+      .get()
+      .then((snapshot) => {
+        let lecture = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        // console.log(lecture);
+        setLecture(lecture);
+      });
+  }, []);
 
   const uploadEmail = () => {
-    if ((checked = first)) {
+    const found = student.some((el) => el.email === email);
+
+    if (checked === 'first') {
+      const found = student.some((el) => el.email === email);
+      if (found) {
+        return Alert.alert(
+          'Email already exsist',
+          'Duplicate data being formed',
+          [
+            {
+              text: 'Retry',
+            },
+          ]
+        );
+      }
       if (!email.match(mailformat)) {
         return Alert.alert('Invalid Email Format', 'Enter valid email', [
           {
@@ -40,6 +85,18 @@ function UploadStudentEmail(props) {
           });
       }
     } else {
+      const found = lecture.some((el) => el.email === email);
+      if (found) {
+        return Alert.alert(
+          'Email already exsist',
+          'Duplicate data being formed',
+          [
+            {
+              text: 'Retry',
+            },
+          ]
+        );
+      }
       if (!email.match(mailformat)) {
         return Alert.alert('Invalid Email Format', 'Enter valid email', [
           {

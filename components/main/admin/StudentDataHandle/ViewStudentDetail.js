@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { FAB } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
 import firebase from 'firebase';
 require('firebase/firestore');
+import SelectPicker from 'react-native-form-select-picker';
 
 function ViewStudentDetail(props) {
   const [info, setInfo] = useState([]);
@@ -21,8 +22,10 @@ function ViewStudentDetail(props) {
   const [email, setEmail] = useState('');
   const [matricNum, setMatricNum] = useState('');
   const [fac, setFac] = useState('');
-  const [year, setYear] = useState('');
+  const [year, setYear] = useState(0);
   const [data, setData] = useState(0);
+  const [facultyData, setFacultyData] = useState([]);
+  let options = [1, 2, 3, 4, 5];
   const infoId = props.route.params.did;
 
   useLayoutEffect(() => {
@@ -45,11 +48,9 @@ function ViewStudentDetail(props) {
     });
   }, []);
 
-
   useEffect(() => {
     fetchData();
   }, [data]);
-
 
   const save = () => {
     //console.log({ name, email, matricNum, fac, year });
@@ -72,25 +73,38 @@ function ViewStudentDetail(props) {
       });
   };
 
-  const fetchData = () =>{
+  const fetchData = () => {
     firebase
-    .firestore()
-    .collection('users')
-    .doc(infoId)
-    .get()
-    .then((snapshot) => {
-      if (snapshot.exists) {
-        setInfo(snapshot.data());
-        setName(snapshot.data().name);
-        setEmail(snapshot.data().email);
-        setMatricNum(snapshot.data().matricNumber);
-        setFac(snapshot.data().faculty);
-        setYear(snapshot.data().year);
-      } else {
-        console.log('does not exist');
-      }
-    });
-  }
+      .firestore()
+      .collection('users')
+      .doc(infoId)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          setInfo(snapshot.data());
+          setName(snapshot.data().name);
+          setEmail(snapshot.data().email);
+          setMatricNum(snapshot.data().matricNumber);
+          setFac(snapshot.data().faculty);
+          setYear(snapshot.data().year);
+        } else {
+          console.log('does not exist');
+        }
+      });
+
+    firebase
+      .firestore()
+      .collection('Faculty')
+      .get()
+      .then((snapshot) => {
+        let faculty = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setFacultyData(faculty);
+      });
+  };
 
   const OriData = () => {
     return (
@@ -157,20 +171,67 @@ function ViewStudentDetail(props) {
             />
           </View>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Faculty :</Text>
-            <TextInput
+            <Text style={styles.label}>Faculty</Text>
+            <SelectPicker
+              placeholder={fac}
+              placeholderStyle={{
+                fontFamily: 'Poppins',
+                fontSize: 20,
+                color: '#000',
+              }}
+              onSelectedStyle={{
+                fontFamily: 'Poppins',
+                fontSize: 15,
+                color: '#000',
+                ...Platform.select({
+                  ios: {
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingBottom: 0,
+                  },
+                }),
+              }}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                ...styles.ui,
+              }}
               style={styles.input}
-              value={fac}
-              onChangeText={(fac) => setFac(fac)}
-            />
+              onValueChange={setFac}
+              selected={fac}
+            >
+              {Object.values(facultyData).map((val) => (
+                <SelectPicker.Item
+                  label={val.faculty}
+                  value={val.faculty}
+                  key={val.id}
+                />
+              ))}
+            </SelectPicker>
           </View>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Year of Study :</Text>
-            <TextInput
+            <Text style={styles.label}>Year of Study</Text>
+            <SelectPicker
+              placeholder={year}
+              placeholderStyle={{
+                fontFamily: 'Poppins',
+                fontSize: 15,
+                color: '#000',
+                marginTop: 5,
+              }}
+              onSelectedStyle={{
+                fontSize: 15,
+                color: '#000',
+              }}
               style={styles.input}
-              value={year}
-              onChangeText={(year) => setYear(year)}
-            />
+              onValueChange={setYear}
+              selected={year}
+            >
+              {Object.values(options).map((val, index) => (
+                <SelectPicker.Item label={val} value={val} key={index} />
+              ))}
+            </SelectPicker>
           </View>
         </View>
 

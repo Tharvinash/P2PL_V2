@@ -316,7 +316,6 @@ function EditProfile(props) {
 
         <View style={styles.formControl}>
           <Text style={styles.label}>Faculty</Text>
-          <View></View>
           <SelectPicker
             placeholder={fac}
             placeholderStyle={{
