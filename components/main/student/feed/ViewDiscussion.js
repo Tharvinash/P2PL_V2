@@ -386,6 +386,7 @@ function ViewDiscussion(props) {
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+    setImage(null);
   };
 
   const toggleReport = () => {
@@ -1311,6 +1312,8 @@ function ViewDiscussion(props) {
                   UploadComment={() => UploadComment()}
                   toggleModal={() => toggleModal()}
                   loading={loading1}
+                  image={image}
+                  Doc={Doc}
                 />
               </Modal>
 
