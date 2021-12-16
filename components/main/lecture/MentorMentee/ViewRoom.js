@@ -634,7 +634,8 @@ function ViewRoom(props) {
   };
 
   const EditComment = (cid) => {
-    setIsVisible(false);
+    setIsVisible(false)
+    setEditCommentModalVisible(false);
     setCommentId(cid);
     firebase
       .firestore()
@@ -648,7 +649,7 @@ function ViewRoom(props) {
   };
 
   const uploadUpdatedComment = () => {
-    if (!editComment.trim()) {
+    if (!caption.trim()) {
       alert('Please Enter Comment');
       return;
     } else {
@@ -820,6 +821,7 @@ function ViewRoom(props) {
                   pickImage={() => pickImage()}
                   UploadComment={() => UploadComment()}
                   toggleModal={() => toggleModal()}
+                  status={0}
                 />
               </Modal>
 
@@ -845,6 +847,7 @@ function ViewRoom(props) {
                   keyExtractor={(item, index) => item.name}
                   UploadComment={() => uploadUpdatedComment()}
                   toggleModal={() => toggleEditComment()}
+                  status={1}
                 />
               </Modal>
             </View>

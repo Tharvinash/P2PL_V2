@@ -81,7 +81,11 @@ const mmCommentCard = (props) => {
             style={styles.blogout}
             onPress={props.UploadComment}
           >
-            <Text style={styles.Ltext}>Add Comment</Text>
+            {props.status == 0 ? (
+              <Text style={styles.Ltext}>Add Comment</Text>
+            ) : (
+              <Text style={styles.Ltext}>Update Comment</Text>
+            )}
           </TouchableOpacity>
         </View>
         <View
