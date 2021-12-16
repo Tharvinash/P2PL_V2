@@ -155,7 +155,7 @@ function Profile(props) {
             color='#3C3A36'
           />
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.button}
           onPress={() => props.navigation.navigate('Activity Tracking')}
         >
@@ -167,7 +167,7 @@ function Profile(props) {
             size={20}
             color='#3C3A36'
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <BottomSheet
           isVisible={isVisible}
           containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}

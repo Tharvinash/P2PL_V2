@@ -26,7 +26,7 @@ function Feed(props) {
   const [post, setPost] = useState([]);
   const [data, setData] = useState(0);
   const [rerender, setrerender] = useState(0);
-  const [numberOfItem, setNumberOfItem] = useState(5);
+  const [numberOfItem, setNumberOfItem] = useState(10);
   const [loadingMore, setLoadingMore] = useState(false);
   const [FilterFeed, setCu] = useState(currentUser.filteredFeed);
   let stopFetchMore = true;

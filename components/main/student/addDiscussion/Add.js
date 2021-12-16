@@ -167,9 +167,10 @@ function Add(props) {
         userId,
         downloadURL,
         title,
-        faculty,
+        faculty: selected,
         description,
         postedBy: currentUser.name,
+        image: currentUser.image,
         favBy: [],
         creation: firebase.firestore.FieldValue.serverTimestamp(),
         noOfComments: 0 // changes for contribution

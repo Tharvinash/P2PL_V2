@@ -896,11 +896,23 @@ function EditDeleteDiscussion(props) {
         }
       />
       <FAB
-        placement="right"
-        color="#E3562A"
-        style={styles.floatButton}
+        placement='right'
+        color='#E3562A'
         onPress={toggleModal}
-        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
+        icon={
+          <Icon
+            reverse
+            name='add-outline'
+            type='ionicon'
+            color='#E3562A'
+            size={35}
+            containerStyle={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: 11,
+            }}
+          />
+        }
       />
     </View>
   );

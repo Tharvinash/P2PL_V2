@@ -24,6 +24,7 @@ function Cd(props) {
       firebase
         .firestore()
         .collection("Discussion")
+        .orderBy("creation", "desc")
         .get()
         .then((snapshot) => {
           let posts = snapshot.docs.map((doc) => {
@@ -41,6 +42,7 @@ function Cd(props) {
     firebase
       .firestore()
       .collection("Discussion")
+      .orderBy("creation", "desc")
       .get()
       .then((snapshot) => {
         let posts = snapshot.docs.map((doc) => {
