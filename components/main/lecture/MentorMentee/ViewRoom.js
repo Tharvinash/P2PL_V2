@@ -179,7 +179,7 @@ function ViewRoom(props) {
       .firestore()
       .collection('DiscussionRoomComment')
       .orderBy('creation', 'desc')
-      .limit(loadMore)
+     // .limit(loadMore)
       .get()
       .then((snapshot) => {
         let comment = snapshot.docs.map((doc) => {
@@ -190,9 +190,9 @@ function ViewRoom(props) {
         setComment(comment);
       });
 
-    setTimeout(function () {
-      setLoadMoreLoading(false);
-    }, 1000);
+    // setTimeout(function () {
+    //   setLoadMoreLoading(false);
+    // }, 1000);
     setUserStatus(currentUser.status);
     setData(11);
   }, [props.currentUser, props.route.params.did, data]);
@@ -203,7 +203,7 @@ function ViewRoom(props) {
         .firestore()
         .collection('DiscussionRoomComment')
         .orderBy('creation', 'desc')
-        .limit(loadMore)
+      //  .limit(loadMore)
         .get()
         .then((snapshot) => {
           let comment = snapshot.docs.map((doc) => {
@@ -670,12 +670,12 @@ function ViewRoom(props) {
     setData(88);
   };
 
-  const loadMoreComment = () => {
-    setLoadMoreLoading(true);
-    let x = 8;
-    setLoadMore(loadMore + x);
-    setData(9);
-  };
+  // const loadMoreComment = () => {
+  //   setLoadMoreLoading(true);
+  //   let x = 8;
+  //   setLoadMore(loadMore + x);
+  //   setData(9);
+  // };
 
   return (
     <View style={{ flex: 1, margin: 10, marginBottom: 5 }}>
@@ -754,7 +754,7 @@ function ViewRoom(props) {
         }
         ListFooterComponent={
           <View>
-            {loadMoreLoading && (
+            {/* {loadMoreLoading && (
               <View
                 style={{
                   justifyContent: 'center',
@@ -763,8 +763,8 @@ function ViewRoom(props) {
               >
                 <ActivityIndicator size='large' color='#E3562A' />
               </View>
-            )}
-            {comment.length != 0 &&
+            )} */}
+            {/* {comment.length != 0 &&
             loadMore >= 8 &&
             totalComment > loadMore &&
             loadMoreLoading == false ? (
@@ -776,7 +776,7 @@ function ViewRoom(props) {
                   Load More ...
                 </Text>
               </TouchableOpacity>
-            ) : null}
+            ) : null} */}
             <BottomSheet
               isVisible={isVisible}
               containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}

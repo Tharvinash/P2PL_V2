@@ -330,6 +330,7 @@ function AddCommentScreen(props) {
     }
 
     addInteraction();
+    props.navigation.goBack();
   };
 
   const removeImage = () => {

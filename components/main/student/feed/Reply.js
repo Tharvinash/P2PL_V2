@@ -123,6 +123,8 @@ function Reply(props) {
   };
 
   useEffect(() => {
+    setImage(null);
+    setDoc(null);
     firebase
       .firestore()
       .collection('Comment')
@@ -1973,6 +1975,8 @@ function Reply(props) {
                 pickImage={() => pickImage()}
                 UploadComment={() => UploadComment()}
                 toggleModal={() => toggleReplyComment()}
+                image={image}
+                Doc={Doc}
               />
             </Modal>
 
@@ -1986,6 +1990,8 @@ function Reply(props) {
                 pickImage={() => pickImage()}
                 UploadComment={() => UploadCommentV2()}
                 toggleModal={() => toggleSubReplyComment()}
+                image={image}
+                Doc={Doc}
               />
             </Modal>
 

@@ -118,6 +118,8 @@ function RoomReplyComment(props) {
   ];
 
   useEffect(() => {
+    setImage(null);
+    setDoc(null);
     setCaption('');
     firebase
       .firestore()
@@ -1124,6 +1126,7 @@ function RoomReplyComment(props) {
                 keyExtractor={(item, index) => item.name}
                 UploadComment={() => uploadUpdatedComment()}
                 toggleModal={() => toggleEditComment()}
+                status={1}
               />
             </Modal>
 
@@ -1152,6 +1155,7 @@ function RoomReplyComment(props) {
                 toggleModal={() => toggleReplyComment()}
                 pickDocument={() => pickDocument()}
                 pickImage={() => pickImage()}
+                status={0}
               />
             </Modal>
 
@@ -1181,6 +1185,7 @@ function RoomReplyComment(props) {
                 toggleModal={() => toggleSubReplyComment()}
                 pickDocument={() => pickDocument()}
                 pickImage={() => pickImage()}
+                status={0}
               />
             </Modal>
 
@@ -1208,6 +1213,7 @@ function RoomReplyComment(props) {
                 keyExtractor={(item, index) => item.name}
                 UploadComment={() => UploadEditSubComment()}
                 toggleModal={() => toggleReplyEditComment()}
+                status={1}
               />
             </Modal>
           </View>

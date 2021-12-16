@@ -22,7 +22,7 @@ const mmCommentCard = (props) => {
                 backgroundColor: '#fff',
               }}
               loadingComponent={props.loadingComponent}
-              textInputMinHeight={30}
+              textInputMinHeight={50}
               textInputMaxHeight={80}
               trigger={'@'}
               triggerLocation={'new-word-only'} // 'new-word-only', 'anywhere'
@@ -38,31 +38,32 @@ const mmCommentCard = (props) => {
             />
           </View>
         </View>
-
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <Icon
-            style={{ marginTop: 5 }}
-            name='attach-outline'
-            type='ionicon'
-            size={30}
-            color='#fff'
-            // onPress={() => {
-            //   pickDocument();
-            // }}
-            onPress={props.pickDocument}
-          />
-          <Icon
-            style={styles.searchIcon}
-            name='image-outline'
-            type='ionicon'
-            size={30}
-            color='#fff'
-            // onPress={() => {
-            //   pickImage();
-            // }}
-            onPress={props.pickImage}
-          />
-        </View>
+        {props.status != 1 ? (
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <Icon
+              style={{ marginTop: 5 }}
+              name='attach-outline'
+              type='ionicon'
+              size={30}
+              color='#fff'
+              // onPress={() => {
+              //   pickDocument();
+              // }}
+              onPress={props.pickDocument}
+            />
+            <Icon
+              style={styles.searchIcon}
+              name='image-outline'
+              type='ionicon'
+              size={30}
+              color='#fff'
+              // onPress={() => {
+              //   pickImage();
+              // }}
+              onPress={props.pickImage}
+            />
+          </View>
+        ) : null}
       </View>
 
       <View
