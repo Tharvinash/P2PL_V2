@@ -20,13 +20,17 @@ function Profile(props) {
   const userId = firebase.auth().currentUser.uid;
   const { currentUser, posts } = props;
   const [user, setUser] = useState(currentUser);
-  const [faculty, setFaculty] = useState("");
+  const [faculty, setFaculty] = useState('');
   const [isVisible, setIsVisible] = useState(false);
 
   const list = [
     {
       title: 'Edit Personal Info',
-      onPress: () => props.navigation.navigate('EditProfile', { uid: userId, facId: faculty }),
+      onPress: () =>
+        props.navigation.navigate('EditProfile', {
+          uid: userId,
+          facId: faculty,
+        }),
     },
     {
       title: 'Edit Password',
@@ -87,6 +91,9 @@ function Profile(props) {
 
         <View>
           <Text style={styles.us}>{user.name}</Text>
+        </View>
+        <View style={{ marginTop: 20 }}>
+          <Text style={styles.us}>({user.faculty})</Text>
         </View>
         <View style={styles.bb}>
           <View style={{ marginHorizontal: 10 }}>

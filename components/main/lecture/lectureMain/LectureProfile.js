@@ -129,6 +129,9 @@ function LectureProfile(props) {
 
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <Text style={styles.us}>{user.name}</Text>
+        <View style={{ marginTop: 20 }}>
+          <Text style={styles.us}>({user.faculty})</Text>
+        </View>
         <TouchableOpacity
           style={styles.title}
           onPress={() => toggleVisibility()}
