@@ -46,9 +46,9 @@ function MainScreen(props) {
           if (posts[i].groupMember.some((el) => el.userId === userId)) {
             x.push(posts[i]);
             setPost(x);
-           // console.log(posts[i]);
+            // console.log(posts[i]);
           } else {
-           // console.log(25);
+            // console.log(25);
           }
         }
       });
@@ -129,40 +129,39 @@ function MainScreen(props) {
             </View>
           )}
         />
-        <SpeedDial
-          isOpen={open}
-          icon={{ name: 'edit', color: '#fff' }}
-          openIcon={{ name: 'close', color: '#fff' }}
-          onOpen={() => setOpen(!open)}
-          onClose={() => setOpen(!open)}
-        >
-          <SpeedDial.Action
-            icon={
-              <Icon
-                reverse
-                name='chalkboard-teacher'
-                type='font-awesome-5'
-                color='#140F38'
-              />
-            }
-            title='Request To Be Mentor'
-            onPress={() => props.navigation.navigate('RequestToBeMentor')}
-          />
-          <SpeedDial.Action
-            icon={
-              <Icon
-                reverse
-                name='user-graduate'
-                type='font-awesome-5'
-                color='#140F38'
-              />
-            }
-            title='Request For Mentor'
-            onPress={() => props.navigation.navigate('RequestForMentor')}
-          />
-        </SpeedDial>
-        
       </View>
+      <SpeedDial
+        isOpen={open}
+        icon={{ name: 'edit', color: '#fff' }}
+        openIcon={{ name: 'close', color: '#fff' }}
+        onOpen={() => setOpen(!open)}
+        onClose={() => setOpen(!open)}
+      >
+        <SpeedDial.Action
+          icon={
+            <Icon
+              reverse
+              name='chalkboard-teacher'
+              type='font-awesome-5'
+              color='#140F38'
+            />
+          }
+          title='Request To Be Mentor'
+          onPress={() => props.navigation.navigate('RequestToBeMentor')}
+        />
+        <SpeedDial.Action
+          icon={
+            <Icon
+              reverse
+              name='user-graduate'
+              type='font-awesome-5'
+              color='#140F38'
+            />
+          }
+          title='Request For Mentor'
+          onPress={() => props.navigation.navigate('RequestForMentor')}
+        />
+      </SpeedDial>
     </View>
   );
 }

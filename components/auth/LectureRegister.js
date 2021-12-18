@@ -195,6 +195,7 @@ export class Register extends Component {
           .collection('users')
           .doc(firebase.auth().currentUser.uid)
           .set({
+            realName:name,
             name,
             email,
             faculty,
