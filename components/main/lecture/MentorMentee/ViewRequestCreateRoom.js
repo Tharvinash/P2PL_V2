@@ -266,7 +266,7 @@ function ViewRequestCreateRoom(props) {
     a.push({
       userId: userId,
       name: currentUser.name,
-      image: 'image',
+      image: currentUser.image,
       status: 0,
     });
     //remove req id from request database
@@ -287,10 +287,7 @@ function ViewRequestCreateRoom(props) {
           .delete();
       }
     }
-    //
-
-    console.log(a);
-    
+     
     firebase
       .firestore()
       .collection('DiscussionRoom')
@@ -353,7 +350,7 @@ function ViewRequestCreateRoom(props) {
           (e) => e.faculty === currentUser.faculty
         );
 
-        let filterRequest = [];
+        let filterRequest = mentee;
         for (var i = 0; i < updatedUser.length; i++) {
           filterRequest.push({
             name: updatedUser[i].name,
@@ -363,6 +360,7 @@ function ViewRequestCreateRoom(props) {
             mc: updatedUser[i].matricNumber,
           });
         }
+
         setMentee(filterRequest);
         setIsAddTrue(true);
       });

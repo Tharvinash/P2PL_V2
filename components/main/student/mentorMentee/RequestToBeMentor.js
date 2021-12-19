@@ -107,7 +107,7 @@ function requesttobementor(props) {
         problems: finalValue,
         image: user.image,
         //commented out for testing purpose
-        //matricNumber: user.matricNumber,
+        matricNumber: user.matricNumber,
         userId,
       })
       .then(function () {
