@@ -19,7 +19,7 @@ import * as Linking from 'expo-linking';
 import Images from 'react-native-scalable-image';
 import { timeDifference } from '../../../utils';
 import { version } from 'react-dom';
-import CommentCard from '../../component/commentCard';
+import ReportComment from '../../component/ReportCommet';
 require('firebase/firestore');
 
 function LectureDiscussionView(props) {
@@ -61,7 +61,6 @@ function LectureDiscussionView(props) {
       .get()
       .then((snapshot) => {
         setUserPosts(snapshot.data());
-        console.log(snapshot.data());
       });
 
     firebase
@@ -261,7 +260,7 @@ function LectureDiscussionView(props) {
       <FlatList
         ListHeaderComponent={
           <View>
-            <View style={{ flexDirection: 'row'}}>
+            <View style={{ flexDirection: 'row' }}>
               <View style={{ flex: 1, justifyContent: 'flex-start' }}>
                 <View style={{ width: '100%' }}>
                   <Text style={styles.title}>{userPosts.title}</Text>
@@ -296,9 +295,10 @@ function LectureDiscussionView(props) {
         horizontal={false}
         extraData={comment}
         data={comment}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) =>
           item.discussionId === discussionId ? (
-            <CommentCard
+            <ReportComment
               picture={item.image}
               status={2}
               verify={item.verify}
@@ -323,14 +323,11 @@ function LectureDiscussionView(props) {
               removeVerifyComment={() => removeVerifyComment(item.id)}
               verifyComment={() => verifyComment(item.id)}
               onSelect={() =>
-                props.navigation.navigate('Reply Discussion', {
+                props.navigation.navigate('ViewReply', {
                   cid: item.id,
                   time: timeDifference(new Date(), item.creation.toDate()),
                   xxx: item.likeBy.includes(userId),
                   mainCommentAuthorName: item.postedBy,
-                  mainCommentUserId: item.userId,
-                  pushToken: item.pushToken,
-                  discussionId: discussionId,
                 })
               }
             />
