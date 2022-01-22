@@ -173,14 +173,15 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    fontFamily: 'Poppins',
+    fontFamily: "Poppins",
     fontSize: 20,
   },
 
   label2: {
-    fontFamily: 'Poppins',
+    fontFamily: "Poppins",
     fontSize: 16,
-    marginTop: 5,
+    marginLeft:5,
+    marginBottom:5,
   },
 
   row: {
@@ -188,11 +189,13 @@ const styles = StyleSheet.create({
   },
 
   input: {
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
     fontFamily: 'Poppins',
-    paddingHorizontal: 2,
-    paddingVertical: 5,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
+    fontSize: 15,
   },
 
   logout: {

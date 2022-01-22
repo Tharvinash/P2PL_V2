@@ -103,17 +103,20 @@ function ViewLectureDetail(props) {
         <ScrollView>
           <View style={styles.form}>
             <View style={styles.formControl}>
-              <Text style={styles.label}>Name: {info.name} </Text>
+              <Text style={styles.label}>Name :</Text>
+              <Text style={styles.input}>{info.name} </Text>
             </View>
           </View>
           <View style={styles.form}>
             <View style={styles.formControl}>
-              <Text style={styles.label}>Email: {info.email} </Text>
+              <Text style={styles.label}>Email :</Text>
+              <Text style={styles.input}>{info.email} </Text>
             </View>
           </View>
           <View style={styles.form}>
             <View style={styles.formControl}>
-              <Text style={styles.label}>Faculty: {info.faculty}</Text>
+              <Text style={styles.label}>Faculty :</Text>
+              <Text style={styles.input}>{info.faculty}</Text>
             </View>
           </View>
         </ScrollView>
@@ -202,7 +205,7 @@ function ViewLectureDetail(props) {
 const styles = StyleSheet.create({
   form: {
     marginHorizontal: 20,
-    marginVertical: 10,
+    marginVertical: 3,
   },
   formControl: {
     width: '100%',
@@ -210,6 +213,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'Poppins',
     fontSize: 20,
+    marginVertical: 5,
   },
 
   label2: {
@@ -223,11 +227,13 @@ const styles = StyleSheet.create({
   },
 
   input: {
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
     fontFamily: 'Poppins',
-    paddingHorizontal: 2,
-    paddingVertical: 5,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
+    fontSize: 15,
   },
 
   logout: {

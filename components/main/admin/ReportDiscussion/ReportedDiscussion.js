@@ -121,7 +121,6 @@ function ReportedDiscussion(props) {
         // Does nothing but dismiss the dialog when tapped
         {
           text: 'No',
-
         },
       ]
     );
@@ -308,7 +307,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'Poppins',
     paddingVertical: 0,
-    //  marginVertical: -5,
+    fontWeight: '700',
     flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
