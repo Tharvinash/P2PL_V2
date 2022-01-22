@@ -273,7 +273,7 @@ export class Register extends Component {
         <TextInput
           style={styles.input}
           underlineColorAndroid='transparent'
-          placeholder='Passowrd'
+          placeholder='Passoword'
           placeholderTextColor='#000'
           autoCapitalize='none'
           secureTextEntry={true}
