@@ -42,7 +42,7 @@ export class Register extends Component {
   };
 
   getData() {
-    setTimeout(() => {
+    // setTimeout(() => {
       firebase
         .firestore()
         .collection('Student')
@@ -56,11 +56,11 @@ export class Register extends Component {
             data: studentEmail,
           });
         });
-    }, 1000);
+    // }, 1000);
   }
 
   getFac() {
-    setTimeout(() => {
+    // setTimeout(() => {
       firebase
         .firestore()
         .collection('Faculty')
@@ -76,7 +76,7 @@ export class Register extends Component {
             fac: faculty,
           });
         });
-    }, 1000);
+    // }, 1000);
   }
 
   componentDidMount() {
@@ -369,7 +369,7 @@ export class Register extends Component {
           selected={this.state.year}
         >
           {Object.values(this.state.options).map((val, index) => (
-            <SelectPicker.Item label={val} value={val} key={index} />
+            <SelectPicker.Item label={val} value={val} key={val.toString()} />
           ))}
         </SelectPicker>
 

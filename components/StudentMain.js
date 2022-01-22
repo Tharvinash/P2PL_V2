@@ -5,6 +5,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // import firebase from 'firebase'
 import { connect } from 'react-redux';
+import * as Notifications from "expo-notifications";//changes
 import { bindActionCreators } from 'redux';
 import {
   fetchUser,
@@ -59,6 +60,7 @@ const HomeStackScreen = () => {
                   type='ionicon'
                   size={30}
                   color='#000'
+                  onPress={() => navigation.navigate("Notification")}
                 />
               </TouchableOpacity>
             </View>
@@ -151,6 +153,109 @@ export class StudentMain extends Component {
     this.props.fetchOption();
     this.props.fetchReportedDiscussion();
     this.props.fetchDiscussionRoom();
+
+
+    //  triggered when user responded to the push notification
+    const backgroundSubscription = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+      const data = response.notification.request.content.data;
+      // console.log(data);
+
+      if (data.id) {
+        let nid;
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .collection("Notifications")
+          .get()
+          .then((snapshot) => {
+            snapshot.docs.map((doc) => {
+              if (doc.data().userId === data.userId && doc.data().description === data.description) {
+                nid = doc.id;
+              }
+            });
+            this.props.navigation.navigate("Discussion", { did: data.id, notificationId: nid })
+          });
+      } else if (data.cid) {
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .collection("Notifications")
+          .get()
+          .then((snapshot) => {
+            let nid;
+            snapshot.docs.map((doc) => {
+              if (doc.data().userId === data.userId && doc.data().description === data.description) {
+                nid = doc.id;
+              }
+            });
+
+            this.props.navigation.navigate("Reply Discussion", { cid: data.cid, notificationId: nid })
+          });
+
+      } else if (data.mmid) {
+        let nid;
+        const loadAsync = async () => {
+          await firebase
+            .firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("Notifications")
+            .get()
+            .then((snapshot) => {
+              snapshot.docs.map((doc) => {
+                if (doc.data().userId === data.userId && doc.data().description === data.description) {
+                  firebase
+                    .firestore()
+                    .collection("users")
+                    .doc(firebase.auth().currentUser.uid)
+                    .collection("Notifications")
+                    .doc(doc.id)
+                    .delete();
+                  // nid = doc.id;
+                  // getId(nid);
+                }
+              });
+              this.props.navigation.navigate("MentorMenteeMainScreenTab", { mmid: data.mmid })
+            });
+        }
+        loadAsync();
+      } else if (data.deleteId) {
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .collection("Notifications")
+          .get()
+          .then((snapshot) => {
+            let nid;
+            snapshot.docs.map((doc) => {
+              if (doc.data().userId === data.userId && doc.data().description === data.description) {
+                nid = doc.id;
+              }
+            });
+            this.props.navigation.navigate("Created Discussions", { notificationId: nid });
+          });
+
+      }
+
+
+    })
+    // manage notification when the app is running
+    const foregroundSubscription = Notifications.addNotificationReceivedListener((notification => {
+      // console.log(notification);
+    }))
+
+    return () => {
+      cleanUp
+      backgroundSubscription.remove();
+      foregroundSubscription.remove();
+    }
+
+
+
   }
   HomeStackScreen = () => {
     const navigation = useNavigation();
@@ -215,7 +320,6 @@ export class StudentMain extends Component {
         <Tab.Screen
           name='MentorMenteeMainScreenTab'
           component={MentorMenteeStackScreen}
-          initialParams={{ age: 45 }}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name='school' color={color} size={26} />

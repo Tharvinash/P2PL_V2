@@ -22,7 +22,7 @@ import { version } from "react-dom";
 require("firebase/firestore");
 
 function LectureDiscussionView(props) {
-  const { currentUser, options } = props;
+  const { currentUser, options, discussionList } = props; //notification
   const [commentId, setCommentId] = useState(null);
   const [newOption, setOption] = useState(options);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
@@ -35,8 +35,10 @@ function LectureDiscussionView(props) {
   const [comment, setComment] = useState(null);
   const [data, setData] = useState(null);
   const [editComment, setEditComment] = useState("");
+  const [isVisible, setIsVisible] = useState(true);
   const [cu, setCu] = useState(currentUser);
-  const [discussionId, setDiscussionId] = useState(props.route.params.did);
+  const [discussList, setDiscussList] = useState();
+  const [discussionId, setDiscussionId] = useState(props.route.params.rdid);
   const [ReportedDiscussionId, setReportedDiscussionId] = useState(
     props.route.params.rid
   );
@@ -47,14 +49,14 @@ function LectureDiscussionView(props) {
     const { currentUser, comments } = props;
     setUser(currentUser);
 
-    if (props.route.params.did) {
-      setDiscussionId(props.route.params.did);
+    if (props.route.params.rdid) {
+      setDiscussionId(props.route.params.rdid);
     }
 
     firebase
       .firestore()
       .collection("Discussion")
-      .doc(props.route.params.did)
+      .doc(props.route.params.rdid)
       .get()
       .then((snapshot) => {
         setUserPosts(snapshot.data());
@@ -88,7 +90,7 @@ function LectureDiscussionView(props) {
       });
 
     setData(11);
-  }, [props.currentUser, props.route.params.did, data]);
+  }, [props.currentUser, props.route.params.rdid, data]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -105,7 +107,16 @@ function LectureDiscussionView(props) {
           });
           setComment(comment);
         });
-    }, [])
+
+      firebase
+        .firestore()
+        .collection("Discussion")
+        .doc(props.route.params.rdid)
+        .get()
+        .then((snapshot) => {
+          setUserPosts(snapshot.data());
+        });
+    }, [data])
   );
 
   useLayoutEffect(() => {
@@ -136,6 +147,13 @@ function LectureDiscussionView(props) {
   }, [data]);
 
   const Delete = () => {
+    const discussionToDelete = discussionList.find(el => el.id === discussionId);
+    const token = discussionToDelete.pushToken;
+    const title = discussionToDelete.title;
+    const discussionOwnerId = discussionToDelete.userId;
+    console.log({ token, title, discussionOwnerId });
+    const notificationTitle = `Your discussion entitled ${title} has been deleted following the receival of reports from the user/users`;
+
     return Alert.alert(
       "Are your sure?",
       "Are you sure you want to remove this Discussion ?",
@@ -144,6 +162,7 @@ function LectureDiscussionView(props) {
         {
           text: "Yes",
           onPress: () => {
+            setIsVisible(false);
             firebase
               .firestore()
               .collection("Discussion")
@@ -154,7 +173,41 @@ function LectureDiscussionView(props) {
               .collection("ReportedDiscussion")
               .doc(ReportedDiscussionId)
               .delete();
-              props.navigation.goBack();
+
+
+            //  -------------------- Sending Push Notification To Author of Discussion -----------------------
+            setData(60);
+            firebase
+              .firestore()
+              .collection("users")
+              .doc(discussionOwnerId)
+              .collection("Notifications")
+              .add({
+                title: notificationTitle,
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                pageId: "null",
+                description: title,
+                userId: userId,
+                dataType: "deleteId"
+              });
+
+            fetch('https://exp.host/--/api/v2/push/send', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Accept-Encoding': 'gzip, deflate',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                to: token,
+                title: notificationTitle,
+                body: `${title}: Deleted`,
+                priority: "normal",
+                data: { deleteId: "null", description: title, userId: userId }
+              })
+            });
+            //  ------------------ Sending Push Notification To Author of Discussion ----------------------- 
+            props.navigation.goBack();
           },
         },
         // The "No" button
@@ -172,39 +225,18 @@ function LectureDiscussionView(props) {
       .collection("ReportedDiscussion")
       .doc(ReportedDiscussionId)
       .delete();
-      props.navigation.goBack();
+    props.navigation.goBack();
   };
 
   if (user === null) {
     return <View />;
   }
 
+  if (!isVisible) { return (<View></View>) }
+
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>{userPosts.title}</Text>
-
-      {userPosts.downloadURL && (
-        <View
-          style={{
-            flexDirection: "row",
-            paddingBottom: 10,
-            justifyContent: "center",
-          }}
-        >
-          {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
-          <Images
-            width={Dimensions.get("window").width} // height will be calculated automatically
-            source={{ uri: userPosts.downloadURL }}
-          />
-        </View>
-      )}
-
-      <View style={styles.desc}>
-        <Text style={styles.descT}>{userPosts.description}</Text>
-      </View>
-      <View style={{ paddingBottom: 10 }}>
-        <Text style={styles.comT}>Comments:</Text>
-      </View>
+    <View style={styles.container}>
       <FlatList
         horizontal={false}
         extraData={comment}
@@ -294,10 +326,45 @@ function LectureDiscussionView(props) {
             </View>
           ) : null
         }
+
+
+        ListHeaderComponent={
+          <View>
+            <Text style={styles.title}>{userPosts.title}</Text>
+
+            {userPosts.downloadURL && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  paddingBottom: 10,
+                  justifyContent: "center",
+                }}
+              >
+                {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
+                <Images
+                  width={Dimensions.get("window").width} // height will be calculated automatically
+                  source={{ uri: userPosts.downloadURL }}
+                />
+              </View>
+            )}
+
+            <View style={styles.desc}>
+              <Text style={styles.descT}>{userPosts.description}</Text>
+            </View>
+            <View style={{ paddingBottom: 10 }}>
+              <Text style={styles.comT}>Comments:</Text>
+            </View>
+
+            <View style={{ justifyContent: "center", alignItems: "center" }}></View>
+          </View>}
       />
-      <View style={{ justifyContent: "center", alignItems: "center" }}></View>
-    </ScrollView>
-  );
+
+
+    </View>
+  )
+
+
+
 }
 
 ////(credits < 30) ? "freshman" : (credits >= 30 && credits < 60) ?"sophomore" : (credits >= 60 && credits < 90) ? "junior" : "senior"
@@ -373,7 +440,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontFamily: "Poppins",
-    lineHeight: 20,
+    lineHeight: 0,
     fontWeight: "700",
     marginBottom: 5,
   },
@@ -450,6 +517,7 @@ const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
   comments: store.userState.comment,
   options: store.userState.option,
+  discussionList: store.userState.posts
 });
 
 export default connect(mapStateToProps, null)(LectureDiscussionView);

@@ -18,6 +18,19 @@ function Cd(props) {
   const { posts } = props;
   const [post, setPost] = useState([]);
   const userId = firebase.auth().currentUser.uid;
+  const notificationId = props.route.params.notificationId;
+
+  const deleteNotifications = () => {
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("Notifications")
+      .doc(notificationId)
+      .delete();
+
+    console.log("deletion done");
+  }
 
   useFocusEffect(
     React.useCallback(() => {
@@ -55,6 +68,12 @@ function Cd(props) {
         setData(999);
       });
   }, [data]);
+
+  useEffect(() => {
+    if (notificationId) {
+      deleteNotifications();
+    }
+  }, [notificationId]);
 
   const renderItem = (data) => (
     <DiscussinCard

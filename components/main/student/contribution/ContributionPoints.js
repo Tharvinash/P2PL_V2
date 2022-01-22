@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  Dimensions,
 } from 'react-native';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
@@ -24,30 +23,28 @@ const ContributionPoints = (props) => {
     props.navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row', paddingRight: 15 }}>
-          <TouchableOpacity>
-            <View style={{ flexDirection: 'row' }}>
-              <View style={{ paddingHorizontal: 10 }}>
-                <Icon
-                  name='trophy-outline'
-                  type='ionicon'
-                  size={30}
-                  color='#000'
-                  onPress={() => {
-                    props.navigation.navigate('AvailableAwards');
-                  }}
-                />
-              </View>
+          <View style={{ paddingHorizontal: 10 }}>
+            <Icon
+              name='trophy-outline'
+              type='ionicon'
+              size={35}
+              color='#000'
+              onPress={() => {
+                props.navigation.navigate('AvailableAwards');
+              }}
+            />
+          </View>
 
-              <Icon
-                name='podium-outline'
-                type='ionicon'
-                size={30}
-                color='#000'
-                onPress={() => {
-                  props.navigation.navigate('LeaderBoard');
-                }}
-              />
-            </View>
+          <TouchableOpacity>
+            <Icon
+              name='podium-outline'
+              type='ionicon'
+              size={35}
+              color='#000'
+              onPress={() => {
+                props.navigation.navigate('LeaderBoard');
+              }}
+            />
           </TouchableOpacity>
         </View>
       ),
@@ -86,36 +83,37 @@ const ContributionPoints = (props) => {
     loadAwards();
   }, []);
 
-  // if (isLoading) {
-  //     return (
-  //         <View style={styles.spinner}>
-  //             <ActivityIndicator size="large" color="orange" />
-  //         </View>
-  //     )
-  // }
+  if (isLoading) {
+    return (
+      <View style={styles.spinner}>
+        <ActivityIndicator size='large' color='orange' />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.screen}>
       <View style={styles.title}>
-        <Text style={styles.titleText}>{title}</Text>
-        <Text style={styles.pointsText}>
-          {/* Total Points:{' '} */}
-          {isLoading ? (
-            <View style={styles.spinner}>
-              <ActivityIndicator size='small' color='orange' />
-            </View>
-          ) : (
-            <View style={{flexDirection:'row'}}>
+        <View style={{ marginVertical: 5 }}>
+          <Text style={styles.titleText}>{title}</Text>
+        </View>
+        <View style={{ marginBottom: 5 }}>
+          <Text style={styles.pointsText}>
+            Total Points:{' '}
+            {isLoading ? (
+              <View style={styles.spinner}>
+                <ActivityIndicator size='small' color='orange' />
+              </View>
+            ) : (
               <Text
-                style={{ fontSize: 23, fontWeight: 'bold', fontFamily: 'Poppins', color:'#fff'}}
+                numberOfLines={2}
+                style={{ fontSize: 18, fontWeight: 'bold' }}
               >
-                {currentUserData.totalPoints} 
+                {currentUserData.totalPoints}
               </Text>
-              <Text style={{ fontSize: 20,fontFamily: 'Poppins', color:'#fff'}}> points</Text>
-            </View>
-          )}
-        </Text>
-        <View></View>
+            )}
+          </Text>
+        </View>
       </View>
       <View style={styles.listContainer}>
         {isLoading ? (
@@ -124,9 +122,7 @@ const ContributionPoints = (props) => {
           </View>
         ) : awards.length === 0 ? (
           <View style={styles.fallBack}>
-            <Text style={styles.fallbackText}>
-              No awards received. Click the button below to know more
-            </Text>
+            <Text style={styles.fallbackText}>No awards received yet</Text>
           </View>
         ) : (
           <FlatList
@@ -142,6 +138,15 @@ const ContributionPoints = (props) => {
           />
         )}
       </View>
+      {/* <View style={styles.points}>
+                <Text style={styles.pointsText}>Total Points: {isLoading ? <View style={styles.spinner}>
+                    <ActivityIndicator size="small" color="orange" />
+                </View> : <Text numberOfLines={2} style={{ fontSize: 18, fontWeight: "bold" }}>{currentUserData.totalPoints}</Text>}</Text>
+            </View> */}
+
+      {/* <TouchableOpacity style={styles.button} onPress={() => { props.navigation.navigate("AvailableAwards") }}>
+                <Text numberOfLines={2} style={styles.buttonText}>View All Available Awards</Text>
+            </TouchableOpacity> */}
     </View>
   );
 };
@@ -154,21 +159,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#140F38',
   },
   title: {
-    marginVertical: 10,
-    paddingVertical:40,
+    marginBottom: 30,
+    marginTop: 20,
     backgroundColor: '#694fad',
+    paddingHorizontal: 15,
+    paddingBottom: 3,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    width: Dimensions.get('window').width * 0.7,
-    height: Dimensions.get('window').width * 0.15,
+    width: 200,
+    borderWidth: 10,
+    borderColor: '#003565',
   },
   titleText: {
     fontFamily: 'Poppins',
     fontSize: 25,
     fontWeight: '700',
     color: 'white',
-    // textDecorationLine: 'underline',
   },
   text: {
     fontFamily: 'Poppins',
@@ -192,24 +199,24 @@ const styles = StyleSheet.create({
   points: {
     paddingHorizontal: 10,
     marginBottom: 20,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
     backgroundColor: '#694fad',
   },
   pointsText: {
     fontFamily: 'Poppins',
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 'bold',
     color: 'white',
   },
   listContainer: {
-    height: '80%',
-    width: '100%',
-    borderRadius: 10,
+    height: '70%',
+    width: '95%',
+    borderRadius: 20,
     overflow: 'hidden',
     elevation: 20,
     backgroundColor: '#003565',
-    marginHorizontal: 10,
+    marginHorizontal: 5,
   },
   spinner: {
     flex: 1,

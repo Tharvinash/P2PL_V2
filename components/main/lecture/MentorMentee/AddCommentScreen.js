@@ -152,9 +152,9 @@ function AddCommentScreen(props) {
         setComment(comment);
       });
 
-    setTimeout(function () {
-      setLoadMoreLoading(false);
-    }, 1000);
+    // setTimeout(function () {
+    //   setLoadMoreLoading(false);
+    // }, 1000);
     setUserStatus(currentUser.status);
     setData(11);
   }, [props.currentUser, props.route.params.did, data]);
@@ -670,10 +670,12 @@ function AddCommentScreen(props) {
               textInputStyle={{
                 borderColor: '#E3562A',
                 borderWidth: 1,
-                padding: 5,
-                fontSize: 15,
+                backgroundColor: '#FFF',
+                borderRadius: 12,
+                padding: 10,
                 fontFamily: 'Poppins',
-                margin: 20,
+                fontSize: 15,
+                margin:20
               }}
               suggestionsPanelStyle={{
                 backgroundColor: '#fff',

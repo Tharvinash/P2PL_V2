@@ -9,6 +9,7 @@ import {
   Dimensions,
   RefreshControl,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { SpeedDial, FAB } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { timeDifference } from '../../../utils';
@@ -53,6 +54,37 @@ function MainScreen(props) {
         }
       });
   }, []);
+
+  //changes
+  useFocusEffect(
+    React.useCallback(() => {
+      firebase
+      .firestore()
+      .collection('DiscussionRoom')
+      .orderBy('creation', 'desc')
+      .get()
+      .then((snapshot) => {
+        let posts = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+
+        const x = [];
+        for (let i = 0; i < posts.length; i++) {
+          if (posts[i].groupMember.some((el) => el.userId === userId)) {
+            x.push(posts[i]);
+            setPost(x);
+            // console.log(posts[i]);
+          } else {
+            // console.log(25);
+          }
+        }
+      });
+    }, [])
+  );
+  //changes
+
 
   // const onRefresh = useCallback(() => {
   //   setRefreshing(true);

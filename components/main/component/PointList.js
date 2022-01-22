@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import moment from 'moment';
 
 const PointsList = (props) => {
@@ -14,21 +14,22 @@ const PointsList = (props) => {
         <Text style={styles.pointsText}>{props.points}</Text>
       </View>
       <View style={styles.details}>
-        <View style={styles.title}>
+        <View style={{marginVertical:10}}>
           <Text style={styles.titleText}>{props.title}</Text>
         </View>
         <View style={styles.description}>
           <Text numberOfLines={2} style={styles.descriptionText}>
             {props.description}
           </Text>
-        </View>
-        {props.time ? (
+          {props.time ? (
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
             <Text style={{ fontStyle: 'italic', ...styles.descriptionText }}>
-              Awarded: {time}
+              {time}
             </Text>
           </View>
         ) : null}
+        </View>
+
       </View>
     </View>
   );
@@ -38,7 +39,6 @@ const styles = StyleSheet.create({
   list: {
     flexDirection: 'row',
     flex: 1,
-    height: Dimensions.get('window').width * 0.25,
     borderBottomWidth: 2,
     borderBottomColor: 'black',
   },
@@ -50,13 +50,13 @@ const styles = StyleSheet.create({
   },
   pointsText: {
     fontFamily: 'Poppins',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+    fontWeight: '700',
   },
   details: {
-    width: '100%',
-    flex:1,
+    width: '80%',
     flexDirection: 'column',
     justifyContent: 'center',
     padding: 10,
@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontFamily: 'Poppins',
-    fontSize: 25,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '700',
     color: 'white',
   },
   descriptionText: {

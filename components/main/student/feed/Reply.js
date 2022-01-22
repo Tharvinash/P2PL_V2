@@ -27,8 +27,7 @@ import ReplyCommentCard from '../../component/replyCommentCard';
 import { ListItem, BottomSheet } from 'react-native-elements';
 
 function Reply(props) {
-  const { currentUser } = props;
-  const discussionId = props.route.params.did;
+  const { currentUser, posts } = props;
   const [currentUserName, setCurrentUserName] = useState(currentUser.name);
   const [loginCurrentUser, setLoginCurrentUser] = useState(currentUser);
   const [cu, setCu] = useState(currentUser);
@@ -54,6 +53,9 @@ function Reply(props) {
   const [mainCommentAuthorName, setMainCommentAuthorName] = useState(
     props.route.params.mainCommentAuthorName
   );
+  const [replyCommentToken, setReplyCommentToken] = useState();//changes for notification
+  const [repliedSubCommentUserId, setRepliedSubCommentUserId] = useState(null);//noti
+
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
   const [isEditReplyCommentModalVisible, setEditReplyCommentModalVisible] =
@@ -71,6 +73,15 @@ function Reply(props) {
   const userId = firebase.auth().currentUser.uid;
   const userIdV2 = firebase.auth().currentUser.uid;
   const time = props.route.params.time;
+
+  //changes
+  const pushToken = props.route.params.pushToken;
+  const mainCommentUserId = props.route.params.mainCommentUserId;//changes conti/noti
+  const discussionId = props.route.params.discussionId;
+  //changes
+
+  const notificationId = props.route.params.notificationId;
+
   let totalReply; //change for contribution
   const images = [
     {
@@ -122,6 +133,19 @@ function Reply(props) {
     setTemporaryId(cid);
   };
 
+  const deleteNotifications = () => {
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("Notifications")
+      .doc(notificationId)
+      .delete();
+
+    console.log("deletion done");
+  }
+
+
   useEffect(() => {
     setImage(null);
     setDoc(null);
@@ -150,31 +174,31 @@ function Reply(props) {
         setTotalComment(replyComment.length);
       });
 
-    // //change for contribution
-    // firebase
-    //   .firestore()
-    //   .collection('Discussion')
-    //   .doc(discussionId)
-    //   .get()
-    //   .then((snapshot) => {
-    //     setDiscussionData(snapshot.data());
-    //   });
-    // //change for contribution
+    //change for contribution
+    firebase
+      .firestore()
+      .collection('Discussion')
+      .doc(discussionId)
+      .get()
+      .then((snapshot) => {
+        setDiscussionData(snapshot.data());
+      });
+    //change for contribution
 
-    // //change for contribution
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .get()
-    //   .then((snapshot) => {
-    //     let users = snapshot.docs.map((doc) => {
-    //       const data = doc.data();
-    //       const id = doc.id;
-    //       return { id, ...data };
-    //     });
-    //     setAllUsers(users);
-    //   });
-    // //change for contribution
+    //change for contribution
+    firebase
+      .firestore()
+      .collection('users')
+      .get()
+      .then((snapshot) => {
+        let users = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setAllUsers(users);
+      });
+    //change for contribution
 
     firebase
       .firestore()
@@ -192,11 +216,11 @@ function Reply(props) {
         });
         setReplyComment(replyComment);
       });
-    setTimeout(function () {
-      setLoadMoreLoading(false);
-    }, 2000);
+    // setTimeout(function () {
+    //   setLoadMoreLoading(false);
+    // }, 2000);
 
-    //setData(100); // changes
+    setData(100); // changes
   }, [data]);
 
   useFocusEffect(
@@ -227,24 +251,30 @@ function Reply(props) {
           setReplyComment(replyComment);
         });
 
-      // //change for contribution
-      // firebase
-      //   .firestore()
-      //   .collection('users')
-      //   .doc(firebase.auth().currentUser.uid)
-      //   .get()
-      //   .then((snapshot) => {
-      //     if (snapshot.exists) {
-      //       setCu(snapshot.data());
-      //     } else {
-      //       console.log('does not exist');
-      //     }
-      //   });
-      // //change for contribution
+      //change for contribution
+      firebase
+        .firestore()
+        .collection('users')
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setCu(snapshot.data());
+          } else {
+            console.log('does not exist');
+          }
+        });
+      //change for contribution
 
       setData(24);
     }, [data])
   );
+
+  useEffect(() => {
+    if (notificationId) {
+      deleteNotifications();
+    }
+  }, [notificationId]);
 
   const pickDocument = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
@@ -284,275 +314,293 @@ function Reply(props) {
       uploadImage();
     }
 
-    // //change for contribution
+    //change for contribution
 
-    // //updating noOfComments under user
-    // const commentNo = cu.noOfComments + 1;
+    //updating noOfComments under user
+    let mainCommentOwner;
+    let replyPoints;
+    let replyAward;
+    let replyUserTitle;
+    let points;
+    let userTitle;
+    let award;
+    let creation = new Date();
+    if (currentUser.status === 0) {
+      const commentNo = cu.noOfComments + 1;
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(userId)
-    //   .update({
-    //     noOfComments: commentNo,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // console.log(commentNo);
-    // //updating noOfComments under user
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(userId)
+        .update({
+          noOfComments: commentNo
+        })
+        .then(() => {
+          console.log("done");
+        });
+      console.log(commentNo);
+      //updating noOfComments under user
 
-    // //update totalPoints and awards based on the noOfComments
-    // let points = cu.totalPoints;
-    // let userTitle = cu.title;
-    // const award = cu.awards;
-    // console.log(award);
-    // let creation = new Date();
-    // if (commentNo === 1 && !award.some((el) => el.title === 'First Comment')) {
-    //   award.push({
-    //     title: 'First Comment',
-    //     description: 'Post a comment on any discussion created to receive this',
-    //     pointsToBeAdded: 1,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 1;
-    // } else if (
-    //   commentNo === 30 &&
-    //   !award.some((el) => el.title === 'Keep Coming Back')
-    // ) {
-    //   award.push({
-    //     title: 'Keep Coming Back',
-    //     description: '30 comments posted! You must like it here!',
-    //     pointsToBeAdded: 5,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 5;
-    // } else if (
-    //   commentNo === 100 &&
-    //   !award.some((el) => el.title === "Can't Stop")
-    // ) {
-    //   award.push({
-    //     title: "Can't Stop",
-    //     description:
-    //       "You've posted 100 comments. I hope this took you more than a day",
-    //     pointsToBeAdded: 10,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 10;
-    // } else if (
-    //   commentNo === 300 &&
-    //   !award.some((el) => el.title === 'Contribution Fanatic')
-    // ) {
-    //   award.push({
-    //     title: 'Contribution Fanatic',
-    //     description: '300 comments. Impressive',
-    //     pointsToBeAdded: 15,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 15;
-    // }
-    // console.log(points);
+      //update totalPoints and awards based on the noOfComments
+      points = cu.totalPoints;
+      userTitle = cu.title;
+      award = cu.awards;
+      console.log(award);
+     
+      if (commentNo === 1 && !(award.some(el => el.title === "First Comment"))) {
+        award.push({
+          title: "First Comment",
+          description: "Post a comment on any discussion created to receive this",
+          pointsToBeAdded: 1,
+          creation: creation.toISOString()
+        })
+        points = points + 1;
+      }
+      else if (commentNo === 30 && !(award.some(el => el.title === "Keep Coming Back"))) {
+        award.push({
+          title: "Keep Coming Back",
+          description: "30 comments posted! You must like it here!",
+          pointsToBeAdded: 5,
+          creation: creation.toISOString()
+        })
+        points = points + 5;
+      } else if (commentNo === 100 && !(award.some(el => el.title === "Can't Stop"))) {
+        award.push({
+          title: "Can't Stop",
+          description: "You've posted 100 comments. I hope this took you more than a day",
+          pointsToBeAdded: 10,
+          creation: creation.toISOString()
+        })
+        points = points + 10;
+      } else if (commentNo === 300 && !(award.some(el => el.title === "Contribution Fanatic"))) {
+        award.push({
+          title: "Contribution Fanatic",
+          description: "300 comments. Impressive",
+          pointsToBeAdded: 15,
+          creation: creation.toISOString()
+        })
+        points = points + 15;
+      }
+      console.log(points);
 
-    // //updating userTitle based on Points
-    // if (points >= 0 && points <= 100) {
-    //   userTitle = 'Beginner';
-    // } else if (points > 100 && points <= 300) {
-    //   userTitle = 'Intermediate';
-    // } else if (points > 300 && points <= 500) {
-    //   userTitle = 'Expert';
-    // } else if (points > 500) {
-    //   userTitle = 'Legend';
-    // }
-    // //updating userTitle based on Points
+      //updating userTitle based on Points
+      if (points >= 0 && points <= 100) {
+        userTitle = "Beginner";
+      } else if (points > 100 && points <= 300) {
+        userTitle = "Intermediate"
+      } else if (points > 300 && points <= 500) {
+        userTitle = "Expert"
+      } else if (points > 500) {
+        userTitle = "Legend"
+      }
+      //updating userTitle based on Points
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(userId)
-    //   .update({
-    //     totalPoints: points,
-    //     awards: award,
-    //     title: userTitle,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //update totalPoints and awards based on the noOfComments
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(userId)
+        .update({
+          totalPoints: points,
+          awards: award,
+          title: userTitle
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //update totalPoints and awards based on the noOfComments
+    }
+    //update totalPoints and awards based on the noOfReplies
+    mainCommentOwner = allUsers.find(el => el.id === mainComment.userId);
+    if (mainCommentOwner.status === 0) {
 
-    // //update totalPoints and awards based on the noOfReplies
-    // const mainCommentOwner = allUsers.find(
-    //   (el) => el.id === mainComment.userId
-    // );
-    // let replyPoints;
-    // let replyAward;
-    // let replyUserTitle;
+      if (userId === mainCommentOwner.id) {
+        replyPoints = points;
+        replyAward = award;
+        replyUserTitle = userTitle;
+      }
+      else {
+        replyPoints = mainCommentOwner.totalPoints;
+        replyAward = mainCommentOwner.awards;
+        replyUserTitle = mainCommentOwner.title;
+      }
 
-    // if (userId === mainCommentOwner.id) {
-    //   replyPoints = points;
-    //   replyAward = award;
-    //   replyUserTitle = userTitle;
-    // } else {
-    //   replyPoints = mainCommentOwner.totalPoints;
-    //   replyAward = mainCommentOwner.awards;
-    //   replyUserTitle = mainCommentOwner.title;
-    // }
 
-    // if (
-    //   totalReply === 20 &&
-    //   !replyAward.some((el) => el.title === 'Attracter')
-    // ) {
-    //   replyAward.push({
-    //     title: 'Attracter',
-    //     description: 'One of your main comments has obtained 20 replies ',
-    //     pointsToBeAdded: 10,
-    //     creation: creation.toISOString(),
-    //   });
-    //   replyPoints = replyPoints + 10;
-    // } else if (
-    //   totalReply === 40 &&
-    //   !replyAward.some((el) => el.title === 'Super Magnet')
-    // ) {
-    //   replyAward.push({
-    //     title: 'Super Magnet',
-    //     description: 'One of your main comments has obtained 50 replies ',
-    //     pointsToBeAdded: 20,
-    //     creation: creation.toISOString(),
-    //   });
-    //   replyPoints = replyPoints + 20;
-    // }
+      if (totalReply === 20 && !(replyAward.some(el => el.title === "Attracter"))) {
+        replyAward.push({
+          title: "Attracter",
+          description: "One of your main comments has obtained 20 replies ",
+          pointsToBeAdded: 10,
+          creation: creation.toISOString()
+        })
+        replyPoints = replyPoints + 10;
+      } else if (totalReply === 40 && !(replyAward.some(el => el.title === "Super Magnet"))) {
+        replyAward.push({
+          title: "Super Magnet",
+          description: "One of your main comments has obtained 50 replies ",
+          pointsToBeAdded: 20,
+          creation: creation.toISOString()
+        })
+        replyPoints = replyPoints + 20;
+      }
 
-    // //updating userTitle based on Points
-    // if (replyPoints >= 0 && replyPoints <= 100) {
-    //   replyUserTitle = 'Beginner';
-    // } else if (replyPoints > 100 && replyPoints <= 300) {
-    //   replyUserTitle = 'Intermediate';
-    // } else if (replyPoints > 300 && replyPoints <= 500) {
-    //   replyUserTitle = 'Expert';
-    // } else if (replyPoints > 500) {
-    //   replyUserTitle = 'Legend';
-    // }
-    // //updating userTitle based on Points
+      //updating userTitle based on Points
+      if (replyPoints >= 0 && replyPoints <= 100) {
+        replyUserTitle = "Beginner";
+      } else if (replyPoints > 100 && replyPoints <= 300) {
+        replyUserTitle = "Intermediate"
+      } else if (replyPoints > 300 && replyPoints <= 500) {
+        replyUserTitle = "Expert"
+      } else if (replyPoints > 500) {
+        replyUserTitle = "Legend"
+      }
+      //updating userTitle based on Points
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(mainCommentUserId)
-    //   .update({
-    //     totalPoints: replyPoints,
-    //     awards: replyAward,
-    //     title: replyUserTitle,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
 
-    // //update totalPoints and awards based on the noOfReplies
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(mainCommentUserId)
+        .update({
+          totalPoints: replyPoints,
+          awards: replyAward,
+          title: replyUserTitle
+        })
+        .then(() => {
+          console.log("done");
+        }).catch((err) => {
+          console.log(err);
+        });
 
-    // //alteration needed
-    // //updating noOfComments under a specific discussion
-    // const discussionCommentNo = discussionData.noOfComments + 1;
-    // const discussionOwner = allUsers.find(
-    //   (el) => el.id === discussionData.userId
-    // );
-    // let discussionOwnerPoints;
-    // let discussionOwnerAwards;
-    // let discussionOwnerTitle;
+      //update totalPoints and awards based on the noOfReplies
+    }
+    //alteration needed
+    //updating noOfComments under a specific discussion
+    const discussionCommentNo = discussionData.noOfComments + 1;
+    const discussionOwner = allUsers.find(el => el.id === discussionData.userId);
+    let discussionOwnerPoints;
+    let discussionOwnerAwards;
+    let discussionOwnerTitle;
 
-    // firebase
-    //   .firestore()
-    //   .collection('Discussion')
-    //   .doc(mainComment.discussionId)
-    //   .update({
-    //     noOfComments: discussionCommentNo,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    firebase
+      .firestore()
+      .collection("Discussion")
+      .doc(mainComment.discussionId)
+      .update({
+        noOfComments: discussionCommentNo
+      })
+      .then(() => {
+        console.log("done");
+      }).catch((err) => {
+        console.log(err);
+      });
 
-    // //updating noOfComments under a specific discussion
+    //updating noOfComments under a specific discussion
+    if (discussionOwner.status === 0) {
+      //updating totalPoints and awards based on the noOfComments in a discussion
+      if ((discussionOwner.id === userId && discussionOwner.id === mainCommentOwner.id) ||
+        (discussionOwner.id !== userId && discussionOwner.id === mainCommentOwner.id)) {
+        discussionOwnerPoints = replyPoints;
+        discussionOwnerAwards = replyAward;
+        discussionOwnerTitle = replyUserTitle;
+      } else if (discussionOwner.id === userId && discussionOwner.id !== mainCommentOwner.id) {
+        discussionOwnerPoints = points;
+        discussionOwnerAwards = award;
+        discussionOwnerTitle = userTitle;
+      } else {
+        discussionOwnerPoints = discussionOwner.totalPoints;
+        discussionOwnerAwards = discussionOwner.awards;
+        discussionOwnerTitle = discussionOwner.title;
+      }
 
-    // //updating totalPoints and awards based on the noOfComments in a discussion
-    // if (
-    //   (discussionOwner.id === userId &&
-    //     discussionOwner.id === mainCommentOwner.id) ||
-    //   (discussionOwner.id !== userId &&
-    //     discussionOwner.id === mainCommentOwner.id)
-    // ) {
-    //   discussionOwnerPoints = replyPoints;
-    //   discussionOwnerAwards = replyAward;
-    //   discussionOwnerTitle = replyUserTitle;
-    // } else if (
-    //   discussionOwner.id === userId &&
-    //   discussionOwner.id !== mainCommentOwner.id
-    // ) {
-    //   discussionOwnerPoints = points;
-    //   discussionOwnerAwards = award;
-    //   discussionOwnerTitle = userTitle;
-    // } else {
-    //   discussionOwnerPoints = discussionOwner.totalPoints;
-    //   discussionOwnerAwards = discussionOwner.awards;
-    //   discussionOwnerTitle = discussionOwner.title;
-    // }
+      if (discussionCommentNo === 30 && !(discussionOwnerAwards.some(el => el.title === "Interesting Topic"))) {
+        discussionOwnerAwards.push({
+          title: "Interesting Topic",
+          description: "One of your posted disucssions has attracted 30 comments",
+          pointsToBeAdded: 15,
+          creation: creation.toISOString()
+        })
+        discussionOwnerPoints = discussionOwnerPoints + 15;
+      } else if (discussionCommentNo === 60 && !(discussionOwnerAwards.some(el => el.title === "Super Interesting Topic"))) {
+        discussionOwnerAwards.push({
+          title: "Super Interesting Topic",
+          description: "One of your posted disucssions has attracted 60 comments",
+          pointsToBeAdded: 25,
+          creation: creation.toISOString()
+        })
+        discussionOwnerPoints = discussionOwnerPoints + 25;
+      }
 
-    // if (
-    //   discussionCommentNo === 30 &&
-    //   !discussionOwnerAwards.some((el) => el.title === 'Interesting Topic')
-    // ) {
-    //   discussionOwnerAwards.push({
-    //     title: 'Interesting Topic',
-    //     description: 'One of your posted disucssions has attracted 30 comments',
-    //     pointsToBeAdded: 15,
-    //     creation: creation.toISOString(),
-    //   });
-    //   discussionOwnerPoints = discussionOwnerPoints + 15;
-    // } else if (
-    //   discussionCommentNo === 60 &&
-    //   !discussionOwnerAwards.some(
-    //     (el) => el.title === 'Super Interesting Topic'
-    //   )
-    // ) {
-    //   discussionOwnerAwards.push({
-    //     title: 'Super Interesting Topic',
-    //     description: 'One of your posted disucssions has attracted 60 comments',
-    //     pointsToBeAdded: 25,
-    //     creation: creation.toISOString(),
-    //   });
-    //   discussionOwnerPoints = discussionOwnerPoints + 25;
-    // }
+      //updating userTitle based on Points
+      if (discussionOwnerPoints >= 0 && discussionOwnerPoints <= 100) {
+        discussionOwnerTitle = "Beginner";
+      } else if (discussionOwnerPoints > 100 && discussionOwnerPoints <= 300) {
+        discussionOwnerTitle = "Intermediate"
+      } else if (discussionOwnerPoints > 300 && discussionOwnerPoints <= 500) {
+        discussionOwnerTitle = "Expert"
+      } else if (discussionOwnerPoints > 500) {
+        discussionOwnerTitle = "Legend"
+      }
+      //updating userTitle based on Points
 
-    // //updating userTitle based on Points
-    // if (discussionOwnerPoints >= 0 && discussionOwnerPoints <= 100) {
-    //   discussionOwnerTitle = 'Beginner';
-    // } else if (discussionOwnerPoints > 100 && discussionOwnerPoints <= 300) {
-    //   discussionOwnerTitle = 'Intermediate';
-    // } else if (discussionOwnerPoints > 300 && discussionOwnerPoints <= 500) {
-    //   discussionOwnerTitle = 'Expert';
-    // } else if (discussionOwnerPoints > 500) {
-    //   discussionOwnerTitle = 'Legend';
-    // }
-    // //updating userTitle based on Points
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(discussionOwner.id)
+        .update({
+          totalPoints: discussionOwnerPoints,
+          awards: discussionOwnerAwards,
+          title: discussionOwnerTitle
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating totalPoints and awards based on the noOfComments in a discussion
+    }
+    //change for contribution
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(discussionOwner.id)
-    //   .update({
-    //     totalPoints: discussionOwnerPoints,
-    //     awards: discussionOwnerAwards,
-    //     title: discussionOwnerTitle,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //updating totalPoints and awards based on the noOfComments in a discussion
+    //  ------------------ Sending Push Notification To Author of Main Comment -----------------------
+    let notificationTitle = `${currentUser.name} replied to your comment`
 
-    // //change for contribution
+    if (cu.status === 1) {
+      notificationTitle = `A lecturer replied to your comment`
+    }
+
+    // console.log(token);
+    if (mainCommentUserId !== userId) {
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(mainCommentUserId)
+        .collection("Notifications")
+        .add({
+          title: notificationTitle,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+          pageId: mainCommentId,
+          description: newReply,
+          userId: userId,
+          dataType: "cid"
+        });
+
+      fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-Encoding': 'gzip, deflate',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          to: pushToken,
+          title: notificationTitle,
+          body: "Tap to see the comment",
+          priority: "normal",
+          data: { cid: mainCommentId, description: newReply, userId: userId }
+        })
+      });
+
+
+    }
+
+    //  ------------------ Sending Push Notification To Author of Main Comment  ----------------------- 
   };
 
   const UploadCommentV2 = () => {
@@ -572,278 +620,298 @@ function Reply(props) {
       uploadImageV1();
     }
 
-    // //change for contribution
+    //change for contribution
+    let mainCommentOwner;
+    let replyPoints;
+    let replyAward;
+    let replyUserTitle;
+    let points;
+    let userTitle;
+    let award;
+    let creation = new Date();
+    if (currentUser.status === 0) {
+      //updating noOfComments under user
+      const commentNo = cu.noOfComments + 1;
 
-    // //updating noOfComments under user
-    // const commentNo = cu.noOfComments + 1;
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(userId)
+        .update({
+          noOfComments: commentNo
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating noOfComments under user
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(userId)
-    //   .update({
-    //     noOfComments: commentNo,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //updating noOfComments under user
+      //update totalPoints and awards based on the noOfComments
+      points = cu.totalPoints;
+      userTitle = cu.title;
+      award = cu.awards;
+     
+      if (commentNo === 1 && !(award.some(el => el.title === "First Comment"))) {
+        award.push({
+          title: "First Comment",
+          description: "Post a comment on any discussion created to receive this",
+          pointsToBeAdded: 1,
+          creation: creation.toISOString()
+        })
+        points = points + 1;
+      }
+      else if (commentNo === 30 && !(award.some(el => el.title === "Keep Coming Back"))) {
+        award.push({
+          title: "Keep Coming Back",
+          description: "30 comments posted! You must like it here!",
+          pointsToBeAdded: 5,
+          creation: creation.toISOString()
+        })
+        points = points + 5;
+      } else if (commentNo === 100 && !(award.some(el => el.title === "Can't Stop"))) {
+        award.push({
+          title: "Can't Stop",
+          description: "You've posted 100 comments. I hope this took you more than a day",
+          pointsToBeAdded: 10,
+          creation: creation.toISOString()
+        })
+        points = points + 10;
+      } else if (commentNo === 300 && !(award.some(el => el.title === "Contribution Fanatic"))) {
+        award.push({
+          title: "Contribution Fanatic",
+          description: "300 comments. Impressive",
+          pointsToBeAdded: 15,
+          creation: creation.toISOString()
+        })
+        points = points + 15;
+      }
 
-    // //update totalPoints and awards based on the noOfComments
-    // let points = cu.totalPoints;
-    // let userTitle = cu.title;
-    // const award = cu.awards;
-    // let creation = new Date();
-    // if (commentNo === 1 && !award.some((el) => el.title === 'First Comment')) {
-    //   award.push({
-    //     title: 'First Comment',
-    //     description: 'Post a comment on any discussion created to receive this',
-    //     pointsToBeAdded: 1,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 1;
-    // } else if (
-    //   commentNo === 30 &&
-    //   !award.some((el) => el.title === 'Keep Coming Back')
-    // ) {
-    //   award.push({
-    //     title: 'Keep Coming Back',
-    //     description: '30 comments posted! You must like it here!',
-    //     pointsToBeAdded: 5,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 5;
-    // } else if (
-    //   commentNo === 100 &&
-    //   !award.some((el) => el.title === "Can't Stop")
-    // ) {
-    //   award.push({
-    //     title: "Can't Stop",
-    //     description:
-    //       "You've posted 100 comments. I hope this took you more than a day",
-    //     pointsToBeAdded: 10,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 10;
-    // } else if (
-    //   commentNo === 300 &&
-    //   !award.some((el) => el.title === 'Contribution Fanatic')
-    // ) {
-    //   award.push({
-    //     title: 'Contribution Fanatic',
-    //     description: '300 comments. Impressive',
-    //     pointsToBeAdded: 15,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 15;
-    // }
+      // console.log(points);
 
-    // // console.log(points);
+      //updating userTitle based on Points
+      if (points >= 0 && points <= 100) {
+        userTitle = "Beginner";
+      } else if (points > 100 && points <= 300) {
+        userTitle = "Intermediate"
+      } else if (points > 300 && points <= 500) {
+        userTitle = "Expert"
+      } else if (points > 500) {
+        userTitle = "Legend"
+      }
+      //updating userTitle based on Points
 
-    // //updating userTitle based on Points
-    // if (points >= 0 && points <= 100) {
-    //   userTitle = 'Beginner';
-    // } else if (points > 100 && points <= 300) {
-    //   userTitle = 'Intermediate';
-    // } else if (points > 300 && points <= 500) {
-    //   userTitle = 'Expert';
-    // } else if (points > 500) {
-    //   userTitle = 'Legend';
-    // }
-    // //updating userTitle based on Points
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(userId)
+        .update({
+          totalPoints: points,
+          awards: award,
+          title: userTitle
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //update totalPoints and awards based on the noOfComments
+    }
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(userId)
-    //   .update({
-    //     totalPoints: points,
-    //     awards: award,
-    //     title: userTitle,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //update totalPoints and awards based on the noOfComments
+    //update totalPoints and awards based on the noOfReplies
+    mainCommentOwner = allUsers.find(el => el.id === mainComment.userId);
+    // console.log(mainCommentOwner.name);
 
-    // //update totalPoints and awards based on the noOfReplies
-    // const mainCommentOwner = allUsers.find(
-    //   (el) => el.id === mainComment.userId
-    // );
-    // // console.log(mainCommentOwner.name);
-    // let replyPoints;
-    // let replyAward;
-    // let replyUserTitle;
+    if (mainCommentOwner.status === 0) {
+      if (userId === mainCommentOwner.id) {
+        replyPoints = points;
+        replyAward = award;
+        replyUserTitle = userTitle;
+      }
+      else {
+        replyPoints = mainCommentOwner.totalPoints;
+        replyAward = mainCommentOwner.awards;
+        replyUserTitle = mainCommentOwner.title;
+      }
 
-    // if (userId === mainCommentOwner.id) {
-    //   replyPoints = points;
-    //   replyAward = award;
-    //   replyUserTitle = userTitle;
-    // } else {
-    //   replyPoints = mainCommentOwner.totalPoints;
-    //   replyAward = mainCommentOwner.awards;
-    //   replyUserTitle = mainCommentOwner.title;
-    // }
+      if (totalReply === 20 && !(replyAward.some(el => el.title === "Attracter"))) {
+        replyAward.push({
+          title: "Attracter",
+          description: "One of your comments has obtained 20 replies ",
+          pointsToBeAdded: 10,
+          creation: creation.toISOString()
+        })
+        replyPoints = replyPoints + 10;
+      } else if (totalReply === 40 && !(replyAward.some(el => el.title === "Super Magnet"))) {
+        replyAward.push({
+          title: "Super Magnet",
+          description: "One of your comments has obtained 50 replies ",
+          pointsToBeAdded: 20,
+          creation: creation.toISOString()
+        })
+        replyPoints = replyPoints + 20;
+      }
+      // console.log(mainCommentUserId)
+      // console.log(replyPoints);
+      // console.log(replyAward);
 
-    // if (
-    //   totalReply === 20 &&
-    //   !replyAward.some((el) => el.title === 'Attracter')
-    // ) {
-    //   replyAward.push({
-    //     title: 'Attracter',
-    //     description: 'One of your comments has obtained 20 replies ',
-    //     pointsToBeAdded: 10,
-    //     creation: creation.toISOString(),
-    //   });
-    //   replyPoints = replyPoints + 10;
-    // } else if (
-    //   totalReply === 40 &&
-    //   !replyAward.some((el) => el.title === 'Super Magnet')
-    // ) {
-    //   replyAward.push({
-    //     title: 'Super Magnet',
-    //     description: 'One of your comments has obtained 50 replies ',
-    //     pointsToBeAdded: 20,
-    //     creation: creation.toISOString(),
-    //   });
-    //   replyPoints = replyPoints + 20;
-    // }
-    // // console.log(mainCommentUserId)
-    // // console.log(replyPoints);
-    // // console.log(replyAward);
 
-    // //updating userTitle based on Points
-    // if (replyPoints >= 0 && replyPoints <= 100) {
-    //   replyUserTitle = 'Beginner';
-    // } else if (replyPoints > 100 && replyPoints <= 300) {
-    //   replyUserTitle = 'Intermediate';
-    // } else if (replyPoints > 300 && replyPoints <= 500) {
-    //   replyUserTitle = 'Expert';
-    // } else if (replyPoints > 500) {
-    //   replyUserTitle = 'Legend';
-    // }
-    // //updating userTitle based on Points
+      //updating userTitle based on Points
+      if (replyPoints >= 0 && replyPoints <= 100) {
+        replyUserTitle = "Beginner";
+      } else if (replyPoints > 100 && replyPoints <= 300) {
+        replyUserTitle = "Intermediate"
+      } else if (replyPoints > 300 && replyPoints <= 500) {
+        replyUserTitle = "Expert"
+      } else if (replyPoints > 500) {
+        replyUserTitle = "Legend"
+      }
+      //updating userTitle based on Points
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(mainCommentUserId)
-    //   .update({
-    //     totalPoints: replyPoints,
-    //     awards: replyAward,
-    //     title: replyUserTitle,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
 
-    // //update totalPoints and awards based on the noOfReplies
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(mainCommentUserId)
+        .update({
+          totalPoints: replyPoints,
+          awards: replyAward,
+          title: replyUserTitle
+        })
+        .then(() => {
+          console.log("done");
+        }).catch((err) => {
+          console.log(err);
+        });
 
-    // //updating noOfComments under a specific discussion
-    // const discussionCommentNo = discussionData.noOfComments + 1;
-    // const discussionOwner = allUsers.find(
-    //   (el) => el.id === discussionData.userId
-    // );
-    // let discussionOwnerPoints;
-    // let discussionOwnerAwards;
-    // let discussionOwnerTitle;
+      //update totalPoints and awards based on the noOfReplies
+    }
+    console.log("hi");
+    //updating noOfComments under a specific discussion
+    const discussionCommentNo = discussionData.noOfComments + 1;
+    const discussionOwner = allUsers.find(el => el.id === discussionData.userId);
+    let discussionOwnerPoints;
+    let discussionOwnerAwards;
+    let discussionOwnerTitle;
 
-    // firebase
-    //   .firestore()
-    //   .collection('Discussion')
-    //   .doc(mainComment.discussionId)
-    //   .update({
-    //     noOfComments: discussionCommentNo,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
 
-    // //updating noOfComments under a specific discussion
+    firebase
+      .firestore()
+      .collection("Discussion")
+      .doc(mainComment.discussionId)
+      .update({
+        noOfComments: discussionCommentNo
+      })
+      .then(() => {
+        console.log("done");
+      }).catch((err) => {
+        console.log(err);
+      });
 
-    // //updating totalPoints and awards based on the noOfComments in a discussion
-    // if (
-    //   (discussionOwner.id === userId &&
-    //     discussionOwner.id === mainCommentOwner.id) ||
-    //   (discussionOwner.id !== userId &&
-    //     discussionOwner.id === mainCommentOwner.id)
-    // ) {
-    //   discussionOwnerPoints = replyPoints;
-    //   discussionOwnerAwards = replyAward;
-    //   discussionOwnerTitle = replyUserTitle;
-    // } else if (
-    //   discussionOwner.id === userId &&
-    //   discussionOwner.id !== mainCommentOwner.id
-    // ) {
-    //   discussionOwnerPoints = points;
-    //   discussionOwnerAwards = award;
-    //   discussionOwnerTitle = userTitle;
-    // } else {
-    //   discussionOwnerPoints = discussionOwner.totalPoints;
-    //   discussionOwnerAwards = discussionOwner.awards;
-    //   discussionOwnerTitle = discussionOwner.title;
-    // }
+    //updating noOfComments under a specific discussion
 
-    // if (
-    //   discussionCommentNo === 30 &&
-    //   !discussionOwnerAwards.some((el) => el.title === 'Interesting Topic')
-    // ) {
-    //   discussionOwnerAwards.push({
-    //     title: 'Interesting Topic',
-    //     description: 'One of your posted disucssions has attracted 30 comments',
-    //     pointsToBeAdded: 15,
-    //     creation: creation.toISOString(),
-    //   });
-    //   discussionOwnerPoints = discussionOwnerPoints + 15;
-    // } else if (
-    //   discussionCommentNo === 60 &&
-    //   !discussionOwnerAwards.some(
-    //     (el) => el.title === 'Super Interesting Topic'
-    //   )
-    // ) {
-    //   discussionOwnerAwards.push({
-    //     title: 'Super Interesting Topic',
-    //     description: 'One of your posted disucssions has attracted 60 comments',
-    //     pointsToBeAdded: 25,
-    //     creation: creation.toISOString(),
-    //   });
-    //   discussionOwnerPoints = discussionOwnerPoints + 25;
-    // }
+    if (discussionOwner.status === 0) {
+      //updating totalPoints and awards based on the noOfComments in a discussion
+      if ((discussionOwner.id === userId && discussionOwner.id === mainCommentOwner.id) ||
+        (discussionOwner.id !== userId && discussionOwner.id === mainCommentOwner.id)) {
+        discussionOwnerPoints = replyPoints;
+        discussionOwnerAwards = replyAward;
+        discussionOwnerTitle = replyUserTitle;
+      } else if (discussionOwner.id === userId && discussionOwner.id !== mainCommentOwner.id) {
+        discussionOwnerPoints = points;
+        discussionOwnerAwards = award;
+        discussionOwnerTitle = userTitle;
+      } else {
+        discussionOwnerPoints = discussionOwner.totalPoints;
+        discussionOwnerAwards = discussionOwner.awards;
+        discussionOwnerTitle = discussionOwner.title
+      }
 
-    // //updating userTitle based on Points
-    // if (discussionOwnerPoints >= 0 && discussionOwnerPoints <= 100) {
-    //   discussionOwnerTitle = 'Beginner';
-    // } else if (discussionOwnerPoints > 100 && discussionOwnerPoints <= 300) {
-    //   discussionOwnerTitle = 'Intermediate';
-    // } else if (discussionOwnerPoints > 300 && discussionOwnerPoints <= 500) {
-    //   discussionOwnerTitle = 'Expert';
-    // } else if (discussionOwnerPoints > 500) {
-    //   discussionOwnerTitle = 'Legend';
-    // }
-    // //updating userTitle based on Points
+      if (discussionCommentNo === 30 && !(discussionOwnerAwards.some(el => el.title === "Interesting Topic"))) {
+        discussionOwnerAwards.push({
+          title: "Interesting Topic",
+          description: "One of your posted disucssions has attracted 30 comments",
+          pointsToBeAdded: 15,
+          creation: creation.toISOString()
+        })
+        discussionOwnerPoints = discussionOwnerPoints + 15;
+      } else if (discussionCommentNo === 60 && !(discussionOwnerAwards.some(el => el.title === "Super Interesting Topic"))) {
+        discussionOwnerAwards.push({
+          title: "Super Interesting Topic",
+          description: "One of your posted disucssions has attracted 60 comments",
+          pointsToBeAdded: 25,
+          creation: creation.toISOString()
+        })
+        discussionOwnerPoints = discussionOwnerPoints + 25;
+      }
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(discussionOwner.id)
-    //   .update({
-    //     totalPoints: discussionOwnerPoints,
-    //     awards: discussionOwnerAwards,
-    //     title: discussionOwnerTitle,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
+      //updating userTitle based on Points
+      if (discussionOwnerPoints >= 0 && discussionOwnerPoints <= 100) {
+        discussionOwnerTitle = "Beginner";
+      } else if (discussionOwnerPoints > 100 && discussionOwnerPoints <= 300) {
+        discussionOwnerTitle = "Intermediate"
+      } else if (discussionOwnerPoints > 300 && discussionOwnerPoints <= 500) {
+        discussionOwnerTitle = "Expert"
+      } else if (discussionOwnerPoints > 500) {
+        discussionOwnerTitle = "Legend"
+      }
+      //updating userTitle based on Points
 
-    // //updating totalPoints and awards based on the noOfComments in a discussion
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(discussionOwner.id)
+        .update({
+          totalPoints: discussionOwnerPoints,
+          awards: discussionOwnerAwards,
+          title: discussionOwnerTitle
+        })
+        .then(() => {
+          console.log("done");
+        });
 
-    // //change for contribution
+      //updating totalPoints and awards based on the noOfComments in a discussion
+    }
+    //change for contribution
+
+    let notificationTitle = `${currentUser.name} replied to your comment`
+    console.log("hi");
+    if (cu.status === 1) {
+      notificationTitle = `A lecturer replied to your comment`
+    }
+    //  ------------------ Sending Push Notification To Author of Reply Comment -----------------------
+    if (repliedSubCommentUserId !== userId) {
+      console.log("hi");
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(repliedSubCommentUserId)
+        .collection("Notifications")
+        .add({
+          title: notificationTitle,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+          pageId: mainCommentId,
+          description: replyOfSubComment,
+          userId: userId,
+          dataType: "cid"
+        });
+     console.log("hi")
+      fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-Encoding': 'gzip, deflate',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          to: replyCommentToken,
+          title: notificationTitle,
+          body: "Tap to see the comment",
+          priority: "normal",
+          data: { cid: mainCommentId, description: replyOfSubComment, userId: userId }
+        })
+      });
+
+console.log("hi");
+    }
+
+    //  ------------------ Sending Push Notification To Author of Reply Comment -----------------------
   };
 
   const uploadDoc = async () => {
@@ -874,9 +942,8 @@ function Reply(props) {
 
   const uploadImage = async () => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${
-      firebase.auth().currentUser.uid
-    }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${firebase.auth().currentUser.uid
+      }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -929,9 +996,8 @@ function Reply(props) {
 
   const uploadImageV2 = async (docSnapshot) => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${
-      firebase.auth().currentUser.uid
-    }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${firebase.auth().currentUser.uid
+      }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -984,9 +1050,8 @@ function Reply(props) {
 
   const uploadImageV1 = async () => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${
-      firebase.auth().currentUser.uid
-    }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${firebase.auth().currentUser.uid
+      }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -1039,9 +1104,8 @@ function Reply(props) {
 
   const uploadImageV3 = async (docSnapshot) => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${
-      firebase.auth().currentUser.uid
-    }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${firebase.auth().currentUser.uid
+      }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -1086,115 +1150,157 @@ function Reply(props) {
       });
     setData(2);
 
-    // //change for contribution
+    //change for contribution
+    //updating number of likes under user
+    const commentPostedBy = mainComment.userId;
+    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    console.log(x);
 
-    // //updating number of likes under user
-    // const commentPostedBy = mainComment.userId;
-    // const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
-    // console.log(x);
+    if (commentOwner.status === 0) {
+      let points = commentOwner.totalPoints;
+      let userTitle = commentOwner.title;
+      let likesNo = commentOwner.noOfLikes;
+      if (commentPostedBy !== userId) {
+        likesNo = likesNo + 1;
+      }
+      console.log(likesNo);
 
-    // let points = commentOwner.totalPoints;
-    // let userTitle = commentOwner.title;
-    // let likesNo = commentOwner.noOfLikes;
-    // if (commentPostedBy !== userId) {
-    //   likesNo = likesNo + 1;
-    // }
-    // console.log(likesNo);
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          noOfLikes: likesNo
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating number of likes under user
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(commentPostedBy)
-    //   .update({
-    //     noOfLikes: likesNo,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //updating number of likes under user
 
-    // //updating totalPoints and awards based on noOfLikes
-    // const award = commentOwner.awards;
-    // console.log(award);
-    // let creation = new Date();
-    // if (
-    //   likesNo === 1 &&
-    //   !award.some((el) => el.title === 'Somebody Likes You')
-    // ) {
-    //   award.push({
-    //     title: 'Somebody Likes You',
-    //     description:
-    //       'Somebody out there liked one of your comments. Keep posting for more',
-    //     pointsToBeAdded: 2,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 2;
-    // } else if (
-    //   likesNo === 25 &&
-    //   !award.some((el) => el.title === 'I Like it A Lot')
-    // ) {
-    //   award.push({
-    //     title: 'I Like it A Lot',
-    //     description: 'Your comments have been liked 25 times',
-    //     pointsToBeAdded: 7,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 7;
-    // } else if (
-    //   likesNo === 50 &&
-    //   !award.some((el) => el.title === 'Seriously Likeable')
-    // ) {
-    //   award.push({
-    //     title: 'Seriously Likeable',
-    //     description: 'Your comments have been liked 50 times',
-    //     pointsToBeAdded: 10,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 10;
-    // } else if (x === 25 && !award.some((el) => el.title === 'Helpful')) {
-    //   award.push({
-    //     title: 'Helpful',
-    //     description: 'One of your comments has attracted 25 likes',
-    //     pointsToBeAdded: 15,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 15;
-    // } else if (x === 50 && !award.some((el) => el.title === 'Super Helpful')) {
-    //   award.push({
-    //     title: 'Super Helpful',
-    //     description: 'One of your comments has attracted 50 likes',
-    //     pointsToBeAdded: 25,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 25;
-    // }
+      //updating totalPoints and awards based on noOfLikes
+      const award = commentOwner.awards;
+      console.log(award);
+      let creation = new Date();
+      if (likesNo === 1 && !(award.some(el => el.title === "Somebody Likes You"))) {
+        award.push({
+          title: "Somebody Likes You",
+          description: "Somebody out there liked one of your comments. Keep posting for more",
+          pointsToBeAdded: 2,
+          creation: creation.toISOString()
+        })
+        points = points + 2;
+      } else if (likesNo === 25 && !(award.some(el => el.title === "I Like it A Lot"))) {
+        award.push({
+          title: "I Like it A Lot",
+          description: "Your comments have been liked 25 times",
+          pointsToBeAdded: 7,
+          creation: creation.toISOString()
+        })
+        points = points + 7;
+      } else if (likesNo === 50 && !(award.some(el => el.title === "Seriously Likeable"))) {
+        award.push({
+          title: "Seriously Likeable",
+          description: "Your comments have been liked 50 times",
+          pointsToBeAdded: 10,
+          creation: creation.toISOString()
+        })
+        points = points + 10;
+      } else if (x === 25 && !(award.some(el => el.title === "Helpful"))) {
+        award.push({
+          title: "Helpful",
+          description: "One of your comments has attracted 25 likes",
+          pointsToBeAdded: 15,
+          creation: creation.toISOString()
+        })
+        points = points + 15;
+      } else if (x === 50 && !(award.some(el => el.title === "Super Helpful"))) {
+        award.push({
+          title: "Super Helpful",
+          description: "One of your comments has attracted 50 likes",
+          pointsToBeAdded: 25,
+          creation: creation.toISOString()
+        })
+        points = points + 25;
+      }
 
-    // //updating userTitle based on Points
-    // if (points >= 0 && points <= 100) {
-    //   userTitle = 'Beginner';
-    // } else if (points > 100 && points <= 300) {
-    //   userTitle = 'Intermediate';
-    // } else if (points > 300 && points <= 500) {
-    //   userTitle = 'Expert';
-    // } else if (points > 500) {
-    //   userTitle = 'Legend';
-    // }
-    // //updating userTitle based on Points
+      //updating userTitle based on Points
+      if (points >= 0 && points <= 100) {
+        userTitle = "Beginner";
+      } else if (points > 100 && points <= 300) {
+        userTitle = "Intermediate"
+      } else if (points > 300 && points <= 500) {
+        userTitle = "Expert"
+      } else if (points > 500) {
+        userTitle = "Legend"
+      }
+      //updating userTitle based on Points
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(commentPostedBy)
-    //   .update({
-    //     totalPoints: points,
-    //     awards: award,
-    //     title: userTitle,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //updating totalPoints and awards based on noOfLikes
-    // //change for contribution
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          totalPoints: points,
+          awards: award,
+          title: userTitle
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating totalPoints and awards based on noOfLikes
+      //change for contribution
+    }
+
+    //  ------------------ Sending Push Notification To Author of  Main Comment -----------------------
+    console.log(mainCommentUserId);
+    console.log(userId);
+    let notificationTitle = `${currentUser.name} liked your comment`;
+
+    if (cu.status === 1) {
+      notificationTitle = `A lecturer liked your comment`
+    }
+
+    if (mainCommentUserId === userId) {
+      console.log("Same user")
+    }
+    else {
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(mainCommentUserId)
+        .collection("Notifications")
+        .add({
+          title: notificationTitle,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+          pageId: mainCommentId,
+          description: mainComment.comment,
+          userId: userId,
+          dataType: "cid"
+        });
+
+      fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-Encoding': 'gzip, deflate',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          to: pushToken,
+          title: notificationTitle,
+          body: "Tap to see the comment",
+          priority: "normal",
+          data: { cid: mainCommentId, description: mainComment.comment, userId: userId }
+
+        })
+      });
+
+
+    }
+    //  ------------------ Sending Push Notification To Author of  Main Comment ----------------------- 
+
   };
 
   const removeLike = (nol) => {
@@ -1217,32 +1323,35 @@ function Reply(props) {
       });
     setData(3);
 
-    // //change for contribution
+    //change for contribution
 
-    // //updating number of likes under user
-    // const commentPostedBy = mainComment.userId;
-    // // console.log(commentPostedBy);
-    // // console.log(allUsers);
-    // const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
-    // // console.log(commentPostedBy);
-    // // console.log(commentOwner);
-    // let likesNo = commentOwner.noOfLikes;
-    // if (commentPostedBy !== userId) {
-    //   likesNo = likesNo - 1;
-    // }
+    //updating number of likes under user
+    const commentPostedBy = mainComment.userId;
+    // console.log(commentPostedBy);
+    // console.log(allUsers);
+    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    // console.log(commentPostedBy);
+    // console.log(commentOwner);
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(commentPostedBy)
-    //   .update({
-    //     noOfLikes: likesNo,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //updating number of likes under user
-    // //change for contribution
+    if (commentOwner.status === 0) {
+      let likesNo = commentOwner.noOfLikes;
+      if (commentPostedBy !== userId) {
+        likesNo = likesNo - 1;
+      }
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          noOfLikes: likesNo
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating number of likes under user
+      //change for contribution
+    }
   };
 
   const Delete = () => {
@@ -1259,53 +1368,55 @@ function Reply(props) {
         {
           text: 'Yes',
           onPress: () => {
-            // //change for contribution
+            //change for contribution
 
-            // //obtain noOfReplies for a mainComment
-            // const currentReplyNo = mainComment.numberOfReply;
-            // console.log(currentReplyNo);
-            // //obtain noOfReplies for a mainComment
+            //obtain noOfReplies for a mainComment
+            const currentReplyNo = mainComment.numberOfReply;
+            console.log(currentReplyNo);
+            //obtain noOfReplies for a mainComment
 
-            // //change for contribution
+            //change for contribution
+
 
             firebase
               .firestore()
-              .collection('Comment')
+              .collection("Comment")
               .doc(mainCommentId)
               .delete();
 
-            // // //change for contribution
 
-            // //updating noOfComments under user
-            // const commentNo = cu.noOfComments - 1;
-            // firebase
-            //   .firestore()
-            //   .collection('users')
-            //   .doc(userId)
-            //   .update({
-            //     noOfComments: commentNo,
-            //   })
-            //   .then(() => {
-            //     console.log('done');
-            //   });
-            // //updating noOfComments under user
+            //change for contribution
+            if (currentUser.status === 0) {
+              //updating noOfComments under user
+              const commentNo = cu.noOfComments - 1;
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(userId)
+                .update({
+                  noOfComments: commentNo
+                })
+                .then(() => {
+                  console.log("done");
+                });
+              //updating noOfComments under user
+            }
 
-            // //updating noOfComments under discussion
-            // const discussionCommentNo =
-            //   discussionData.noOfComments - 1 - currentReplyNo;
-            // firebase
-            //   .firestore()
-            //   .collection('Discussion')
-            //   .doc(discussionId)
-            //   .update({
-            //     noOfComments: discussionCommentNo,
-            //   })
-            //   .then(() => {
-            //     console.log('done');
-            //   });
-            // //updating noOfComments under discussion
+            //updating noOfComments under discussion
+            const discussionCommentNo = discussionData.noOfComments - 1 - currentReplyNo;
+            firebase
+              .firestore()
+              .collection("Discussion")
+              .doc(discussionId)
+              .update({
+                noOfComments: discussionCommentNo
+              })
+              .then(() => {
+                console.log("done");
+              });
+            //updating noOfComments under discussion
 
-            // //change for contribution
+            //change for contribution
 
             props.navigation.goBack();
           },
@@ -1377,9 +1488,11 @@ function Reply(props) {
     setEditReplyCommentModalVisible(!isEditReplyCommentModalVisible);
   };
 
-  const toggleSubReplyComment = (id, posted, userId) => {
+  const toggleSubReplyComment = (id, posted, token, userId) => {
     setIdOfRepliedSubComment(id);
     setAuthorOfRepliedSubComment(posted);
+    setReplyCommentToken(token); //added
+    setRepliedSubCommentUserId(userId); //added
     setReplySubCommentModalVisible(!isReplySubCommentModalVisible);
   };
 
@@ -1405,9 +1518,10 @@ function Reply(props) {
           mainCommentId: idOfRepliedSubComment, // id of comment being replied
           attachedDocument: doc,
           attachedImage: img,
+          pushToken: currentUser.pushToken // change for notification
         });
 
-      const totalReply = mainComment.numberOfReply + 1;
+      totalReply = mainComment.numberOfReply + 1;
       firebase.firestore().collection('Comment').doc(mainCommentId).update({
         numberOfReply: totalReply,
       });
@@ -1439,12 +1553,15 @@ function Reply(props) {
           mainCommentId,
           attachedDocument: doc,
           attachedImage: img,
+          pushToken: currentUser.pushToken  // change for notification
         });
 
-      const totalReply = mainComment.numberOfReply + 1;
+      totalReply = mainComment.numberOfReply + 1;
+      console.log(totalReply);
       firebase.firestore().collection('Comment').doc(mainCommentId).update({
         numberOfReply: totalReply,
       });
+      console.log(totalReply);
       setReplyCommentModalVisible(!isReplyCommentModalVisible);
     }
 
@@ -1469,48 +1586,52 @@ function Reply(props) {
               .doc(rcid)
               .delete();
 
-            // //change for contribution
+            //change for contribution
+             setData(20);
+            //update noOfReplies for a mainComment // already changed
+            const totalReply = mainComment.numberOfReply - 1;
+            firebase
+              .firestore()
+              .collection("Comment")
+              .doc(mainCommentId)
+              .update({
+                numberOfReply: totalReply,
+              });
+            //update noOfReplies for a mainComment
 
-            // //update noOfReplies for a mainComment // already changed
-            // const totalReply = mainComment.numberOfReply - 1;
-            // firebase
-            //   .firestore()
-            //   .collection('Comment')
-            //   .doc(mainCommentId)
-            //   .update({
-            //     numberOfReply: totalReply,
-            //   });
-            // //update noOfReplies for a mainComment
+            if (currentUser.status === 0) {
+              //update noOfComments under user
+              const commentNo = cu.noOfComments - 1;
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(userId)
+                .update({
+                  noOfComments: commentNo
+                })
+                .then(() => {
+                  console.log("done");
+                });
+              //update noOfComments under user
+            }
 
-            // //update noOfComments under user
-            // const commentNo = cu.noOfComments - 1;
-            // firebase
-            //   .firestore()
-            //   .collection('users')
-            //   .doc(userId)
-            //   .update({
-            //     noOfComments: commentNo,
-            //   })
-            //   .then(() => {
-            //     console.log('done');
-            //   });
-            // //update noOfComments under user
+            //update noOfComments under discussion
+            console.log(discussionData.noOfComments);
+            const discussionCommentNo = discussionData.noOfComments - 1;
+            firebase
+              .firestore()
+              .collection("Discussion")
+              .doc(discussionId)
+              .update({
+                noOfComments: discussionCommentNo
+              })
+              .then(() => {
+                console.log("done");
+              });
+            //update noOfComments under discussion
 
-            // //update noOfComments under discussion
-            // const discussionCommentNo = discussionData.noOfComments - 1;
-            // firebase
-            //   .firestore()
-            //   .collection('Discussion')
-            //   .doc(discussionId)
-            //   .update({
-            //     noOfComments: discussionCommentNo,
-            //   })
-            //   .then(() => {
-            //     console.log('done');
-            //   });
-            // //update noOfComments under discussion
+            //change for contribution
 
-            // //change for contribution
 
             setData(4);
           },
@@ -1546,116 +1667,161 @@ function Reply(props) {
       });
     setData(2);
 
-    // //change for contribution
+    //change for contribution
 
-    // //updating number of likes under user
-    // const commentPostedBy = uid;
-    // const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
-    // console.log(x);
+    //updating number of likes under user
+    const commentPostedBy = uid;
+    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    console.log(x);
 
-    // let points = commentOwner.totalPoints;
-    // let userTitle = commentOwner.title;
-    // let likesNo = commentOwner.noOfLikes;
-    // if (commentPostedBy !== userId) {
-    //   likesNo = likesNo + 1;
-    // }
-    // console.log(likesNo);
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(commentPostedBy)
-    //   .update({
-    //     noOfLikes: likesNo,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //updating number of likes under user
+    if (commentOwner.status === 0) {
+      let points = commentOwner.totalPoints;
+      let userTitle = commentOwner.title;
+      let likesNo = commentOwner.noOfLikes;
+      if (commentPostedBy !== userId) {
+        likesNo = likesNo + 1;
+      }
+      console.log(likesNo);
 
-    // //updating totalPoints and awards based on noOfLikes
-    // const award = commentOwner.awards;
-    // console.log(award);
-    // let creation = new Date();
-    // if (
-    //   likesNo === 1 &&
-    //   !award.some((el) => el.title === 'Somebody Likes You')
-    // ) {
-    //   award.push({
-    //     title: 'Somebody Likes You',
-    //     description:
-    //       'Somebody out there liked one of your comments. Keep posting for more',
-    //     pointsToBeAdded: 2,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 2;
-    // } else if (
-    //   likesNo === 25 &&
-    //   !award.some((el) => el.title === 'I Like it A Lot')
-    // ) {
-    //   award.push({
-    //     title: 'I Like it A Lot',
-    //     description: 'Your comments have been liked 25 times',
-    //     pointsToBeAdded: 7,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 7;
-    // } else if (
-    //   likesNo === 50 &&
-    //   !award.some((el) => el.title === 'Seriously Likeable')
-    // ) {
-    //   award.push({
-    //     title: 'Seriously Likeable',
-    //     description: 'Your comments have been liked 50 times',
-    //     pointsToBeAdded: 10,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 10;
-    // } else if (x === 25 && !award.some((el) => el.title === 'Helpful')) {
-    //   award.push({
-    //     title: 'Helpful',
-    //     description: 'One of your comments has attracted 25 likes',
-    //     pointsToBeAdded: 15,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 15;
-    // } else if (x === 50 && !award.some((el) => el.title === 'Super Helpful')) {
-    //   award.push({
-    //     title: 'Super Helpful',
-    //     description: 'One of your comments has attracted 50 likes',
-    //     pointsToBeAdded: 25,
-    //     creation: creation.toISOString(),
-    //   });
-    //   points = points + 25;
-    // }
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          noOfLikes: likesNo
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating number of likes under user
 
-    // //updating userTitle based on Points
-    // if (points >= 0 && points <= 100) {
-    //   userTitle = 'Beginner';
-    // } else if (points > 100 && points <= 300) {
-    //   userTitle = 'Intermediate';
-    // } else if (points > 300 && points <= 500) {
-    //   userTitle = 'Expert';
-    // } else if (points > 500) {
-    //   userTitle = 'Legend';
-    // }
-    // //updating userTitle based on Points
+      //updating totalPoints and awards based on noOfLikes
+      const award = commentOwner.awards;
+      console.log(award);
+      let creation = new Date();
+      if (likesNo === 1 && !(award.some(el => el.title === "Somebody Likes You"))) {
+        award.push({
+          title: "Somebody Likes You",
+          description: "Somebody out there liked one of your comments. Keep posting for more",
+          pointsToBeAdded: 2,
+          creation: creation.toISOString()
+        })
+        points = points + 2;
+      } else if (likesNo === 25 && !(award.some(el => el.title === "I Like it A Lot"))) {
+        award.push({
+          title: "I Like it A Lot",
+          description: "Your comments have been liked 25 times",
+          pointsToBeAdded: 7,
+          creation: creation.toISOString()
+        })
+        points = points + 7;
+      } else if (likesNo === 50 && !(award.some(el => el.title === "Seriously Likeable"))) {
+        award.push({
+          title: "Seriously Likeable",
+          description: "Your comments have been liked 50 times",
+          pointsToBeAdded: 10,
+          creation: creation.toISOString()
+        })
+        points = points + 10;
+      } else if (x === 25 && !(award.some(el => el.title === "Helpful"))) {
+        award.push({
+          title: "Helpful",
+          description: "One of your comments has attracted 25 likes",
+          pointsToBeAdded: 15,
+          creation: creation.toISOString()
+        })
+        points = points + 15;
+      } else if (x === 50 && !(award.some(el => el.title === "Super Helpful"))) {
+        award.push({
+          title: "Super Helpful",
+          description: "One of your comments has attracted 50 likes",
+          pointsToBeAdded: 25,
+          creation: creation.toISOString()
+        })
+        points = points + 25;
+      }
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(commentPostedBy)
-    //   .update({
-    //     totalPoints: points,
-    //     awards: award,
-    //     title: userTitle,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //updating totalPoints and awards based on noOfLikes
+      //updating userTitle based on Points
+      if (points >= 0 && points <= 100) {
+        userTitle = "Beginner";
+      } else if (points > 100 && points <= 300) {
+        userTitle = "Intermediate"
+      } else if (points > 300 && points <= 500) {
+        userTitle = "Expert"
+      } else if (points > 500) {
+        userTitle = "Legend"
+      }
+      //updating userTitle based on Points
 
-    // //change for contribution
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          totalPoints: points,
+          awards: award,
+          title: userTitle
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating totalPoints and awards based on noOfLikes
+    }
+    //change for contribution
+
+    let notificationTitle = `${currentUserName} liked your comment`;
+    if (cu.status === 1) {
+      notificationTitle = `A lecturer liked to your comment`
+    }
+
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .collection("Reply")
+      .doc(rcid)
+      .get()
+      .then((snapshot) => {
+        //  ------------------ Sending Push Notification To Author of ReplyComment -----------------------
+        if (snapshot.data().postedBy !== currentUserName) {
+
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(snapshot.data().userId)
+            .collection("Notifications")
+            .add({
+              title: notificationTitle,
+              creation: firebase.firestore.FieldValue.serverTimestamp(),
+              pageId: mainCommentId,
+              description: snapshot.data().comment,
+              userId: userId,
+              dataType: "cid"
+            });
+
+          fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Accept-Encoding': 'gzip, deflate',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              to: snapshot.data().pushToken,
+              title: notificationTitle,
+              body: "Tap to see the comment",
+              priority: "high",
+              data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
+
+            })
+          });
+
+
+        }
+        //  ------------------ Sending Push Notification To Author of ReplyComment -----------------------
+      });
+
   };
 
   const RemoveLikeToReplyComment = (rcid, nol, lb, uid) => {
@@ -1680,33 +1846,36 @@ function Reply(props) {
       });
     setData(3);
 
-    // //change for contribution
+    //change for contribution
 
-    // //updating number of likes under user
-    // const commentPostedBy = uid;
-    // // console.log(commentPostedBy);
-    // // console.log(allUsers);
-    // const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
-    // // console.log(commentPostedBy);
-    // // console.log(commentOwner);
-    // let likesNo = commentOwner.noOfLikes;
-    // if (commentPostedBy !== userId) {
-    //   likesNo = likesNo - 1;
-    // }
 
-    // firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .doc(commentPostedBy)
-    //   .update({
-    //     noOfLikes: likesNo,
-    //   })
-    //   .then(() => {
-    //     console.log('done');
-    //   });
-    // //updating number of likes under user
+    //updating number of likes under user
+    const commentPostedBy = uid
+    // console.log(commentPostedBy);
+    // console.log(allUsers);
+    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    // console.log(commentPostedBy);
+    // console.log(commentOwner);
 
-    // //change for contribution
+    if (commentOwner.status === 0) {
+      let likesNo = commentOwner.noOfLikes;
+      if (commentPostedBy !== userId) {
+        likesNo = likesNo - 1;
+      }
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          noOfLikes: likesNo
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating number of likes under user
+    }
+    //change for contribution
   };
 
   const UploadEditSubComment = () => {
@@ -1760,6 +1929,84 @@ function Reply(props) {
         console.log('done');
       });
     setData(5);
+
+    //  ------------------ Sending Push Notification To Author of Comment -----------------------
+
+    const notificationTitle = `A lecturer verified your comment`;
+    const notificationTitle2 = `A lecturer verfied a comment in your discussion thread`;
+    const mainDiscussion = posts.find(el => el.id === discussionId);
+
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .get()
+      .then((snapshot) => {
+
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(snapshot.data().userId)
+          .collection("Notifications")
+          .add({
+            title: notificationTitle,
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            pageId: mainCommentId,
+            description: snapshot.data().comment,
+            userId: userId,
+            dataType: "cid"
+          });
+
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(mainDiscussion.userId)
+          .collection("Notifications")
+          .add({
+            title: notificationTitle2,
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            pageId: mainCommentId,
+            description: snapshot.data().comment,
+            userId: userId,
+            dataType: "cid"
+          });
+
+        fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Accept-Encoding': 'gzip, deflate',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            to: snapshot.data().pushToken,
+            title: notificationTitle,
+            body: "Tap to see the comment",
+            priority: "normal",
+            data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
+          })
+        });
+
+        fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Accept-Encoding': 'gzip, deflate',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            to: mainDiscussion.pushToken,
+            title: notificationTitle2,
+            body: "Tap to see the comment",
+            priority: "normal",
+            data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
+          })
+        });
+
+
+
+      });
+    //  ------------------ Sending Push Notification To Author of Comment -----------------------
   };
 
   const removeVerifyReplyComment = (rcid) => {
@@ -1793,6 +2040,84 @@ function Reply(props) {
         console.log('done');
       });
     setData(70);
+
+    //  ------------------ Sending Push Notification To Author of Comment -----------------------
+    const notificationTitle = `A lecturer verified your comment`
+    const notificationTitle2 = `A lecturer verfied a comment in your discussion thread`;
+    const mainDiscussion = posts.find(el => el.id === discussionId);
+
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(mainCommentId)
+      .collection("Reply")
+      .doc(rcid)
+      .get()
+      .then((snapshot) => {
+
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(snapshot.data().userId)
+          .collection("Notifications")
+          .add({
+            title: notificationTitle,
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            pageId: mainCommentId,
+            description: snapshot.data().comment,
+            dataType: "cid"
+          });
+
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(mainDiscussion.userId)
+          .collection("Notifications")
+          .add({
+            title: notificationTitle2,
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            pageId: mainCommentId,
+            description: snapshot.data().comment,
+            userId: userId,
+            dataType: "cid"
+          });
+
+        fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Accept-Encoding': 'gzip, deflate',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            to: snapshot.data().pushToken,
+            title: notificationTitle,
+            body: "Tap to see the comment",
+            priority: "normal",
+            data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
+          })
+        });
+
+        fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Accept-Encoding': 'gzip, deflate',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            to: mainDiscussion.pushToken,
+            title: notificationTitle2,
+            body: "Tap to see the comment",
+            priority: "normal",
+            data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
+          })
+        });
+
+
+
+      });
+    //  ------------------ Sending Push Notification To Author of Comment -----------------------
   };
 
   const loadMoreComment = () => {
@@ -1848,7 +2173,7 @@ function Reply(props) {
                 )
               }
               toggleSubReplyComment={() =>
-                toggleSubReplyComment(item.id, item.postedBy, item.userId)
+                toggleSubReplyComment(item.id, item.postedBy, item.pushToken, item.userId)
               }
             />
           </View>
@@ -1906,8 +2231,8 @@ function Reply(props) {
               </View>
             )}
             {replyComment.length != 0 &&
-            loadMoreLoading == false &&
-            totalComment > loadMore ? (
+              loadMoreLoading == false &&
+              totalComment > loadMore ? (
               <TouchableOpacity
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}

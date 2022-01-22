@@ -125,9 +125,9 @@ function Feed(props) {
       }
     }
 
-    setTimeout(function () {
-      setLoadingMore(false);
-    }, 1000);
+    // setTimeout(function () {
+    //   setLoadingMore(false);
+    // }, 1000);
   };
 
   const renderItem = ({ item }) => {
@@ -139,6 +139,7 @@ function Feed(props) {
             onPress={() =>
               props.navigation.navigate("Discussion", {
                 did: item.id,
+                owner:item.userId  //changes
               })
             }
           >

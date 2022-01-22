@@ -182,9 +182,9 @@ function RoomReplyComment(props) {
         );
         setTotalNumberOfReplyComment(snapshot.data().totalNumberOfReplyComment);
       });
-    setTimeout(function () {
-      setLoadMoreLoading(false);
-    }, 2000);
+    // setTimeout(function () {
+    //   setLoadMoreLoading(false);
+    // }, 2000);
   }, [data]);
 
   useFocusEffect(

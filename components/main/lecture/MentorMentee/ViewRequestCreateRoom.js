@@ -314,6 +314,45 @@ function ViewRequestCreateRoom(props) {
         interaction: [0, 0, 0, 0, 0, 0],
       })
       .then(function () {
+         //change for notification
+         for (let i = 0; i < mentee.length; i++) {
+          if(mentee[i].status == 0){
+            continue;
+          }
+
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(mentee[i].userId)
+            .collection("Notifications")
+            .add({
+              title: `You have been added to a discussion room`,
+              creation: firebase.firestore.FieldValue.serverTimestamp(),
+              pageId: "default",
+              description: `${title}`,
+              userId: userId,
+              dataType: "mmid"
+            });
+            
+          fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Accept-Encoding': 'gzip, deflate',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              to: mentee[i].pushToken,
+              title: `You have been added to a discussion room`,
+              body: `Tap to see the rooms `,
+              priority: "normal",
+              data: { mmid: "navigate", description:`${title}`, userId: userId }
+            })
+          });
+
+          
+        }
+        //change for notification
         props.navigation.navigate('Room');
       });
   };
@@ -358,6 +397,7 @@ function ViewRequestCreateRoom(props) {
             image: updatedUser[i].image,
             userId: updatedUser[i].id,
             mc: updatedUser[i].matricNumber,
+            pushToken:updatedUser[i].pushToken
           });
         }
 
@@ -560,16 +600,17 @@ function ViewRequestCreateRoom(props) {
                     {mentor.some((el) => el.userId === item.userId) ||
                     mentee.some((el) => el.userId === item.userId) ? (
                       <TouchableOpacity
-                        onPress={() =>
-                          addInGroup({
-                            userId: item.userId,
-                            name: item.name,
-                            mc: item.matricNumber,
-                            image: item.image,
-                            reqId: item.id,
-                            year: item.year,
-                          })
-                        }
+                        // onPress={() =>
+                        //   addInGroup({
+                        //     userId: item.userId,
+                        //     name: item.name,
+                        //     mc: item.matricNumber,
+                        //     image: item.image,
+                        //     reqId: item.id,
+                        //     year: item.year,
+                        //     pushToken: item.pushToken // change for notification
+                        //   })
+                        // }
                       >
                         <Icon
                           name='remove-outline'
@@ -589,6 +630,7 @@ function ViewRequestCreateRoom(props) {
                             image: item.image,
                             reqId: item.id,
                             year: item.year,
+                            pushToken: item.pushToken //change for notification
                           })
                         }
                       >
@@ -606,15 +648,16 @@ function ViewRequestCreateRoom(props) {
                     {mentor.some((el) => el.userId === item.id) ||
                     mentee.some((el) => el.userId === item.id) ? (
                       <TouchableOpacity
-                        onPress={() =>
-                          addInGroup({
-                            userId: item.id,
-                            name: item.name,
-                            mc: item.matricNumber,
-                            image: item.image,
-                            year: item.year,
-                          })
-                        }
+                        // onPress={() =>
+                        //   addInGroup({
+                        //     userId: item.id,
+                        //     name: item.name,
+                        //     mc: item.matricNumber,
+                        //     image: item.image,
+                        //     year: item.year,
+                        //     pushToken: item.pushToken // change for notification
+                        //   })
+                        // }
                       >
                         <Icon
                           name='remove-outline'
@@ -633,6 +676,7 @@ function ViewRequestCreateRoom(props) {
                             mc: item.matricNumber,
                             image: item.image,
                             year: item.year,
+                            pushToken: item.pushToken // change for notification
                           })
                         }
                       >

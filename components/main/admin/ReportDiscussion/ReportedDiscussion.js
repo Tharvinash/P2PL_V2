@@ -22,8 +22,10 @@ function ReportedDiscussion(props) {
   const [data, setData] = useState(reportedDiscussion);
   const [x, setX] = useState(0);
   const [discussionList, setDiscussionList] = useState(); // changes
+  const userId = firebase.auth().currentUser.uid; //changes notification
 
   useEffect(() => {
+    console.log(Dimensions.get('window').width);
     firebase
       .firestore()
       .collection('ReportedDiscussion')
@@ -80,7 +82,7 @@ function ReportedDiscussion(props) {
         <TouchableOpacity
           onPress={() =>
             props.navigation.navigate('ViewDiscussion', {
-              did: data.item.reportedDiscussion,
+              rdid: data.item.reportedDiscussion,
               rid: data.item.id,
             })
           }
@@ -105,6 +107,14 @@ function ReportedDiscussion(props) {
 
   const deleteRow = (x, y) => {
 
+    //changes
+    const discussionToDelete = discussionList.find(el => el.id === y)
+    const token = discussionToDelete.pushToken;
+    const title = discussionToDelete.title;
+    const discussionOwnerId = discussionToDelete.userId;
+    const notificationTitle = `Your discussion entitled ${title} has been deleted following the receival of reports from the user/users`;
+    //changes
+
     return Alert.alert(
       'Are your sure?',
       'Are you sure you want to remove this Discussion ?',
@@ -120,6 +130,39 @@ function ReportedDiscussion(props) {
               .doc(x)
               .delete();
             setX(3);
+
+            //  -------------------- Sending Push Notification To Author of Discussion -----------------------
+
+            firebase
+              .firestore()
+              .collection("users")
+              .doc(discussionOwnerId)
+              .collection("Notifications")
+              .add({
+                title: notificationTitle,
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                pageId: "null",
+                description: title,
+                userId: userId,
+                dataType: "deleteId"
+              });
+
+            fetch('https://exp.host/--/api/v2/push/send', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Accept-Encoding': 'gzip, deflate',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                to: token,
+                title: notificationTitle,
+                body: `${title}: Deleted`,
+                priority: "normal",
+                data: { deleteId: "null", description: title, userId: userId }
+              })
+            });
+            //  ------------------ Sending Push Notification To Author of Discussion ----------------------- 
           },
         },
         // The "No" button
@@ -156,7 +199,7 @@ function ReportedDiscussion(props) {
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
         previewRowKey={'0'}
-        rightOpenValue={-150}
+        rightOpenValue={-143}
         previewRowKey={'0'}
         previewOpenValue={-40}
         previewOpenDelay={3000}
@@ -179,7 +222,7 @@ const styles = StyleSheet.create({
 
   backRightBtnLeft: {
     backgroundColor: 'blue',
-    right: 75,
+    right: Dimensions.get('window').width < 400 ? 71 : 40,
   },
 
   backRightBtn: {
@@ -188,13 +231,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     top: 0,
-    width: 75,
+    width: 70,
+    height: "100%",
+    flex: 1,
     borderRadius: 16,
   },
 
   backRightBtnRight: {
     backgroundColor: 'red',
-    right: 0,
+    right:Dimensions.get('window').width < 400 ? 0 : -30,
   },
 
   rowBack: {
@@ -220,7 +265,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 370,
+    width:Dimensions.get('window').width < 400 ? 340 : 380
   },
 
   cardContent: {

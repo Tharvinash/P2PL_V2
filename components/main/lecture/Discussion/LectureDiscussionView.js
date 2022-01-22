@@ -31,7 +31,7 @@ import { ActivityIndicator } from 'react-native-paper';
 require('firebase/firestore');
 
 function LectureDiscussionView(props) {
-  const { currentUser, options, fullComments, report } = props;
+  const { currentUser, options, discussionList, report } = props;
   const [isModalVisible, setModalVisible] = useState(false);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
@@ -59,9 +59,10 @@ function LectureDiscussionView(props) {
   const [loadMore, setLoadMore] = useState(11);
   const [totalComment, setTotalComment] = useState(0);
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
   //changes for reported discussion
   const [reportData, setReportData] = useState(report);
-  const [admin, setAdmin] = useState([]);
+  const [admin, setAdmin] = useState([]); //notifications
   //changes for reported discussion
 
   const userId = firebase.auth().currentUser.uid;
@@ -194,6 +195,22 @@ function LectureDiscussionView(props) {
       });
     //changes for reported discussion
 
+    //change for contribution module
+    firebase
+      .firestore()
+      .collection("users")
+      .get()
+      .then((snapshot) => {
+        let users = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
+        });
+        setAllUsers(users);
+      });
+    //change for contribution module
+
+
     firebase
       .firestore()
       .collection('Comment')
@@ -211,9 +228,9 @@ function LectureDiscussionView(props) {
         );
         setComment(newArray2);
       });
-    setTimeout(function () {
-      setLoadMoreLoading(false);
-    }, 2000);
+    // setTimeout(function () {
+    //   setLoadMoreLoading(false);
+    // }, 2000);
 
     setData(5);
   }, [props.currentUser, props.route.params.did, data]);
@@ -250,6 +267,18 @@ function LectureDiscussionView(props) {
             console.log('does not exist');
           }
         });
+      //changes
+      firebase
+        .firestore()
+        .collection("Discussion")
+        .doc(props.route.params.did)
+        .get()
+        .then((snapshot) => {
+          setUserPosts(snapshot.data());
+        });
+      //changes
+
+      setData(89);
     }, [])
   );
 
@@ -363,6 +392,30 @@ function LectureDiscussionView(props) {
     }
     setData(71);
     //change for reported Discussion
+
+
+    for (let i = 0; i < admin.length; i++) {
+      //  ------------------ Sending Push Notification To Admin-----------------------
+
+      // console.log(token);
+      fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-Encoding': 'gzip, deflate',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          to: admin[i].token,
+          title: `${cu.name} reported a discussion`,
+          body: "Tap to see the discussion",
+          priority: "normal",
+          data: { rdid: discussionId }
+        })
+      });
+      //  ------------------ Sending Push Notification To Admin----------------------- 
+    }
+
   };
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
@@ -393,6 +446,84 @@ function LectureDiscussionView(props) {
         console.log('done');
       });
     setData(11);
+
+    //  ------------------ Sending Push Notification To Author of Comment -----------------------
+    const notificationTitle = `A lecturer verfied your comment`;
+
+    const notificationTitle2 = `A lecturer verfied a comment in your discussion thread`;
+    const mainDiscussion = discussionList.find(el => el.id === discussionId);
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cid)
+      .get()
+      .then((snapshot) => {
+
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(snapshot.data().userId)
+          .collection("Notifications")
+          .add({
+            title: notificationTitle,
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            pageId: snapshot.data().discussionId,
+            description: snapshot.data().comment,
+            userId: userId,
+            dataType: "id"
+          });
+
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(mainDiscussion.userId)
+          .collection("Notifications")
+          .add({
+            title: notificationTitle2,
+            creation: firebase.firestore.FieldValue.serverTimestamp(),
+            pageId: snapshot.data().discussionId,
+            description: snapshot.data().comment,
+            userId: userId,
+            dataType: "id"
+          });
+
+
+        fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Accept-Encoding': 'gzip, deflate',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            to: snapshot.data().pushToken,
+            title: notificationTitle,
+            body: "Tap to see the comment",
+            priority: "normal",
+            data: { id: snapshot.data().discussionId, description: snapshot.data().comment, userId: userId }
+          })
+        });
+
+
+        fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Accept-Encoding': 'gzip, deflate',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            to: mainDiscussion.pushToken,
+            title: notificationTitle2,
+            body: "Tap to see the comment",
+            priority: "normal",
+            data: { id: snapshot.data().discussionId, description: snapshot.data().comment, userId: userId }
+          })
+        });
+
+
+      });
+    //  ------------------ Sending Push Notification To Author of Comment -----------------------
   };
 
   const removeVerifyComment = (cid) => {
@@ -458,6 +589,64 @@ function LectureDiscussionView(props) {
     if (image != null && Doc == null) {
       uploadImage();
     }
+
+    console.log(userPosts.noOfComments);
+    const discussionCommentNo = userPosts.noOfComments + 1;
+
+    firebase
+      .firestore()
+      .collection("Discussion")
+      .doc(discussionId)
+      .update({
+        noOfComments: discussionCommentNo
+      })
+      .then(() => {
+        console.log("done");
+      });
+
+    //  ------------------ Sending Push Notification To Author of Discussion -----------------------
+    const notificationTitle = `A lecturer commented on you discussion thread`;
+
+    if (userPosts.userId !== userId) {
+      const discussionToken = userPosts.pushToken;
+      // console.log(token);
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(userPosts.userId)
+        .collection("Notifications")
+        .add({
+          title: notificationTitle,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+          pageId: discussionId,
+          description: newComment,
+          userId: userId,
+          dataType: "id"
+        });
+
+
+      fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-Encoding': 'gzip, deflate',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          to: discussionToken,
+          title: notificationTitle,
+          body: "Tap to see the comments",
+          priority: "normal",
+          data: { id: discussionId, description: newComment, userId: userId }
+        })
+      });
+
+
+    }
+
+    //  ------------------ Sending Push Notification To Author of Discussion ----------------------- 
+
+
   };
 
   const pickDocument = async () => {
@@ -510,9 +699,8 @@ function LectureDiscussionView(props) {
 
   const uploadImage = async () => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${
-      firebase.auth().currentUser.uid
-    }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${firebase.auth().currentUser.uid
+      }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -565,9 +753,8 @@ function LectureDiscussionView(props) {
 
   const uploadImageV2 = async (docSnapshot) => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${
-      firebase.auth().currentUser.uid
-    }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${firebase.auth().currentUser.uid
+      }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -703,8 +890,35 @@ function LectureDiscussionView(props) {
         {
           text: 'Yes',
           onPress: () => {
-            firebase.firestore().collection('Comment').doc(cid).delete();
+            const commentList = [...comment];
+            //obtain noOfReplies for a mainComment
+            //needed for lecturer
+            const currentReplyNo = commentList.find(el => el.id === cid).numberOfReply;
+            console.log(currentReplyNo);
+            //needed for lecturer
+            //obtain noOfReplies for a mainComment
+
+            firebase.firestore().collection("Comment").doc(cid).delete();
             setData(4);
+
+
+            //updating noOfComments under discussion
+            //needed for lecturer
+            console.log(userPosts.noOfComments);
+            const discussionCommentNo = userPosts.noOfComments - 1 - currentReplyNo;
+            console.log(discussionCommentNo);
+            firebase
+              .firestore()
+              .collection("Discussion")
+              .doc(discussionId)
+              .update({
+                noOfComments: discussionCommentNo
+              })
+              .then(() => {
+                console.log("done update");
+              });
+            //needed for lecturer
+            //updating noOfComments under discussion
           },
         },
         // The "No" button
@@ -735,6 +949,155 @@ function LectureDiscussionView(props) {
         console.log('done');
       });
     setData(2);
+
+    const commentList = [...comment];
+    const commentPostedBy = commentList.find(el => el.id === cid).userId;
+    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    console.log(x);
+
+    if (commentOwner.status == 0) {
+      let points = commentOwner.totalPoints;
+      let userTitle = commentOwner.title;
+      let likesNo = commentOwner.noOfLikes;
+      if (commentPostedBy !== userId) {
+        likesNo = likesNo + 1;
+      }
+      console.log(likesNo);
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          noOfLikes: likesNo
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating number of likes under user
+
+      //updating totalPoints and awards based on noOfLikes
+      const award = commentOwner.awards;
+      console.log(award);
+      let creation = new Date();
+      if (likesNo === 1 && !(award.some(el => el.title === "Somebody Likes You"))) {
+        award.push({
+          title: "Somebody Likes You",
+          description: "Somebody out there liked one of your comments. Keep posting for more",
+          pointsToBeAdded: 2,
+          creation: creation.toISOString()
+        })
+        points = points + 2;
+      } else if (likesNo === 25 && !(award.some(el => el.title === "I Like it A Lot"))) {
+        award.push({
+          title: "I Like it A Lot",
+          description: "Your comments have been liked 25 times",
+          pointsToBeAdded: 7,
+          creation: creation.toISOString()
+        })
+        points = points + 7;
+      } else if (likesNo === 50 && !(award.some(el => el.title === "Seriously Likeable"))) {
+        award.push({
+          title: "Seriously Likeable",
+          description: "Your comments have been liked 50 times",
+          pointsToBeAdded: 10,
+          creation: creation.toISOString()
+        })
+        points = points + 10;
+      } else if (x === 25 && !(award.some(el => el.title === "Helpful"))) {
+        award.push({
+          title: "Helpful",
+          description: "One of your comments has attracted 25 likes",
+          pointsToBeAdded: 15,
+          creation: creation.toISOString()
+        })
+        points = points + 15;
+      } else if (x === 50 && !(award.some(el => el.title === "Super Helpful"))) {
+        award.push({
+          title: "Super Helpful",
+          description: "One of your comments has attracted 50 likes",
+          pointsToBeAdded: 25,
+          creation: creation.toISOString()
+        })
+        points = points + 25;
+      }
+
+      //updating userTitle based on Points
+      if (points >= 0 && points <= 100) {
+        userTitle = "Beginner";
+      } else if (points > 100 && points <= 300) {
+        userTitle = "Intermediate"
+      } else if (points > 300 && points <= 500) {
+        userTitle = "Expert"
+      } else if (points > 500) {
+        userTitle = "Legend"
+      }
+      //updating userTitle based on Points
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          totalPoints: points,
+          awards: award,
+          title: userTitle
+        })
+        .then(() => {
+          console.log("done");
+        });
+
+      //updating totalPoints and awards based on noOfLikes
+    }
+    // change for contribution
+
+    const notificationTitle = `A lecturer liked your comment`;
+    //  ------------------ Sending Push Notification To Author of Comment -----------------------
+    firebase
+      .firestore()
+      .collection("Comment")
+      .doc(cid)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.data().userId !== userId) {
+
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(snapshot.data().userId)
+            .collection("Notifications")
+            .add({
+              title: notificationTitle,
+              creation: firebase.firestore.FieldValue.serverTimestamp(),
+              pageId: snapshot.data().discussionId,
+              description: snapshot.data().comment,
+              userId: userId,
+              dataType: "id"
+            });
+
+          fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Accept-Encoding': 'gzip, deflate',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              to: snapshot.data().pushToken,
+              title: notificationTitle,
+              body: "Tap to see the comment",
+              priority: "normal",
+              data: { id: snapshot.data().discussionId, description: snapshot.data().comment, userId: userId }
+            })
+          });
+
+
+        }
+
+
+      });
+    //  ------------------ Sending Push Notification To Author of Comment ----------------------- 
+
   };
 
   const removeLike = (cid, nol, lb) => {
@@ -756,6 +1119,35 @@ function LectureDiscussionView(props) {
         console.log('done');
       });
     setData(3);
+
+    //change for contribution
+
+    //updating number of likes under user
+    //needed for lecturer
+    const commentList = [...comment];
+    const commentPostedBy = commentList.find(el => el.id === cid).userId;
+    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+
+    if (commentOwner.status == 0) {
+      let likesNo = commentOwner.noOfLikes;
+      if (commentPostedBy !== userId) {
+        likesNo = likesNo - 1;
+      }
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(commentPostedBy)
+        .update({
+          noOfLikes: likesNo
+        })
+        .then(() => {
+          console.log("done");
+        });
+      //updating number of likes under user
+    }
+    //change for contribution
+
   };
 
   const EditComment = (cid) => {
@@ -842,10 +1234,12 @@ function LectureDiscussionView(props) {
               onSelect={() =>
                 props.navigation.navigate('Reply Discussion', {
                   cid: item.id,
-                  id: discussionId,
                   time: timeDifference(new Date(), item.creation.toDate()),
                   xxx: item.likeBy.includes(userId),
                   mainCommentAuthorName: item.postedBy,
+                  mainCommentUserId: item.userId,
+                  pushToken: item.pushToken,
+                  discussionId: discussionId
                 })
               }
             />
@@ -898,9 +1292,9 @@ function LectureDiscussionView(props) {
               </View>
             )}
             {comment.length != 0 &&
-            loadMore >= 8 &&
-            totalComment > loadMore &&
-            loadMoreLoading == false ? (
+              loadMore >= 8 &&
+              totalComment > loadMore &&
+              loadMoreLoading == false ? (
               <TouchableOpacity
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}
@@ -1077,6 +1471,7 @@ const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
   fullComments: store.userState.comment,
   options: store.userState.option,
+  discussionList: store.userState.posts,
   report: store.userState.reportedDiscussion,
 });
 

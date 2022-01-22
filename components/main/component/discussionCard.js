@@ -61,14 +61,9 @@ const styles = StyleSheet.create({
 
   title: {
     color: "#fff",
-    fontSize: 20,
-    fontFamily: "Poppins",
-    paddingVertical: 0,
-    //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    lineHeight: 25,
+    fontSize: 22,
+    fontFamily: "PoppinsSemiBold",
+    lineHeight: 30,
   },
 });
 

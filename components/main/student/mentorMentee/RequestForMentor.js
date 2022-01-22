@@ -59,6 +59,7 @@ function requestformentor(props) {
         //commenting out just for testing purpose
         matricNumber: user.matricNumber,
         userId,
+        pushToken: user.pushToken // change for notification
       })
       .then(function () {
         props.navigation.goBack();
@@ -66,26 +67,30 @@ function requestformentor(props) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1}}>
       <ScrollView>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Name: {user.realName} </Text>
+            <Text style={styles.label}>Name :</Text>
+            <Text style={styles.input}>Name: {user.realName} </Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Matric Number: {user.matricNumber}</Text>
+            <Text style={styles.label}>Matric Number :</Text>
+            <Text style={styles.input}>{user.matricNumber}</Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Faculty: {user.faculty}</Text>
+            <Text style={styles.label}>Faculty :</Text>
+            <Text style={styles.input}>{user.faculty}</Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Year: {user.year} </Text>
+            <Text style={styles.label}>Year :</Text>
+            <Text style={styles.input}>{user.year} </Text>
           </View>
         </View>
         <View style={styles.form}>
@@ -113,7 +118,7 @@ function requestformentor(props) {
             </View>
           </View>
         </View>
-        <View style={styles.form}>
+        <View style={{...styles.form, marginBottom:70}}>
           <View style={styles.formControl}>
             <Text style={styles.label}>Description: </Text>
             <TextInput
@@ -139,8 +144,8 @@ function requestformentor(props) {
 
 const styles = StyleSheet.create({
   form: {
-    marginLeft: 20,
-    marginVertical: 10,
+    marginHorizontal: 20,
+    marginVertical: 3,
   },
   formControl: {
     width: "100%",
@@ -148,6 +153,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Poppins",
     fontSize: 20,
+    marginVertical: 5,
   },
 
   label2: {
@@ -162,32 +168,15 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    fontFamily: "Poppins",
-    paddingHorizontal: 2,
-    paddingVertical: 5,
-    borderBottomColor: "#ccc",
-    borderBottomWidth: 1,
-  },
-
-  logout: {
-    width: 160,
-    height: 40,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
-    borderRadius: 16,
-    marginTop: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
+    fontFamily: 'Poppins',
     fontSize: 15,
-    justifyContent: "space-between",
   },
+
 });
 
 const mapStateToProps = (store) => ({

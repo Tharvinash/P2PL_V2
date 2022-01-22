@@ -8,6 +8,8 @@ import {
   Dimensions,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
+  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { connect } from 'react-redux';
@@ -17,6 +19,7 @@ import { FAB } from 'react-native-elements';
 import SelectPicker from 'react-native-form-select-picker';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
+
 require('firebase/firestore');
 function EditProfile(props) {
   const { currentUser, comments, posts } = props;
@@ -37,90 +40,124 @@ function EditProfile(props) {
   const [imageChanged, setImageChanged] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [cu, setCu] = useState(currentUser);
+  const [isImage, setIsImage] = useState();
   const [rn, setRn] = useState('');
+  const [isLoading, setIsLoading] = useState(false); //might
   let options = [1, 2, 3, 4, 5];
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const defaultImage =
     'https://firebasestorage.googleapis.com/v0/b/p2pl-bcbbd.appspot.com/o/default%2FnewProfile.png?alt=media&token=b2e22482-506a-4e78-ae2e-e38c83ee7c27';
 
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection('users')
-      .doc(props.route.params.uid)
-      .get()
-      .then((snapshot) => {
-        setUserId(snapshot.data().name);
-        setYear(snapshot.data().year);
-        setFac(snapshot.data().faculty);
-        setStatus(snapshot.data().status);
-        setMatricNum(snapshot.data().matricNumber);
-        setRn(snapshot.data().realName);
-      });
-    firebase
-      .firestore()
-      .collection('Faculty')
-      .get()
-      .then((snapshot) => {
-        let faculty = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data };
-        });
-        setFacultyData(faculty);
-      });
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      firebase
-        .firestore()
-        .collection('Discussion')
-        .get()
-        .then((snapshot) => {
-          let discussion = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            const id = doc.id;
-            return { id, ...data };
-          });
-          //discussion
-
-          const newArray2 = discussion.filter(
-            (e) => e.userId === nameToBeEditted
-          );
-
-          const secArray2 = newArray2.map((element) => element.id);
-          setDntbc(secArray2);
-        });
-
-      firebase
-        .firestore()
-        .collection('Comment')
-        .orderBy('creation', 'asc')
-        .get()
-        .then((snapshot) => {
-          let comment = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            const id = doc.id;
-            return { id, ...data };
-          });
-          const newArray = comment.filter(
-            (element) => element.userId === nameToBeEditted
-          );
-          const secArray = newArray.map((element) => element.id);
-          setCntbu(secArray);
-        });
-
-      firebase
+    const loadAsync = async () => {
+      setIsLoading(true);
+      await firebase
         .firestore()
         .collection('users')
         .doc(props.route.params.uid)
         .get()
         .then((snapshot) => {
-          setCu(snapshot.data());
+          setUserId(snapshot.data().name);
+          setYear(snapshot.data().year);
+          setFac(snapshot.data().faculty);
+          setStatus(snapshot.data().status);
+          setMatricNum(snapshot.data().matricNumber);
+          setRn(snapshot.data().realName);
         });
+      await firebase
+        .firestore()
+        .collection('Faculty')
+        .get()
+        .then((snapshot) => {
+          let faculty = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setFacultyData(faculty);
+        });
+
+      setIsLoading(false);
+    };
+
+    loadAsync();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadAsync = async () => {
+        setIsLoading(true);
+        await firebase
+          .firestore()
+          .collection('Discussion')
+          .get()
+          .then((snapshot) => {
+            let discussion = snapshot.docs.map((doc) => {
+              const data = doc.data();
+              const id = doc.id;
+              return { id, ...data };
+            });
+            //discussion
+
+            const newArray2 = discussion.filter(
+              (e) => e.userId === nameToBeEditted
+            );
+
+            const secArray2 = newArray2.map((element) => element.id);
+            setDntbc(secArray2);
+          });
+
+        await firebase
+          .firestore()
+          .collection('Comment')
+          .orderBy('creation', 'asc')
+          .get()
+          .then((snapshot) => {
+            let comment = snapshot.docs.map((doc) => {
+              const data = doc.data();
+              const id = doc.id;
+              return { id, ...data };
+            });
+            const newArray = comment.filter(
+              (element) => element.userId === nameToBeEditted
+            );
+            const secArray = newArray.map((element) => element.id);
+            setCntbu(secArray);
+          });
+
+        await firebase
+          .firestore()
+          .collection('users')
+          .doc(props.route.params.uid)
+          .get()
+          .then((snapshot) => {
+            setCu(snapshot.data());
+            setIsImage(snapshot.data().image);
+          });
+        setIsLoading(false);
+      };
+
+      loadAsync();
     }, [])
   );
+
+  // const validate =(id) =>{
+  //   let value =false;
+  //   if (id == null) {
+  //     value = true;
+  //     console.log("null")
+  //     Alert.alert(
+  //       "Empty field",
+  //       "Kindly fill in the UserId",
+  //       [
+  //         {
+  //           text: "Ok",
+  //         },
+  //       ]
+  //     );
+  //   }
+  //   return value;
+  // }
 
   const Save = async () => {
     setModalVisible(!isModalVisible);
@@ -263,125 +300,138 @@ function EditProfile(props) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Full Name</Text>
-          <Text style={styles.input}>{rn}</Text>
+    <View style={{ flex: 1, backgroundColor: '#140F38' }}>
+      {isLoading ? (
+        <View style={styles.spinner}>
+          <ActivityIndicator size='large' color='orange' />
         </View>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>User Id</Text>
-          <TextInput
-            style={styles.input}
-            value={userId}
-            onChangeText={(userId) => setUserId(userId)}
-          />
-        </View>
-        {status == 0 && (
-          <View style={styles.formControl}>
-            <Text style={styles.label}>Matric Number </Text>
-            <TextInput
-              style={styles.input}
-              value={matricNum}
-              onChangeText={(matricNum) => setMatricNum(matricNum)}
-            />
-          </View>
-        )}
+      ) : (
+        <ScrollView>
+          <View style={styles.form}>
+            <View style={styles.formControl}>
+              <Text style={styles.label}>Full Name</Text>
+              <Text style={styles.input}>{rn}</Text>
+            </View>
+            <View style={styles.formControl}>
+              <Text style={styles.label}>User Id</Text>
+              <TextInput
+                style={styles.input}
+                value={userId}
+                onChangeText={(userId) => setUserId(userId)}
+              />
+            </View>
+            {status == 0 && (
+              <View style={styles.formControl}>
+                <Text style={styles.label}>Matric Number </Text>
+                <Text style={styles.input}>{matricNum}</Text>
+              </View>
+            )}
 
-        {status == 0 && (
-          <View style={styles.formControl}>
-            <Text style={styles.label}>Year of Study</Text>
-            <SelectPicker
-              placeholder={year}
-              placeholderStyle={{
-                fontFamily: 'Poppins',
-                fontSize: 15,
-                color: '#000',
-                marginTop: 5,
-              }}
-              onSelectedStyle={{
-                fontSize: 15,
-                color: '#000',
-              }}
-              style={styles.input}
-              onValueChange={setYear}
-              selected={year}
-            >
-              {Object.values(options).map((val, index) => (
-                <SelectPicker.Item label={val} value={val} key={index} />
-              ))}
-            </SelectPicker>
-          </View>
-        )}
+            {status == 0 && (
+              <View style={styles.formControl}>
+                <Text style={styles.label}>Year of Study</Text>
+                {/* <Text style={styles.input}>{year}</Text> */}
+                <SelectPicker
+                  placeholder={year}
+                  placeholderStyle={{
+                    fontFamily: 'Poppins',
+                    fontSize: 15,
+                    color: '#000',
+                    marginTop: 5,
+                  }}
+                  onSelectedStyle={{
+                    fontSize: 15,
+                    color: '#000',
+                  }}
+                  style={styles.input}
+                  onValueChange={setYear}
+                  selected={year}
+                >
+                  {Object.values(options).map((val, index) => (
+                    <SelectPicker.Item label={val} value={val} key={index} />
+                  ))}
+                </SelectPicker>
+              </View>
+            )}
 
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Faculty</Text>
-          <SelectPicker
-            placeholder={fac}
-            placeholderStyle={{
-              fontFamily: 'Poppins',
-              fontSize: 20,
-              color: '#000',
-            }}
-            onSelectedStyle={{
-              fontFamily: 'Poppins',
-              fontSize: 15,
-              color: '#000',
-              ...Platform.select({
-                ios: {
-                  flex: 1,
+            <View style={styles.formControl}>
+              <Text style={styles.label}>Faculty</Text>
+              <Text style={styles.input}>{fac}</Text>
+              {/* <SelectPicker
+                placeholder={fac}
+                placeholderStyle={{
+                  fontFamily: 'Poppins',
+                  fontSize: 20,
+                  color: '#000',
+                }}
+                onSelectedStyle={{
+                  fontFamily: 'Poppins',
+                  fontSize: 15,
+                  color: '#000',
+                  ...Platform.select({
+                    ios: {
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      paddingBottom: 0,
+                    },
+                  }),
+                }}
+                style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  paddingBottom: 0,
-                },
-              }),
-            }}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              ...styles.ui,
-            }}
-            style={styles.input}
-            onValueChange={setFac}
-            selected={fac}
-          >
-            {Object.values(facultyData).map((val) => (
-              <SelectPicker.Item
-                label={val.faculty}
-                value={val.faculty}
-                key={val.id}
-              />
-            ))}
-          </SelectPicker>
-        </View>
-
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Profile Picture</Text>
-          <View style={{ flexDirection: 'row' }}>
-            {cu.image != defaultImage ? (
-              <TouchableOpacity
-                style={styles.logout}
-                onPress={() => removePicture()}
+                  ...styles.ui,
+                }}
+                style={styles.input}
+                onValueChange={setFac}
+                selected={fac}
               >
-                <Text style={styles.Ltext}>Remove Existing Image</Text>
-              </TouchableOpacity>
-            ) : null}
-            <TouchableOpacity style={styles.logout} onPress={() => pickImage()}>
-              <Text style={styles.Ltext}>New Image</Text>
-            </TouchableOpacity>
+                {Object.values(facultyData).map((val) => (
+                  <SelectPicker.Item
+                    label={val.faculty}
+                    value={val.faculty}
+                    key={val.id}
+                  />
+                ))}
+              </SelectPicker> */}
+            </View>
+
+            <View style={{ ...styles.formControl, marginTop: 5 }}>
+              <Text style={styles.label}>Profile Picture</Text>
+              <View style={{ flexDirection: 'row' }}>
+                {cu.image != defaultImage ? (
+                  <TouchableOpacity
+                    style={{ ...styles.logout, marginRight: 15 }}
+                    onPress={() => removePicture()}
+                  >
+                    <Text style={styles.Ltext}>Remove Existing Image</Text>
+                  </TouchableOpacity>
+                ) : null}
+
+                <TouchableOpacity
+                  style={styles.logout}
+                  onPress={() => pickImage()}
+                >
+                  <Text style={styles.Ltext}>New Image</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-      <View style={{ alignItems: 'center' }}>
-        {image && (
-          <Image source={{ uri: image }} style={{ height: 200, width: 200 }} />
-        )}
-      </View>
-      <Modal isVisible={isModalVisible}>
-        <View style={{ justifyContent: 'center', flex: 1 }}>
-          <ActivityIndicator size='large' color='#E3562A' />
-        </View>
-      </Modal>
+          <View style={{ alignItems: 'center' }}>
+            {image && (
+              <Image
+                source={{ uri: image }}
+                style={{ height: 200, width: 200 }}
+              />
+            )}
+          </View>
+          <Modal isVisible={isModalVisible}>
+            <View style={{ justifyContent: 'center', flex: 1 }}>
+              <ActivityIndicator size='large' color='#E3562A' />
+            </View>
+          </Modal>
+        </ScrollView>
+      )}
       <FAB
         placement='right'
         color='#E3562A'
@@ -407,13 +457,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     fontSize: 20,
     marginVertical: 8,
+    color: '#fff',
   },
   input: {
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
     fontFamily: 'Poppins',
-    paddingHorizontal: 2,
-    paddingVertical: 5,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
+    fontSize: 15,
   },
 
   logout: {
@@ -432,7 +485,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Poppins',
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: 20,
     justifyContent: 'space-between',
   },
 
@@ -442,6 +495,11 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').width * 0.1,
     backgroundColor: '#E3562A',
     borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spinner: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },

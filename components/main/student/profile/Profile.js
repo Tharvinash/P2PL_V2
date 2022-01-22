@@ -26,15 +26,18 @@ function Profile(props) {
   const list = [
     {
       title: 'Edit Personal Info',
-      onPress: () =>
-        props.navigation.navigate('EditProfile', {
-          uid: userId,
-          facId: faculty,
-        }),
+      onPress: () =>{
+        setIsVisible(false);
+        props.navigation.navigate('EditProfile', {uid: userId,facId: faculty,});
+        
+      },
     },
     {
       title: 'Edit Password',
-      onPress: () => props.navigation.navigate('Change Password'),
+      onPress: () => {
+        setIsVisible(false);
+        props.navigation.navigate('Change Password');
+      },
     },
     {
       title: 'Cancel',
@@ -73,7 +76,6 @@ function Profile(props) {
   };
 
   return (
-    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={{ alignItems: 'center', marginBottom: 20, marginTop: 10 }}>
           <Image
@@ -92,8 +94,8 @@ function Profile(props) {
         <View>
           <Text style={styles.us}>{user.name}</Text>
         </View>
-        <View style={{ marginTop: 20 }}>
-          <Text style={styles.us}>({user.faculty})</Text>
+        <View>
+          <Text style={styles.fac}>({user.faculty})</Text>
         </View>
         <View style={styles.bb}>
           <View style={{ marginHorizontal: 10 }}>
@@ -192,7 +194,7 @@ function Profile(props) {
           ))}
         </BottomSheet>
       </ScrollView>
-    </View>
+
   );
 }
 
@@ -259,6 +261,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     marginTop: -20,
+  },
+
+  fac: {
+    color: 'white',
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
+    alignItems: 'flex-end',
   },
 });
 

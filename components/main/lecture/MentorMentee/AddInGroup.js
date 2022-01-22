@@ -14,6 +14,13 @@ function AddInGroupV2(props) {
   const userId = firebase.auth().currentUser.uid;
   const infoId = props.route.params.did;
 
+  //changes
+  let roomTitle = "undefined";
+  let roomId;
+  const [rTitle, setRTitle] = useState();
+  const [rId, setRId] = useState();
+  //changes
+
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
@@ -86,8 +93,8 @@ function AddInGroupV2(props) {
       });
   }, [data]);
 
-  const checkOut = () =>{
-    if(added){
+  const checkOut = () => {
+    if (added) {
       return Alert.alert(
         "Save changes",
         "Changes are saved !",
@@ -96,6 +103,40 @@ function AddInGroupV2(props) {
           {
             text: "Yes",
             onPress: () => {
+              const notificationTitle = `You have been added to a discussion room`;
+
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(info.userId)
+                .collection("Notifications")
+                .add({
+                  title: notificationTitle,
+                  creation: firebase.firestore.FieldValue.serverTimestamp(),
+                  pageId: "default",
+                  description: `${rTitle}`,
+                  userId: userId,
+                  dataType: "mmid"
+                });
+
+
+              fetch('https://exp.host/--/api/v2/push/send', {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Accept-Encoding': 'gzip, deflate',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  to: info.pushToken,
+                  title: notificationTitle,
+                  body: "Tap to see the rooms",
+                  priority: "normal",
+                  //changes
+                  data: { mmid: rId, description: `${rTitle}`, userId: userId }
+                })
+              });
+
               firebase.firestore().collection("RequestForMentor").doc(infoId).delete();
               props.navigation.navigate("ViewRequest")
             },
@@ -107,12 +148,20 @@ function AddInGroupV2(props) {
           },
         ]
       );
-    }else{
+    } else {
       props.navigation.navigate("ViewRequest")
     }
   }
 
-  const AddInGroup = (gid, gm) => {
+  const AddInGroup = (gid, gm, rt) => {
+     //changes
+     roomId = gid;
+     console.log(roomId);
+     roomTitle = rt;
+     console.log(roomTitle);
+     setRTitle(roomTitle);
+     setRId(roomId);
+     //changes
     setAdded(true)
     gm.push({
       userId: info.userId,
@@ -120,6 +169,7 @@ function AddInGroupV2(props) {
       mc: "mc",
       image: "image",
       status: 1,
+      pushToken: info.pushToken
     });
 
     firebase.firestore().collection("DiscussionRoom").doc(gid).update({
@@ -160,7 +210,7 @@ function AddInGroupV2(props) {
               description={item.description}
               added={yyy(item.groupMember)}
               RemoveInGroup={() => RemoveInGroup(item.id, item.groupMember)}
-              AddInGroup={() => AddInGroup(item.id, item.groupMember)}
+              AddInGroup={() => AddInGroup(item.id, item.groupMember, item.title)}
             />
           )}
         />

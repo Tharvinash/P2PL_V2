@@ -59,18 +59,20 @@ const LeaderBoard = (props) => {
 
   return (
     <View style={styles.screen}>
-      <FlatList
-        data={studentsList}
-        renderItem={(itemData) => (
-          <Ranking
-            image={itemData.item.image}
-            name={itemData.item.name}
-            title={itemData.item.title}
-            faculty={itemData.item.faculty}
-            points={itemData.item.totalPoints}
-          />
-        )}
-      />
+      <View style={{ marginVertical: 20 }}>
+        <FlatList
+          data={studentsList}
+          renderItem={(itemData) => (
+            <Ranking
+              image={itemData.item.image}
+              name={itemData.item.name}
+              title={itemData.item.title}
+              faculty={itemData.item.faculty}
+              points={itemData.item.totalPoints}
+            />
+          )}
+        />
+      </View>
     </View>
   );
 };

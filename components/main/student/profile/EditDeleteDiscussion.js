@@ -177,9 +177,9 @@ function EditDeleteDiscussion(props) {
         );
         setComment(newArray2);
       });
-    setTimeout(function () {
-      setLoadMoreLoading(false);
-    }, 2000);
+    // setTimeout(function () {
+    //   setLoadMoreLoading(false);
+    // }, 2000);
 
     setData(5);
   }, [props.currentUser, props.route.params.did, data]);

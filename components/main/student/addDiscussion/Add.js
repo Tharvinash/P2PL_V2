@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   Text,
   View,
@@ -9,17 +9,17 @@ import {
   Image,
   ScrollView,
   Dimensions,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import firebase from "firebase";
-require("firebase/firestore");
-require("firebase/firebase-storage");
-import { connect } from "react-redux";
-import { Icon } from "react-native-elements";
-import { FAB } from "react-native-elements";
-import Modal from "react-native-modal";
-import Images from "react-native-scalable-image";
-import SelectPicker from "react-native-form-select-picker";
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import firebase from 'firebase';
+require('firebase/firestore');
+require('firebase/firebase-storage');
+import { connect } from 'react-redux';
+import { Icon } from 'react-native-elements';
+import { FAB } from 'react-native-elements';
+import Modal from 'react-native-modal';
+import Images from 'react-native-scalable-image';
+import SelectPicker from 'react-native-form-select-picker';
 
 function Add(props) {
   const { currentUser } = props;
@@ -27,9 +27,9 @@ function Add(props) {
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [faculty, setFaculty] = useState("");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [faculty, setFaculty] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [selected, setSelected] = useState();
 
@@ -58,12 +58,12 @@ function Add(props) {
 
       const galleryStatus =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setHasGalleryPermission(galleryStatus.status === "granted");
+      setHasGalleryPermission(galleryStatus.status === 'granted');
     })();
 
     firebase
       .firestore()
-      .collection("Faculty")
+      .collection('Faculty')
       .get()
       .then((snapshot) => {
         let faculty = snapshot.docs.map((doc) => {
@@ -97,12 +97,12 @@ function Add(props) {
 
   const uploadImage = async () => {
     if (!title.trim()) {
-      alert("Please Enter Title");
+      alert('Please Enter Title');
       return;
     }
 
     if (!selected) {
-      alert("Please Enter Faculty");
+      alert('Please Enter Faculty');
       return;
     }
 
@@ -126,7 +126,7 @@ function Add(props) {
       const taskCompleted = () => {
         task.snapshot.ref.getDownloadURL().then((snapshot) => {
           savePostData(snapshot, title, description);
-          console.log("downloadUri" + snapshot);
+          console.log('downloadUri' + snapshot);
           setModalVisible(!isModalVisible);
         });
       };
@@ -135,11 +135,11 @@ function Add(props) {
         console.log(snapshot);
       };
 
-      task.on("state_changed", taskProgress, taskError, taskCompleted);
+      task.on('state_changed', taskProgress, taskError, taskCompleted);
     } else {
       firebase
         .firestore()
-        .collection("Discussion")
+        .collection('Discussion')
         .add({
           userId,
           title,
@@ -149,12 +149,13 @@ function Add(props) {
           image: currentUser.image,
           favBy: [],
           creation: firebase.firestore.FieldValue.serverTimestamp(),
-          noOfComments: 0 //change for contribution
+          pushToken: currentUser.pushToken, //change for notification,
+          noOfComments: 0, //change for contribution
         })
         .then(function () {
           setModalVisible(!isModalVisible);
           props.navigation.popToTop();
-          console.log("Done");
+          console.log('Done');
         });
     }
   };
@@ -162,7 +163,7 @@ function Add(props) {
   const savePostData = (downloadURL, title, description) => {
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection('Discussion')
       .add({
         userId,
         downloadURL,
@@ -173,12 +174,13 @@ function Add(props) {
         image: currentUser.image,
         favBy: [],
         creation: firebase.firestore.FieldValue.serverTimestamp(),
-        noOfComments: 0 // changes for contribution
+        pushToken: currentUser.pushToken, // changes for notification,
+        noOfComments: 0, // changes for contribution
       })
       .then(function () {
         setModalVisible(!isModalVisible);
         props.navigation.popToTop();
-        console.log("Done");
+        console.log('Done');
       });
   };
 
@@ -187,23 +189,21 @@ function Add(props) {
       <ScrollView>
         <View
           style={{
-            borderBottomColor: "#fff",
-            borderBottomWidth: 1,
             margin: 20,
           }}
         >
-          <View>
-            <Text style={styles.title}>Title : </Text>
+          <View
+            style={{
+              borderBottomColor: '#fff',
+              borderBottomWidth: 1,
+            }}
+          >
+            <Text style={styles.title}>Title </Text>
           </View>
           <TextInput
-            style={{
-              fontFamily: "Poppins",
-              fontSize: 20,
-              color: "#fff",
-              marginTop: 5,
-            }}
-            placeholder="Place your title here"
-            placeholderTextColor="#fff"
+            style={styles.titleInput}
+            placeholder='Place your title here'
+            placeholderTextColor='#000'
             multiline={true}
             defaultValue={title}
             onChangeText={(title) => setTitle(title)}
@@ -211,31 +211,31 @@ function Add(props) {
         </View>
 
         <View style={{ marginLeft: 20 }}>
-          <View style={{ justifyContent: "center" }}>
+          <View style={{ justifyContent: 'center' }}>
             <Text style={styles.title}>Add Faculty: </Text>
             <SelectPicker
-              placeholder="Faculty"
+              placeholder='Faculty'
               placeholderStyle={{
-                fontFamily: "Poppins",
+                fontFamily: 'Poppins',
                 fontSize: 20,
-                color: "#fff",
+                color: '#fff',
               }}
               onSelectedStyle={{
-                fontFamily: "Poppins",
+                fontFamily: 'Poppins',
                 fontSize: 15,
-                color: "#fff",
+                color: '#fff',
                 ...Platform.select({
                   ios: {
                     flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     paddingBottom: 0,
                   },
                 }),
               }}
               style={{
-                justifyContent: "center",
-                alignItems: "center",
+                justifyContent: 'center',
+                alignItems: 'center',
                 ...styles.ui,
               }}
               onValueChange={(value) => {
@@ -258,8 +258,8 @@ function Add(props) {
             <TouchableOpacity style={styles.ui} onPress={pickImage}>
               <Text
                 style={{
-                  color: "#fff",
-                  fontFamily: "Poppins",
+                  color: '#fff',
+                  fontFamily: 'Poppins',
                   fontSize: 20,
                 }}
               >
@@ -269,10 +269,10 @@ function Add(props) {
           </View>
         </View>
 
-        <View style={{ alignItems: "center" }}>
+        <View style={{ alignItems: 'center' }}>
           {image && (
             <Images
-              width={Dimensions.get("window").width} // height will be calculated automatically
+              width={Dimensions.get('window').width} // height will be calculated automatically
               source={{ uri: image }}
             />
           )}
@@ -280,7 +280,7 @@ function Add(props) {
 
         <View
           style={{
-            borderBottomColor: "#fff",
+            borderBottomColor: '#fff',
             borderBottomWidth: 1,
             margin: 20,
           }}
@@ -290,30 +290,26 @@ function Add(props) {
         <View>
           <TextInput
             style={styles.desc}
-            placeholder="Type here"
+            placeholder='Place your description here'
+            placeholderTextColor='#000'
             multiline={true}
             defaultValue={description}
             onChangeText={(description) => setDescription(description)}
           />
         </View>
         <Modal isVisible={isModalVisible}>
-          <View style={{ justifyContent: "center", flex: 1 }}>
-            <ActivityIndicator size="large" color="#E3562A" />
+          <View style={{ justifyContent: 'center', flex: 1 }}>
+            <ActivityIndicator size='large' color='#E3562A' />
           </View>
         </Modal>
       </ScrollView>
       <FAB
-        placement="right"
-        color="#E3562A"
+        placement='right'
+        color='#E3562A'
         onPress={uploadImage}
-        size="large"
+        size='large'
         icon={
-          <Icon
-            reverse
-            name="upload"
-            type="font-awesome-5"
-            color="#E3562A"
-          />
+          <Icon reverse name='upload' type='font-awesome-5' color='#E3562A' />
         }
       />
     </View>
@@ -334,95 +330,106 @@ function Add(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
+    backgroundColor: '#140F38',
   },
 
   image: {
     flex: 1,
     width: null,
     height: null,
-    resizeMode: "contain",
+    resizeMode: 'contain',
   },
 
   dropdown: {
-    color: "#fff",
+    color: '#fff',
   },
 
   title: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 25,
-    color: "#fff",
-    alignContent: "space-around",
+    color: '#fff',
+    alignContent: 'space-around',
   },
 
   fac: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 25,
-    color: "#fff",
-    alignContent: "space-around",
+    color: '#fff',
+    alignContent: 'space-around',
     paddingBottom: 20,
   },
 
   image: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 25,
-    color: "#fff",
-    alignContent: "space-around",
+    color: '#fff',
+    alignContent: 'space-around',
     paddingRight: 20,
   },
 
   ui: {
     marginVertical: 10,
-    width: Dimensions.get("window").width * 0.5,
-    height: Dimensions.get("window").width * 0.12,
-    backgroundColor: "#E3562A",
+    width: Dimensions.get('window').width * 0.5,
+    height: Dimensions.get('window').width * 0.12,
+    backgroundColor: '#E3562A',
     borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   uit: {
-    color: "#fff",
-    justifyContent: "center",
+    color: '#fff',
+    justifyContent: 'center',
     left: 10,
     top: 2,
-    fontFamily: "Poppins",
-    textAlign: "center",
+    fontFamily: 'Poppins',
+    textAlign: 'center',
   },
 
   desc: {
-    color: "#000",
+    color: '#000',
     marginTop: -10,
     margin: 20,
     height: 250,
-    borderColor: "#E3562A",
+    borderColor: '#E3562A',
     borderWidth: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     width: 350,
     borderRadius: 12,
     padding: 10,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
+  },
+
+  titleInput: {
+    color: '#000',
+    marginTop:10,
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
+    fontFamily: 'Poppins',
   },
 
   blogout: {
     width: 160,
     height: 40,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
+    backgroundColor: '#E3562A',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 20,
   },
 
   Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     paddingTop: 8,
   },
 });

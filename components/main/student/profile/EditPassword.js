@@ -12,6 +12,7 @@ import {
 import firebase from 'firebase';
 import { Icon } from 'react-native-elements';
 import { FAB } from 'react-native-elements';
+import validator from 'validator';
 
 require('firebase/firestore');
 function EditPassword(props) {
@@ -28,34 +29,83 @@ function EditPassword(props) {
   };
 
   const onChangePasswordPress = () => {
-    reauthenticate(currentPassword)
-      .then(() => {
-        var user = firebase.auth().currentUser;
-        user
-          .updatePassword(newPassword)
-          .then(() => {
-            Alert.alert('Password was changed');
-            props.navigation.navigate('Profile');
-          })
-          .catch((error) => {
-            console.log(error.message);
-          });
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
+    if (currentPassword === null || newPassword === null) {
+      Alert.alert('Empty field', 'Kindly fill up the required fields', [
+        {
+          text: 'Ok',
+          onPress: () => {
+            return;
+          },
+        },
+      ]);
+    } else {
+      let value;
+      reauthenticate(currentPassword)
+        .then(() => {
+          if (
+            validator.isStrongPassword(newPassword, {
+              minLength: 8,
+              minLowercase: 1,
+              minUppercase: 1,
+              minNumbers: 1,
+              minSymbols: 1,
+            })
+          ) {
+            value = true;
+            console.log('Is Strong Password');
+          } else {
+            value = false;
+          }
+
+          var user = firebase.auth().currentUser;
+          if (value) {
+            user
+              .updatePassword(newPassword)
+              .then(() => {
+                Alert.alert('Success', 'Password has been changed', [
+                  {
+                    text: 'Ok',
+                    onPress: () => props.navigation.navigate('Profile'),
+                  },
+                ]);
+              })
+              .catch((error) => {
+                console.log(error.message);
+                console.log('boy');
+              });
+          } else {
+            return Alert.alert(
+              'Invalid password',
+              'The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ',
+              [
+                {
+                  text: 'Retry',
+                },
+              ]
+            );
+          }
+        })
+        .catch((error) => {
+          console.log(error.message);
+          Alert.alert('Failed', 'Incorrect Current Password', [
+            {
+              text: 'Retry',
+            },
+          ]);
+        });
+    }
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#140F38' }}>
       <View style={styles.form}>
         <View style={styles.formControl}>
-          <Text style={styles.label}>Current Password</Text>
+          <Text style={styles.label}>Current Password :</Text>
           <TextInput
             placeholder='Current Password'
             autoCapitalize='none'
             secureTextEntry={true}
-            style={styles.input}
+            style={styles.inputV2}
             value={currentPassword}
             onChangeText={(currentPassword) =>
               setCurrentPassword(currentPassword)
@@ -65,12 +115,12 @@ function EditPassword(props) {
       </View>
       <View style={styles.form}>
         <View style={styles.formControl}>
-          <Text style={styles.label}>New Password</Text>
+          <Text style={styles.label}>New Password :</Text>
           <TextInput
             placeholder='New Password'
             autoCapitalize='none'
             secureTextEntry={true}
-            style={styles.input}
+            style={styles.inputV2}
             value={newPassword}
             onChangeText={(newPassword) => setNewPassword(newPassword)}
           />
@@ -92,7 +142,8 @@ function EditPassword(props) {
 
 const styles = StyleSheet.create({
   form: {
-    margin: 20,
+    marginHorizontal: 20,
+    marginVertical: 10,
   },
   formControl: {
     width: '100%',
@@ -101,6 +152,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     fontSize: 20,
     marginVertical: 8,
+    color: "#fff"
   },
   input: {
     fontFamily: 'Poppins',
@@ -128,6 +180,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 15,
     justifyContent: 'space-between',
+  },
+
+  inputV2: {
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
+    fontFamily: 'Poppins',
+    fontSize: 15,
   },
 });
 
