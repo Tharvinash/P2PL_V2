@@ -28,6 +28,63 @@ function EditPassword(props) {
     return user.reauthenticateWithCredential(cred);
   };
 
+  const changePassword = () => {
+console.log(24)
+    // let value;
+    // reauthenticate(currentPassword)
+    //   .then(() => {
+    //     if (
+    //       validator.isStrongPassword(newPassword, {
+    //         minLength: 8,
+    //         minLowercase: 1,
+    //         minUppercase: 1,
+    //         minNumbers: 1,
+    //         minSymbols: 1,
+    //       })
+    //     ) {
+    //       value = true;
+    //       console.log('Is Strong Password');
+    //     } else {
+    //       value = false;
+    //     }
+
+    //     var user = firebase.auth().currentUser;
+    //     if (value) {
+    //       user
+    //         .updatePassword(newPassword)
+    //         .then(() => {
+    //           Alert.alert('Success', 'Password has been changed', [
+    //             {
+    //               text: 'Ok',
+    //               onPress: () => props.navigation.navigate('Profile'),
+    //             },
+    //           ]);
+    //         })
+    //         .catch((error) => {
+    //           console.log(error.message);
+    //         });
+    //     } else {
+    //       return Alert.alert(
+    //         'Invalid password',
+    //         'The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ',
+    //         [
+    //           {
+    //             text: 'Retry',
+    //           },
+    //         ]
+    //       );
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.message);
+    //     Alert.alert('Failed', 'Incorrect Current Password', [
+    //       {
+    //         text: 'Retry',
+    //       },
+    //     ]);
+    //   });
+  };
+
   const onChangePasswordPress = () => {
     if (currentPassword === null || newPassword === null) {
       Alert.alert('Empty field', 'Kindly fill up the required fields', [
@@ -39,60 +96,9 @@ function EditPassword(props) {
         },
       ]);
     } else {
-      let value;
-      reauthenticate(currentPassword)
-        .then(() => {
-          if (
-            validator.isStrongPassword(newPassword, {
-              minLength: 8,
-              minLowercase: 1,
-              minUppercase: 1,
-              minNumbers: 1,
-              minSymbols: 1,
-            })
-          ) {
-            value = true;
-            console.log('Is Strong Password');
-          } else {
-            value = false;
-          }
-
-          var user = firebase.auth().currentUser;
-          if (value) {
-            user
-              .updatePassword(newPassword)
-              .then(() => {
-                Alert.alert('Success', 'Password has been changed', [
-                  {
-                    text: 'Ok',
-                    onPress: () => props.navigation.navigate('Profile'),
-                  },
-                ]);
-              })
-              .catch((error) => {
-                console.log(error.message);
-                console.log('boy');
-              });
-          } else {
-            return Alert.alert(
-              'Invalid password',
-              'The password must contain \n - at least 1 lowercase alphabetical character \n - at least 1 uppercase alphabetical character \n - at least 1 numeric character \n - at least one special character \n - must be eight characters or longer  ',
-              [
-                {
-                  text: 'Retry',
-                },
-              ]
-            );
-          }
-        })
-        .catch((error) => {
-          console.log(error.message);
-          Alert.alert('Failed', 'Incorrect Current Password', [
-            {
-              text: 'Retry',
-            },
-          ]);
-        });
+      setTimeout(function () {
+        changePassword();
+      }, 2000);
     }
   };
 
@@ -152,7 +158,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     fontSize: 20,
     marginVertical: 8,
-    color: "#fff"
+    color: '#fff',
   },
   input: {
     fontFamily: 'Poppins',

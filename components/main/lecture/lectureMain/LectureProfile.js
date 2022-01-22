@@ -129,8 +129,8 @@ function LectureProfile(props) {
 
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <Text style={styles.us}>{user.name}</Text>
-        <View style={{ marginTop: 20 }}>
-          <Text style={styles.us}>({user.faculty})</Text>
+        <View>
+          <Text style={styles.fac}>({user.faculty})</Text>
         </View>
         <TouchableOpacity
           style={styles.title}
@@ -246,47 +246,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  edit: {
-    width: 160,
-    height: 40,
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E3562A',
-    borderRadius: 16,
-    marginTop: 10,
-    marginHorizontal: 10,
-  },
-
-  dropdown: {
-    width: 160,
-    height: 42,
-    left: 20,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-
-    marginHorizontal: 110,
-  },
-
-  bb: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 40,
-    marginVertical: 20,
-  },
-
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-
-  imageContainer: {
-    borderRadius: (Dimensions.get('window').width * 0.7) / 2,
-    borderColor: 'black',
-    borderWidth: 3,
-    width: Dimensions.get('window').width * 0.3,
-    height: Dimensions.get('window').width * 0.3,
-    overflow: 'hidden',
-    marginVertical: Dimensions.get('window').height / 30,
-  },
 
   us: {
     textAlign: 'center',
@@ -295,6 +254,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     marginTop: -20,
+  },
+
+  fac: {
+    color: 'white',
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
+    alignItems: 'flex-end',
   },
 });
 

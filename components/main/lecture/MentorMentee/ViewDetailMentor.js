@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-} from "react-native";
-import PDFReader from "rn-pdf-reader-js";
-import { FAB } from "react-native-elements";
-import { Icon } from "react-native-elements";
-import Modal from "react-native-modal";
-import firebase from "firebase";
-require("firebase/firestore");
+} from 'react-native';
+import PDFReader from 'rn-pdf-reader-js';
+import { FAB } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
+import firebase from 'firebase';
+require('firebase/firestore');
 
 function ViewDetailMentor(props) {
   const [info, setInfo] = useState([]);
@@ -24,7 +24,7 @@ function ViewDetailMentor(props) {
   useEffect(() => {
     firebase
       .firestore()
-      .collection("RequestToBeMentor")
+      .collection('RequestToBeMentor')
       .doc(infoId)
       .get()
       .then((snapshot) => {
@@ -32,13 +32,13 @@ function ViewDetailMentor(props) {
           setInfo(snapshot.data());
           setarray(snapshot.data().problems);
         } else {
-          console.log("does not exist");
+          console.log('does not exist');
         }
       });
   }, []);
 
   const xxx = () => {
-    props.navigation.navigate("AddInGroupV2", {
+    props.navigation.navigate('AddInGroupV2', {
       did: infoId,
     });
   };
@@ -48,43 +48,66 @@ function ViewDetailMentor(props) {
       <ScrollView>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Name: {info.name} </Text>
+            <Text style={styles.label}>Name :</Text>
+            <Text style={styles.input}>{info.name} </Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Faculty: {info.faculty}</Text>
+            <Text style={styles.label}>Faculty :</Text>
+            <Text style={styles.input}>{info.faculty}</Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Year: {info.year} </Text>
+            <Text style={styles.label}>Year :</Text>
+            <Text style={styles.input}>{info.year} </Text>
           </View>
         </View>
 
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={styles.label}>Description: {info.description} </Text>
+            <Text style={styles.label}>Description :</Text>
+            <Text style={styles.input}>{info.description} </Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
             <Text style={styles.label}>Issue: </Text>
-            {array.map((item, key) => (
-              <Text key={key} style={styles.label}>
-                {" "}
-                - {item}{" "}
+            <View style={styles.input}>
+              {array.map((item, key) => (
+                <Text key={key} style={styles.labelIssue}>
+                  {' '}
+                  - {item}{' '}
+                </Text>
+              ))}
+            </View>
+          </View>
+        </View>
+        {info.qualificationProof ? (
+          <View style={styles.form}>
+            <View style={styles.formControl}>
+              <Text style={styles.label}>
+                Qualification: {info.qualification}{' '}
               </Text>
-            ))}
+              <Text style={styles.input}>
+                Qualification: {info.qualification}{' '}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.form}>
-          <View style={styles.formControl}>
-            <Text style={styles.label}>
-              Qualification: {info.qualification}{" "}
-            </Text>
+        ) : (
+          <View style={{...styles.form, marginBottom: 70}}>
+            <View style={styles.formControl}>
+              <Text style={styles.label}>
+                Qualification: {info.qualification}{' '}
+              </Text>
+              <Text style={styles.input}>
+               {info.qualification}{' '}
+              </Text>
+            </View>
           </View>
-        </View>
+        )}
+
         {info.qualificationProof && (
           <View style={styles.form}>
             <View style={styles.formControl}>
@@ -96,16 +119,16 @@ function ViewDetailMentor(props) {
                 >
                   <Text
                     style={{
-                      fontFamily: "Poppins",
+                      fontFamily: 'Poppins',
                     }}
                   >
                     Doc
                   </Text>
                   <Icon
-                    name="download-outline"
-                    type="ionicon"
+                    name='download-outline'
+                    type='ionicon'
                     size={25}
-                    color="#000"
+                    color='#000'
                   />
                 </TouchableOpacity>
               </View>
@@ -125,14 +148,13 @@ function ViewDetailMentor(props) {
         </TouchableOpacity>
       </Modal>
 
-
       <FAB
-        placement="right"
-        title="Add in group"
-        overlayColor="#000"
+        placement='right'
+        title='Add in group'
+        color='#E3562A'
         style={styles.floatButton}
         onPress={() => xxx()}
-        icon={<Icon name="add-outline" type="ionicon" size={30} color="#fff" />}
+        icon={<Icon name='add-outline' type='ionicon' size={30} color='#fff' />}
       />
     </View>
   );
@@ -141,66 +163,74 @@ function ViewDetailMentor(props) {
 const styles = StyleSheet.create({
   form: {
     marginHorizontal: 20,
-    marginVertical: 10,
+    marginVertical: 5,
   },
   formControl: {
-    width: "100%",
+    width: '100%',
   },
   label: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
+    marginVertical: 5,
     fontSize: 20,
   },
 
+  labelIssue: {
+    fontFamily: 'Poppins',
+    fontSize: 15,
+  },
+
   label2: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     fontSize: 16,
     marginTop: 5,
   },
 
   row: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
 
   input: {
-    fontFamily: "Poppins",
-    paddingHorizontal: 2,
-    paddingVertical: 5,
-    borderBottomColor: "#ccc",
-    borderBottomWidth: 1,
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
+    fontFamily: 'Poppins',
+    fontSize: 15,
   },
 
   logout: {
     width: 160,
     height: 40,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
+    backgroundColor: '#E3562A',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   icon: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingRight: 5,
   },
 
   attachment: {
-    backgroundColor: "#808080",
+    backgroundColor: '#808080',
     height: 45,
     marginRight: 5,
-    borderColor: "#000",
+    borderColor: '#000',
     borderRadius: 5,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingLeft: 10,
     elevation: 2,
     marginVertical: 3,

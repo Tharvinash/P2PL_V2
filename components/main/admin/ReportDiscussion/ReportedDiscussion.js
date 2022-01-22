@@ -101,14 +101,35 @@ function ReportedDiscussion(props) {
   );
 
   const closeRow = (rowKey) => {
-    firebase.firestore().collection('ReportedDiscussion').doc(rowKey).delete();
-    setX(2);
+    return Alert.alert(
+      'Ignore',
+      'Are you sure you want to ignore this Discussion ?',
+      [
+        // The "Yes" button
+        {
+          text: 'Yes',
+          onPress: () => {
+            firebase
+              .firestore()
+              .collection('ReportedDiscussion')
+              .doc(rowKey)
+              .delete();
+            setX(2);
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: 'No',
+
+        },
+      ]
+    );
   };
 
   const deleteRow = (x, y) => {
-
     //changes
-    const discussionToDelete = discussionList.find(el => el.id === y)
+    const discussionToDelete = discussionList.find((el) => el.id === y);
     const token = discussionToDelete.pushToken;
     const title = discussionToDelete.title;
     const discussionOwnerId = discussionToDelete.userId;
@@ -116,7 +137,7 @@ function ReportedDiscussion(props) {
     //changes
 
     return Alert.alert(
-      'Are your sure?',
+      'Delete',
       'Are you sure you want to remove this Discussion ?',
       [
         // The "Yes" button
@@ -135,16 +156,16 @@ function ReportedDiscussion(props) {
 
             firebase
               .firestore()
-              .collection("users")
+              .collection('users')
               .doc(discussionOwnerId)
-              .collection("Notifications")
+              .collection('Notifications')
               .add({
                 title: notificationTitle,
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
-                pageId: "null",
+                pageId: 'null',
                 description: title,
                 userId: userId,
-                dataType: "deleteId"
+                dataType: 'deleteId',
               });
 
             fetch('https://exp.host/--/api/v2/push/send', {
@@ -152,17 +173,17 @@ function ReportedDiscussion(props) {
               headers: {
                 Accept: 'application/json',
                 'Accept-Encoding': 'gzip, deflate',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
               },
               body: JSON.stringify({
                 to: token,
                 title: notificationTitle,
                 body: `${title}: Deleted`,
-                priority: "normal",
-                data: { deleteId: "null", description: title, userId: userId }
-              })
+                priority: 'normal',
+                data: { deleteId: 'null', description: title, userId: userId },
+              }),
             });
-            //  ------------------ Sending Push Notification To Author of Discussion ----------------------- 
+            //  ------------------ Sending Push Notification To Author of Discussion -----------------------
           },
         },
         // The "No" button
@@ -192,7 +213,15 @@ function ReportedDiscussion(props) {
   );
 
   return (
-    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#140F38',
+        paddingVertical: 10,
+      }}
+    >
       <SwipeListView
         disableRightSwipe
         data={data}
@@ -232,14 +261,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     width: 70,
-    height: "100%",
+    height: '100%',
     flex: 1,
     borderRadius: 16,
   },
 
   backRightBtnRight: {
     backgroundColor: 'red',
-    right:Dimensions.get('window').width < 400 ? 0 : -30,
+    right: Dimensions.get('window').width < 400 ? 0 : -30,
   },
 
   rowBack: {
@@ -248,10 +277,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingLeft: 15,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: 340,
     borderRadius: 16,
   },
 
@@ -259,13 +286,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     elevation: 5,
     backgroundColor: '#003565',
-    shadowOffset: { width: 1, height: 1 },
-    shadowColor: '#333',
-    shadowOpacity: 0.3,
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width:Dimensions.get('window').width < 400 ? 340 : 380
+    width: Dimensions.get('window').width < 400 ? 380 : 380,
   },
 
   cardContent: {

@@ -100,18 +100,6 @@ function LectureDiscussionView(props) {
               }}
             />
           </TouchableOpacity>
-
-          <TouchableOpacity>
-            <Icon
-              name='share-social-outline'
-              type='ionicon'
-              size={30}
-              color='#000'
-              onPress={() => {
-                onShare();
-              }}
-            />
-          </TouchableOpacity>
         </View>
       ),
     });

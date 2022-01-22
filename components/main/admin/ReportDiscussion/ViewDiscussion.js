@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,19 @@ import {
   ScrollView,
   Dimensions,
   TouchableOpacity,
-  Alert
-} from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
-import Modal from "react-native-modal";
-import { connect } from "react-redux";
-import firebase from "firebase";
-import * as Linking from "expo-linking";
-import Images from "react-native-scalable-image";
-import { timeDifference } from "../../../utils";
-import { version } from "react-dom";
-require("firebase/firestore");
+  Alert,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
+import { connect } from 'react-redux';
+import firebase from 'firebase';
+import * as Linking from 'expo-linking';
+import Images from 'react-native-scalable-image';
+import { timeDifference } from '../../../utils';
+import { version } from 'react-dom';
+import CommentCard from '../../component/commentCard';
+require('firebase/firestore');
 
 function LectureDiscussionView(props) {
   const { currentUser, options, discussionList } = props; //notification
@@ -29,12 +30,12 @@ function LectureDiscussionView(props) {
     useState(false);
   const [isReportVisible, setReportVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState('');
   const [userPosts, setUserPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [comment, setComment] = useState(null);
   const [data, setData] = useState(null);
-  const [editComment, setEditComment] = useState("");
+  const [editComment, setEditComment] = useState('');
   const [isVisible, setIsVisible] = useState(true);
   const [cu, setCu] = useState(currentUser);
   const [discussList, setDiscussList] = useState();
@@ -55,17 +56,18 @@ function LectureDiscussionView(props) {
 
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection('Discussion')
       .doc(props.route.params.rdid)
       .get()
       .then((snapshot) => {
         setUserPosts(snapshot.data());
+        console.log(snapshot.data());
       });
 
     firebase
       .firestore()
-      .collection("Comment")
-      .orderBy("creation", "asc")
+      .collection('Comment')
+      .orderBy('creation', 'asc')
       .get()
       .then((snapshot) => {
         let comment = snapshot.docs.map((doc) => {
@@ -78,14 +80,14 @@ function LectureDiscussionView(props) {
 
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(firebase.auth().currentUser.uid)
       .get()
       .then((snapshot) => {
         if (snapshot.exists) {
           setCu(snapshot.data());
         } else {
-          console.log("does not exist");
+          console.log('does not exist');
         }
       });
 
@@ -96,8 +98,8 @@ function LectureDiscussionView(props) {
     React.useCallback(() => {
       firebase
         .firestore()
-        .collection("Comment")
-        .orderBy("creation", "asc")
+        .collection('Comment')
+        .orderBy('creation', 'asc')
         .get()
         .then((snapshot) => {
           let comment = snapshot.docs.map((doc) => {
@@ -110,7 +112,7 @@ function LectureDiscussionView(props) {
 
       firebase
         .firestore()
-        .collection("Discussion")
+        .collection('Discussion')
         .doc(props.route.params.rdid)
         .get()
         .then((snapshot) => {
@@ -122,23 +124,23 @@ function LectureDiscussionView(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+        <View style={{ flexDirection: 'row', paddingRight: 15 }}>
           <TouchableOpacity>
             <Icon
-              name="remove-circle-outline"
-              type="ionicon"
+              name='remove-circle-outline'
+              type='ionicon'
               size={30}
-              color="#000"
+              color='#000'
               onPress={() => {
                 Ignore();
               }}
             />
           </TouchableOpacity>
           <Icon
-            name="trash-outline"
-            type="ionicon"
+            name='trash-outline'
+            type='ionicon'
             size={30}
-            color="#000"
+            color='#000'
             onPress={() => Delete()}
           />
         </View>
@@ -147,7 +149,9 @@ function LectureDiscussionView(props) {
   }, [data]);
 
   const Delete = () => {
-    const discussionToDelete = discussionList.find(el => el.id === discussionId);
+    const discussionToDelete = discussionList.find(
+      (el) => el.id === discussionId
+    );
     const token = discussionToDelete.pushToken;
     const title = discussionToDelete.title;
     const discussionOwnerId = discussionToDelete.userId;
@@ -155,40 +159,39 @@ function LectureDiscussionView(props) {
     const notificationTitle = `Your discussion entitled ${title} has been deleted following the receival of reports from the user/users`;
 
     return Alert.alert(
-      "Are your sure?",
-      "Are you sure you want to remove this Discussion ?",
+      'Delete',
+      'Are you sure you want to remove this Discussion ?',
       [
         // The "Yes" button
         {
-          text: "Yes",
+          text: 'Yes',
           onPress: () => {
             setIsVisible(false);
             firebase
               .firestore()
-              .collection("Discussion")
+              .collection('Discussion')
               .doc(discussionId)
               .delete();
             firebase
               .firestore()
-              .collection("ReportedDiscussion")
+              .collection('ReportedDiscussion')
               .doc(ReportedDiscussionId)
               .delete();
-
 
             //  -------------------- Sending Push Notification To Author of Discussion -----------------------
             setData(60);
             firebase
               .firestore()
-              .collection("users")
+              .collection('users')
               .doc(discussionOwnerId)
-              .collection("Notifications")
+              .collection('Notifications')
               .add({
                 title: notificationTitle,
                 creation: firebase.firestore.FieldValue.serverTimestamp(),
-                pageId: "null",
+                pageId: 'null',
                 description: title,
                 userId: userId,
-                dataType: "deleteId"
+                dataType: 'deleteId',
               });
 
             fetch('https://exp.host/--/api/v2/push/send', {
@@ -196,153 +199,87 @@ function LectureDiscussionView(props) {
               headers: {
                 Accept: 'application/json',
                 'Accept-Encoding': 'gzip, deflate',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
               },
               body: JSON.stringify({
                 to: token,
                 title: notificationTitle,
                 body: `${title}: Deleted`,
-                priority: "normal",
-                data: { deleteId: "null", description: title, userId: userId }
-              })
+                priority: 'normal',
+                data: { deleteId: 'null', description: title, userId: userId },
+              }),
             });
-            //  ------------------ Sending Push Notification To Author of Discussion ----------------------- 
+            //  ------------------ Sending Push Notification To Author of Discussion -----------------------
             props.navigation.goBack();
           },
         },
         // The "No" button
         // Does nothing but dismiss the dialog when tapped
         {
-          text: "No",
+          text: 'No',
         },
       ]
     );
   };
 
   const Ignore = () => {
-    firebase
-      .firestore()
-      .collection("ReportedDiscussion")
-      .doc(ReportedDiscussionId)
-      .delete();
-    props.navigation.goBack();
+    return Alert.alert(
+      'Ignore',
+      'Are you sure you want to ignore this Discussion ?',
+      [
+        // The "Yes" button
+        {
+          text: 'Yes',
+          onPress: () => {
+            firebase
+              .firestore()
+              .collection('ReportedDiscussion')
+              .doc(ReportedDiscussionId)
+              .delete();
+            props.navigation.goBack();
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: 'No',
+        },
+      ]
+    );
   };
 
   if (user === null) {
     return <View />;
   }
 
-  if (!isVisible) { return (<View></View>) }
-
+  if (!isVisible) {
+    return <View></View>;
+  }
 
   return (
     <View style={styles.container}>
       <FlatList
-        horizontal={false}
-        extraData={comment}
-        data={comment}
-        renderItem={({ item }) =>
-          item.discussionId === discussionId ? (
-            <View>
-              <View style={{ flexDirection: "row" }}>
-                <View>
-                  <Image
-                    style={{
-                      marginRight: 15,
-                      width: 35,
-                      height: 35,
-                      borderRadius: 35 / 2,
-                    }}
-                    source={{
-                      uri: item.image,
-                    }}
-                  />
-                  <View
-                    style={{
-                      marginRight: 10,
-                      paddingTop: 10,
-                    }}
-                  ></View>
-                </View>
-                <View style={styles.commentCon}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.userT}>{item.postedBy} </Text>
-                    {item.creation === null ? (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        Now
-                      </Text>
-                    ) : (
-                      <Text style={(styles.userC, { marginRight: 20 })}>
-                        {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
-                    )}
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={styles.userC}>{item.comment}</Text>
-                  </View>
-                  <View style={{ flexDirection: "row" }}>
-                    <Icon
-                      style={{
-                        paddingLeft: 10,
-                      }}
-                      name="chatbubble-ellipses-outline"
-                      type="ionicon"
-                      size={20}
-                      color="#000"
-                      onPress={() =>
-                        props.navigation.navigate("ViewReply", {
-                          cid: item.id,
-                          time: timeDifference(
-                            new Date(),
-                            item.creation.toDate()
-                          ),
-                          xxx: item.likeBy.includes(userId),
-                          mainCommentAuthorName: item.postedBy,
-                        })
-                      }
-                    />
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        marginRight: 3,
-                        fontFamily: "Poppins",
-                      }}
-                    >
-                      ({item.numberOfReply})
-                    </Text>
-                  </View>
+        ListHeaderComponent={
+          <View>
+            <View style={{ flexDirection: 'row'}}>
+              <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+                <View style={{ width: '100%' }}>
+                  <Text style={styles.title}>{userPosts.title}</Text>
                 </View>
               </View>
             </View>
-          ) : null
-        }
-
-
-        ListHeaderComponent={
-          <View>
-            <Text style={styles.title}>{userPosts.title}</Text>
 
             {userPosts.downloadURL && (
               <View
                 style={{
-                  flexDirection: "row",
+                  flexDirection: 'row',
                   paddingBottom: 10,
-                  justifyContent: "center",
+                  justifyContent: 'center',
                 }}
               >
                 {/* <Image style={styles.image} source={{ uri: userPosts.downloadURL }} /> */}
                 <Images
-                  width={Dimensions.get("window").width} // height will be calculated automatically
+                  width={Dimensions.get('window').width} // height will be calculated automatically
                   source={{ uri: userPosts.downloadURL }}
                 />
               </View>
@@ -354,62 +291,99 @@ function LectureDiscussionView(props) {
             <View style={{ paddingBottom: 10 }}>
               <Text style={styles.comT}>Comments:</Text>
             </View>
-
-            <View style={{ justifyContent: "center", alignItems: "center" }}></View>
-          </View>}
+          </View>
+        }
+        horizontal={false}
+        extraData={comment}
+        data={comment}
+        renderItem={({ item }) =>
+          item.discussionId === discussionId ? (
+            <CommentCard
+              picture={item.image}
+              status={2}
+              verify={item.verify}
+              postedBy={item.postedBy}
+              creation={item.creation}
+              comment={item.comment}
+              attachedDocument={item.attachedDocument}
+              attachedImage={item.attachedImage}
+              numOfLike={item.numOfLike}
+              likeBy={item.likeBy.includes(userId)}
+              removeLike={() =>
+                removeLike(item.id, item.numOfLike, item.likeBy)
+              }
+              xxx={() => toggleVisibility(item.id)}
+              addLike={() => addLike(item.id, item.numOfLike, item.likeBy)}
+              firstUserId={item.userId}
+              secondUserId={userId}
+              delete={() => Delete(item.id)}
+              downlaodDoc={() => downlaodDoc()}
+              editComment={() => EditComment(item.id)}
+              numberOfReply={item.numberOfReply}
+              removeVerifyComment={() => removeVerifyComment(item.id)}
+              verifyComment={() => verifyComment(item.id)}
+              onSelect={() =>
+                props.navigation.navigate('Reply Discussion', {
+                  cid: item.id,
+                  time: timeDifference(new Date(), item.creation.toDate()),
+                  xxx: item.likeBy.includes(userId),
+                  mainCommentAuthorName: item.postedBy,
+                  mainCommentUserId: item.userId,
+                  pushToken: item.pushToken,
+                  discussionId: discussionId,
+                })
+              }
+            />
+          ) : null
+        }
       />
-
-
     </View>
-  )
-
-
-
+  );
 }
 
 ////(credits < 30) ? "freshman" : (credits >= 30 && credits < 60) ?"sophomore" : (credits >= 60 && credits < 90) ? "junior" : "senior"
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
+    margin: 10,
     // marginTop: 20,
     marginBottom: 5,
     // marginLeft: 20,
     // marginLeft:20
   },
   container3: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   titlex: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
 
   titley: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 25,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    fontWeight: "700",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    fontWeight: '700',
     marginBottom: 20,
   },
   card: {
     borderRadius: 16,
     elevation: 5,
-    backgroundColor: "#140F38",
+    backgroundColor: '#140F38',
     shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.3,
     shadowRadius: 2,
     marginHorizontal: 4,
@@ -424,13 +398,13 @@ const styles = StyleSheet.create({
 
   input: {
     height: 60,
-    borderColor: "#E3562A",
+    borderColor: '#E3562A',
     borderWidth: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     width: 340,
     borderRadius: 12,
     padding: 10,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   logo: {
@@ -439,23 +413,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontFamily: "Poppins",
-    lineHeight: 0,
-    fontWeight: "700",
+    fontFamily: 'PoppinsMedium',
     marginBottom: 5,
   },
   image: {
     flex: 1,
     //aspectRatio: 3 / 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     width: 300,
     height: 300,
-    resizeMode: "contain",
+    resizeMode: 'contain',
   },
 
   commentCon: {
-    borderColor: "#E3562A",
+    borderColor: '#E3562A',
     borderBottomWidth: 5,
     width: 300,
     paddingVertical: 3,
@@ -467,48 +439,48 @@ const styles = StyleSheet.create({
 
   descT: {
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   comT: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 18,
   },
 
   userT: {
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
   },
 
   userC: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     lineHeight: 20,
     fontSize: 15,
   },
 
   userT: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     fontSize: 15,
   },
 
   blogout: {
     width: 140,
     height: 40,
-    backgroundColor: "#E3562A",
-    borderColor: "#E3562A",
+    backgroundColor: '#E3562A',
+    borderColor: '#E3562A',
     borderRadius: 16,
     marginTop: 20,
   },
 
   Ltext: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Poppins",
-    fontWeight: "700",
+    color: '#fff',
+    textAlign: 'center',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
     fontSize: 15,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     paddingTop: 8,
   },
 });
@@ -517,7 +489,7 @@ const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
   comments: store.userState.comment,
   options: store.userState.option,
-  discussionList: store.userState.posts
+  discussionList: store.userState.posts,
 });
 
 export default connect(mapStateToProps, null)(LectureDiscussionView);

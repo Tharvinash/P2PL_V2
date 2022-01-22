@@ -66,7 +66,7 @@ function CreateRoom(props) {
   };
 
   return (
-    <ScrollView>
+    <View style={{ flex: 1, backgroundColor: '#140F38' }}>
       <View style={styles.form}>
         <View style={styles.formControl}>
           <Text style={styles.label}>Discussion Room Title : </Text>
@@ -109,14 +109,14 @@ function CreateRoom(props) {
           </View>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   form: {
-    marginLeft: 20,
-    marginVertical: 10,
+    marginHorizontal: 20,
+    marginVertical: 5,
   },
   formControl: {
     width: "100%",
@@ -124,6 +124,8 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Poppins",
     fontSize: 20,
+    marginVertical: 8,
+    color: '#fff',
   },
 
   label2: {
@@ -137,11 +139,13 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    fontFamily: "Poppins",
-    paddingHorizontal: 2,
-    paddingVertical: 5,
-    borderBottomColor: "#ccc",
-    borderBottomWidth: 1,
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
+    fontFamily: 'Poppins',
+    fontSize: 15,
   },
 
   logout: {

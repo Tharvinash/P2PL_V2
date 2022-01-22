@@ -52,15 +52,6 @@ function HomeStackScreen() {
                   onPress={() => navigation.navigate("Search Results")}
                 />
               </TouchableOpacity>
-
-              <TouchableOpacity>
-                <Icon
-                  name="notifications-outline"
-                  type="ionicon"
-                  size={30}
-                  color="#000"
-                />
-              </TouchableOpacity>
             </View>
           ),
           headerStyle: { backgroundColor: "#fff" },

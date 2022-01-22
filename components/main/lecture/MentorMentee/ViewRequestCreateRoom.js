@@ -488,7 +488,7 @@ function ViewRequestCreateRoom(props) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#140F38' }}>
       <View>
         <FlatList
           data={list}
@@ -500,7 +500,7 @@ function ViewRequestCreateRoom(props) {
               <TouchableOpacity
                 onPress={() => chageList(item.id)}
                 style={{
-                  backgroundColor: item.id == filter ? '#003565' : '#140F38',
+                  backgroundColor: item.id == filter ? '#E3562A' : '#003565',
                   marginHorizontal: 5,
                   width: Dimensions.get('window').width * 0.5,
                   height: 50,
@@ -550,7 +550,7 @@ function ViewRequestCreateRoom(props) {
                 name='filter-outline'
                 type='ionicon'
                 size={30}
-                color='#000'
+                color='#fff'
                 onPress={FilterRequest}
               />
             </View>
@@ -846,10 +846,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     elevation: 5,
     backgroundColor: '#003565',
-    shadowOffset: { width: 1, height: 1 },
-    shadowColor: '#333',
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
     marginHorizontal: 5,
     marginVertical: 5,
     width: Dimensions.get('window').width * 0.95,
