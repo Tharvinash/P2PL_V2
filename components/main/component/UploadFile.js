@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Dimensions
 } from "react-native";
 import { Icon } from "react-native-elements";
 
@@ -30,7 +31,7 @@ const UploadFile = (props) => {
         />
       </View>
 
-      <View style={{ flexDirection: "row", justifyContent: "center", alignContent: "space-between",}}>
+      <View style={{ flexDirection: "row", justifyContent: "center", alignContent: "space-between"}}>
         <View style={{ paddingHorizontal: 20}}>
           <TouchableOpacity style={styles.blogout} onPress={props.uploadDoc}>
             <Text style={styles.Ltext}>Done</Text>
@@ -49,6 +50,8 @@ const UploadFile = (props) => {
 const styles = StyleSheet.create({
   searchSection: {
     flexDirection: "row",
+    width: Dimensions.get('window').width * 0.9,
+    height: Dimensions.get('window').width * 0.15,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff",
