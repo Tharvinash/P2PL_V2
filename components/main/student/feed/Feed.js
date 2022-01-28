@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -9,12 +9,12 @@ import {
   Image,
   ActivityIndicator,
   Dimensions,
-} from "react-native";
-import { Icon } from "react-native-elements";
-import { connect } from "react-redux";
-import { timeDifference } from "../../../utils";
-import firebase from "firebase";
-require("firebase/firestore");
+} from 'react-native';
+import { Icon } from 'react-native-elements';
+import { connect } from 'react-redux';
+import { timeDifference } from '../../../utils';
+import firebase from 'firebase';
+require('firebase/firestore');
 
 function Feed(props) {
   const { posts, currentUser } = props;
@@ -41,14 +41,14 @@ function Feed(props) {
       LoadDiscussion();
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(firebase.auth().currentUser.uid)
         .get()
         .then((snapshot) => {
           if (snapshot.exists) {
             setCu(snapshot.data().filteredFeed);
           } else {
-            console.log("does not exist");
+            console.log('does not exist');
           }
         });
     }, [])
@@ -58,8 +58,8 @@ function Feed(props) {
     setLoadingMore(!loadingMore);
     firebase
       .firestore()
-      .collection("Discussion")
-      .orderBy("creation", "desc")
+      .collection('Discussion')
+      .orderBy('creation', 'desc')
       .limit(numberOfItem)
       .get()
       .then((snapshot) => {
@@ -76,8 +76,8 @@ function Feed(props) {
   const FetchAllDiscussion = () => {
     firebase
       .firestore()
-      .collection("Discussion")
-      .orderBy("creation", "desc")
+      .collection('Discussion')
+      .orderBy('creation', 'desc')
       .get()
       .then((snapshot) => {
         let posts = snapshot.docs.map((doc) => {
@@ -92,12 +92,12 @@ function Feed(props) {
   const ListFooterComponent = () => (
     <View
       style={{
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#140F38",
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#140F38',
       }}
     >
-      <ActivityIndicator size="large" color="#E3562A" />
+      <ActivityIndicator size='large' color='#E3562A' />
     </View>
   );
 
@@ -137,15 +137,15 @@ function Feed(props) {
           <TouchableOpacity
             style={{ flex: 1 }}
             onPress={() =>
-              props.navigation.navigate("Discussion", {
+              props.navigation.navigate('Discussion', {
                 did: item.id,
-                owner:item.userId  //changes
+                owner: item.userId, //changes
               })
             }
           >
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                <View style={{ flexDirection: "row", width: "100%" }}>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+                <View style={{ flexDirection: 'row', width: '100%' }}>
                   <Image
                     style={{
                       width: 35,
@@ -165,19 +165,22 @@ function Feed(props) {
                 {timeDifference(new Date(), item.creation.toDate())}
               </Text>
             </View>
-
-            <Text numberOfLines={2} style={styles.title}>
-              {item.title}
-            </Text>
-
             <View
               style={{
-                backgroundColor: "#003565",
-                borderRadius: 16,
-                justifyContent: "center",
+                borderBottomColor: '#fff',
+                borderRightColor: '#003565',
+                borderLeftColor: '#003565',
+                borderWidth: 2,
+                borderTopColor:"#003565",
+                marginBottom:5
               }}
             >
-              <Text style={{ color: "#fff" }}>{item.faculty}</Text>
+              <Text numberOfLines={2} style={styles.title}>
+                {item.title}
+              </Text>
+            </View>
+            <View>
+              <Text style={{ color: '#fff' }}>{item.faculty}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -233,9 +236,9 @@ function Feed(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   image: {
@@ -243,40 +246,40 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 1,
   },
   postedTime: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
   //name
   userName: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "PoppinsMedium",
+    fontFamily: 'PoppinsMedium',
   },
 
   //title
   title: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 25,
-    fontFamily: "PoppinsSemiBold",
+    fontFamily: 'PoppinsSemiBold',
     lineHeight: 30,
   },
 
   //faculty
   faculty: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   card: {
     //16
-    borderRadius: Dimensions.get("window").width / 24.5,
+    borderRadius: Dimensions.get('window').width / 24.5,
     elevation: 5,
-    backgroundColor: "#003565",
+    backgroundColor: '#003565',
     marginHorizontal: 4,
     marginVertical: 6,
-    width: Dimensions.get("window").width * 0.95,
+    width: Dimensions.get('window').width * 0.95,
   },
 
   cardContent: {
