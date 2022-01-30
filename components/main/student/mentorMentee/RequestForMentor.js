@@ -6,7 +6,7 @@ import {
   TextInput,
   ActivityIndicator,
   ScrollView,
-  Alert
+  Alert,
 } from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { connect } from 'react-redux';
@@ -30,7 +30,6 @@ function requestformentor(props) {
   const userId = firebase.auth().currentUser.uid;
 
   const UploadReq = () => {
-    setModalVisible(!isModalVisible);
     if (problem1 === true) {
       finalValue.push('Academic');
     }
@@ -47,6 +46,32 @@ function requestformentor(props) {
       finalValue.push('Personal Projects');
     }
 
+    if (finalValue.length === 0) {
+      return Alert.alert(
+        'Issue cannot be empty ',
+        'Please check atlest one issue',
+        [
+          // The "Yes" button
+          {
+            text: 'Ok',
+          },
+        ]
+      );
+    }
+
+    if (desc.trim() === '') {
+      return Alert.alert(
+        'Description cannot be empty ',
+        'Please enter description',
+        [
+          // The "Yes" button
+          {
+            text: 'Ok',
+          },
+        ]
+      );
+    }
+    setModalVisible(!isModalVisible); 
     firebase
       .firestore()
       .collection('RequestForMentor')

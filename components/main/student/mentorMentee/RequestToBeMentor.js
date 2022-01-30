@@ -45,21 +45,87 @@ function requesttobementor(props) {
     console.log(result);
   };
 
+  const removeDocument = () =>{
+    setName(null)
+  }
+
   const uploadDoc = async () => {
+    if (problem1 === true) {
+      finalValue.push('Academic');
+    }
+    if (problem2 === true) {
+      finalValue.push('Internship');
+    }
+    if (problem3 === true) {
+      finalValue.push('Subject Registration');
+    }
+    if (problem4 === true) {
+      finalValue.push('Club Activities');
+    }
+    if (problem5 === true) {
+      finalValue.push('Personal Projects');
+    }
+
+    if (finalValue.length === 0) {
+      return Alert.alert(
+        'Issue cannot be empty ',
+        'Please check atlest one issue',
+        [
+          // The "Yes" button
+          {
+            text: 'Ok',
+          },
+        ]
+      );
+    }
+
+    if (desc.trim() === '') {
+      return Alert.alert(
+        'Description cannot be empty ',
+        'Please enter description',
+        [
+          // The "Yes" button
+          {
+            text: 'Ok',
+          },
+        ]
+      );
+    }
+
+    if (qualification.trim() === '') {
+      return Alert.alert(
+        'Qualification cannot be empty ',
+        'Please enter qualification',
+        [
+          // The "Yes" button
+          {
+            text: 'Ok',
+          },
+        ]
+      );
+    }
+
+    if (name != null) {
+      if (name.slice(-4) !== '.pdf') {
+        return Alert.alert(
+          'Only PDF file can be uploaded ',
+          'Please upload a PDF file',
+          [
+            // The "Yes" button
+            {
+              text: 'Ok',
+            },
+          ]
+        );
+      }
+    }
+
     setModalVisible(!isModalVisible);
     if (name != null) {
-      // if (name.includes('.docx')) {
-      //   const childPath = `doc/${1234}/${name}`;
-      //   console.log(childPath);
-      // } else {
       const childPath = `doc/${1234}/${Math.random().toString(36)}`;
-      //}
-
       const response = await fetch(Doc);
       const blob = await response.blob();
-
       const task = firebase.storage().ref().child(childPath).put(blob);
-
       const taskProgress = (snapshot) => {
         console.log(`transferred: ${snapshot.bytesTransferred}`);
       };
@@ -81,22 +147,6 @@ function requesttobementor(props) {
   };
 
   const savePostDoc = (downloadURL) => {
-    if (problem1 === true) {
-      finalValue.push('Academic');
-    }
-    if (problem2 === true) {
-      finalValue.push('Internship');
-    }
-    if (problem3 === true) {
-      finalValue.push('Subject Registration');
-    }
-    if (problem4 === true) {
-      finalValue.push('Club Activities');
-    }
-    if (problem5 === true) {
-      finalValue.push('Personal Projects');
-    }
-
     firebase
       .firestore()
       .collection('RequestToBeMentor')
@@ -246,12 +296,21 @@ function requesttobementor(props) {
         <View
           style={{ justifyContent: 'center', marginLeft: 20, marginBottom: 10 }}
         >
-          <TouchableOpacity
-            style={styles.logout}
-            onPress={() => pickDocument()}
-          >
-            <Text style={styles.Ltext}>Upload Document </Text>
-          </TouchableOpacity>
+          {name === null ? (
+            <TouchableOpacity
+              style={styles.logout}
+              onPress={() => pickDocument()}
+            >
+              <Text style={styles.Ltext}>Upload Document </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.logout}
+              onPress={() => removeDocument()}
+            >
+              <Text style={styles.Ltext}>Remove Document </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
       <FAB

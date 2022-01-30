@@ -8,7 +8,6 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import CheckBox from 'expo-checkbox';
 import firebase from 'firebase';
 require('firebase/firestore');
 import { FAB } from 'react-native-elements';
@@ -28,7 +27,7 @@ function ContactAdmin({ navigation }) {
   const [desc, setDesc] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [facultyData, setFacultyData] = useState([]);
-
+  const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   useEffect(() => {
     const loadAsync = async () => {
       await firebase
@@ -48,6 +47,74 @@ function ContactAdmin({ navigation }) {
   }, []);
 
   const UploadReq = () => {
+
+    if (userName.trim() === '') {
+      return Alert.alert(
+        'Full name cannot be empty ',
+        'Please enter your full name',
+        [
+          // The "Yes" button
+          {
+            text: 'Retry',
+          },
+        ]
+      );
+    }
+    
+    if (!email.match(mailformat)) {
+      return Alert.alert(
+        'Invalid Email Address',
+        'You have entered and invalid email address',
+        [
+          // The "Yes" button
+          {
+            text: 'Retry',
+          },
+        ]
+      );
+    }
+
+    if (fac.trim() === '') {
+      return Alert.alert(
+        'Faculty cannot be empty ',
+        'Please enter your faculty',
+        [
+          // The "Yes" button
+          {
+            text: 'Retry',
+          },
+        ]
+      );
+    }
+
+    if (probDesc.trim() === '') {
+      return Alert.alert(
+        'Problem description be empty ',
+        'Please enter your problem description',
+        [
+          // The "Yes" button
+          {
+            text: 'Retry',
+          },
+        ]
+      );
+    }
+
+    if(checked === 'first'){
+      if (maticNum.trim() === '') {
+        return Alert.alert(
+          'Matric number be empty ',
+          'Please enter your matric number',
+          [
+            // The "Yes" button
+            {
+              text: 'Retry',
+            },
+          ]
+        );
+      }
+    }
+
     setModalVisible(!isModalVisible);
     let x = '';
     if (checked === 'first') {
