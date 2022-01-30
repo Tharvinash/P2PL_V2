@@ -99,7 +99,7 @@ function ViewDetailMentor(props) {
           <View style={{...styles.form, marginBottom: 70}}>
             <View style={styles.formControl}>
               <Text style={styles.label}>
-                Qualification: {info.qualification}{' '}
+                {info.qualification}{' '}
               </Text>
               <Text style={styles.input}>
                {info.qualification}{' '}
