@@ -4,18 +4,17 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  FlatList,
-  TouchableOpacity,
+  ActivityIndicator,
   ScrollView,
+  Alert
 } from 'react-native';
 import CheckBox from 'expo-checkbox';
-import { Checkbox } from 'react-native-paper';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 require('firebase/firestore');
 import { FAB } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
-import SnackBar from 'react-native-snackbar-component';
+import Modal from 'react-native-modal';
 
 function requestformentor(props) {
   const { currentUser } = props;
@@ -27,9 +26,11 @@ function requestformentor(props) {
   const [finalValue, setFinalValue] = useState([]);
   const [user, setUser] = useState(currentUser);
   const [desc, setDesc] = useState('');
+  const [isModalVisible, setModalVisible] = useState(false);
   const userId = firebase.auth().currentUser.uid;
 
   const UploadReq = () => {
+    setModalVisible(!isModalVisible);
     if (problem1 === true) {
       finalValue.push('Academic');
     }
@@ -63,7 +64,19 @@ function requestformentor(props) {
         pushToken: user.pushToken, // change for notification
       })
       .then(function () {
-        props.navigation.goBack();
+        setModalVisible(!isModalVisible);
+        return Alert.alert(
+          'Request send succeccfully',
+          'The lecture will review this requst for further action',
+          [
+            {
+              text: 'Ok',
+              onPress: () => {
+                props.navigation.goBack();
+              },
+            },
+          ]
+        );
       });
   };
 
@@ -139,6 +152,11 @@ function requestformentor(props) {
         onPress={() => UploadReq()}
         icon={<Icon reverse name='send' type='font-awesome' color='#E3562A' />}
       />
+      <Modal isVisible={isModalVisible}>
+        <View style={{ justifyContent: 'center', flex: 1 }}>
+          <ActivityIndicator size='large' color='#E3562A' />
+        </View>
+      </Modal>
     </View>
   );
 }

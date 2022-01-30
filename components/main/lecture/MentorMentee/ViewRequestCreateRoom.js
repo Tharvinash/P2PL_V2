@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Dimensions,
   TextInput,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import firebase from 'firebase';
 import { connect } from 'react-redux';
@@ -27,6 +29,7 @@ function ViewRequestCreateRoom(props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isAddTrue, setIsAddTrue] = useState(false);
+  const [isModalVisibleV2, setModalVisibleV2] = useState(false);
   const userId = firebase.auth().currentUser.uid;
   const title = props.route.params.title;
   const desc = props.route.params.desc;
@@ -260,6 +263,7 @@ function ViewRequestCreateRoom(props) {
   };
 
   const createRoom = () => {
+    setModalVisibleV2(!isModalVisibleV2);
     let a = mentee;
 
     //adding creator
@@ -287,7 +291,7 @@ function ViewRequestCreateRoom(props) {
           .delete();
       }
     }
-     
+
     firebase
       .firestore()
       .collection('DiscussionRoom')
@@ -314,45 +318,48 @@ function ViewRequestCreateRoom(props) {
         interaction: [0, 0, 0, 0, 0, 0],
       })
       .then(function () {
-         //change for notification
-         for (let i = 0; i < mentee.length; i++) {
-          if(mentee[i].status == 0){
+        //change for notification
+        for (let i = 0; i < mentee.length; i++) {
+          if (mentee[i].status == 0) {
             continue;
           }
 
           firebase
             .firestore()
-            .collection("users")
+            .collection('users')
             .doc(mentee[i].userId)
-            .collection("Notifications")
+            .collection('Notifications')
             .add({
               title: `You have been added to a discussion room`,
               creation: firebase.firestore.FieldValue.serverTimestamp(),
-              pageId: "default",
+              pageId: 'default',
               description: `${title}`,
               userId: userId,
-              dataType: "mmid"
+              dataType: 'mmid',
             });
-            
+
           fetch('https://exp.host/--/api/v2/push/send', {
             method: 'POST',
             headers: {
               Accept: 'application/json',
               'Accept-Encoding': 'gzip, deflate',
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               to: mentee[i].pushToken,
               title: `You have been added to a discussion room`,
               body: `Tap to see the rooms `,
-              priority: "normal",
-              data: { mmid: "navigate", description:`${title}`, userId: userId }
-            })
+              priority: 'normal',
+              data: {
+                mmid: 'navigate',
+                description: `${title}`,
+                userId: userId,
+              },
+            }),
           });
-
-          
         }
         //change for notification
+        setModalVisibleV2(!isModalVisibleV2);
         props.navigation.navigate('Room');
       });
   };
@@ -397,7 +404,7 @@ function ViewRequestCreateRoom(props) {
             image: updatedUser[i].image,
             userId: updatedUser[i].id,
             mc: updatedUser[i].matricNumber,
-            pushToken:updatedUser[i].pushToken
+            pushToken: updatedUser[i].pushToken,
           });
         }
 
@@ -600,17 +607,17 @@ function ViewRequestCreateRoom(props) {
                     {mentor.some((el) => el.userId === item.userId) ||
                     mentee.some((el) => el.userId === item.userId) ? (
                       <TouchableOpacity
-                        // onPress={() =>
-                        //   addInGroup({
-                        //     userId: item.userId,
-                        //     name: item.name,
-                        //     mc: item.matricNumber,
-                        //     image: item.image,
-                        //     reqId: item.id,
-                        //     year: item.year,
-                        //     pushToken: item.pushToken // change for notification
-                        //   })
-                        // }
+                      // onPress={() =>
+                      //   addInGroup({
+                      //     userId: item.userId,
+                      //     name: item.name,
+                      //     mc: item.matricNumber,
+                      //     image: item.image,
+                      //     reqId: item.id,
+                      //     year: item.year,
+                      //     pushToken: item.pushToken // change for notification
+                      //   })
+                      // }
                       >
                         <Icon
                           name='remove-outline'
@@ -630,7 +637,7 @@ function ViewRequestCreateRoom(props) {
                             image: item.image,
                             reqId: item.id,
                             year: item.year,
-                            pushToken: item.pushToken //change for notification
+                            pushToken: item.pushToken, //change for notification
                           })
                         }
                       >
@@ -648,16 +655,16 @@ function ViewRequestCreateRoom(props) {
                     {mentor.some((el) => el.userId === item.id) ||
                     mentee.some((el) => el.userId === item.id) ? (
                       <TouchableOpacity
-                        // onPress={() =>
-                        //   addInGroup({
-                        //     userId: item.id,
-                        //     name: item.name,
-                        //     mc: item.matricNumber,
-                        //     image: item.image,
-                        //     year: item.year,
-                        //     pushToken: item.pushToken // change for notification
-                        //   })
-                        // }
+                      // onPress={() =>
+                      //   addInGroup({
+                      //     userId: item.id,
+                      //     name: item.name,
+                      //     mc: item.matricNumber,
+                      //     image: item.image,
+                      //     year: item.year,
+                      //     pushToken: item.pushToken // change for notification
+                      //   })
+                      // }
                       >
                         <Icon
                           name='remove-outline'
@@ -676,7 +683,7 @@ function ViewRequestCreateRoom(props) {
                             mc: item.matricNumber,
                             image: item.image,
                             year: item.year,
-                            pushToken: item.pushToken // change for notification
+                            pushToken: item.pushToken, // change for notification
                           })
                         }
                       >
@@ -830,6 +837,11 @@ function ViewRequestCreateRoom(props) {
           )}
         </View>
       )}
+      <Modal isVisible={isModalVisibleV2}>
+        <View style={{ justifyContent: 'center', flex: 1 }}>
+          <ActivityIndicator size='large' color='#E3562A' />
+        </View>
+      </Modal>
     </View>
   );
 }

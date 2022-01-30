@@ -53,8 +53,8 @@ function Reply(props) {
   const [mainCommentAuthorName, setMainCommentAuthorName] = useState(
     props.route.params.mainCommentAuthorName
   );
-  const [replyCommentToken, setReplyCommentToken] = useState();//changes for notification
-  const [repliedSubCommentUserId, setRepliedSubCommentUserId] = useState(null);//noti
+  const [replyCommentToken, setReplyCommentToken] = useState(); //changes for notification
+  const [repliedSubCommentUserId, setRepliedSubCommentUserId] = useState(null); //noti
 
   const [isEditCommentModalVisible, setEditCommentModalVisible] =
     useState(false);
@@ -76,7 +76,7 @@ function Reply(props) {
 
   //changes
   const pushToken = props.route.params.pushToken;
-  const mainCommentUserId = props.route.params.mainCommentUserId;//changes conti/noti
+  const mainCommentUserId = props.route.params.mainCommentUserId; //changes conti/noti
   const discussionId = props.route.params.discussionId;
   //changes
 
@@ -136,15 +136,14 @@ function Reply(props) {
   const deleteNotifications = () => {
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(firebase.auth().currentUser.uid)
-      .collection("Notifications")
+      .collection('Notifications')
       .doc(notificationId)
       .delete();
 
-    console.log("deletion done");
-  }
-
+    console.log('deletion done');
+  };
 
   useEffect(() => {
     setImage(null);
@@ -330,13 +329,13 @@ function Reply(props) {
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(userId)
         .update({
-          noOfComments: commentNo
+          noOfComments: commentNo,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       console.log(commentNo);
       //updating noOfComments under user
@@ -346,128 +345,144 @@ function Reply(props) {
       userTitle = cu.title;
       award = cu.awards;
       console.log(award);
-     
-      if (commentNo === 1 && !(award.some(el => el.title === "First Comment"))) {
+
+      if (
+        commentNo === 1 &&
+        !award.some((el) => el.title === 'First Comment')
+      ) {
         award.push({
-          title: "First Comment",
-          description: "Post a comment on any discussion created to receive this",
+          title: 'First Comment',
+          description:
+            'Post a comment on any discussion created to receive this',
           pointsToBeAdded: 1,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 1;
-      }
-      else if (commentNo === 30 && !(award.some(el => el.title === "Keep Coming Back"))) {
+      } else if (
+        commentNo === 30 &&
+        !award.some((el) => el.title === 'Keep Coming Back')
+      ) {
         award.push({
-          title: "Keep Coming Back",
-          description: "30 comments posted! You must like it here!",
+          title: 'Keep Coming Back',
+          description: '30 comments posted! You must like it here!',
           pointsToBeAdded: 5,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 5;
-      } else if (commentNo === 100 && !(award.some(el => el.title === "Can't Stop"))) {
+      } else if (
+        commentNo === 100 &&
+        !award.some((el) => el.title === "Can't Stop")
+      ) {
         award.push({
           title: "Can't Stop",
-          description: "You've posted 100 comments. I hope this took you more than a day",
+          description:
+            "You've posted 100 comments. I hope this took you more than a day",
           pointsToBeAdded: 10,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 10;
-      } else if (commentNo === 300 && !(award.some(el => el.title === "Contribution Fanatic"))) {
+      } else if (
+        commentNo === 300 &&
+        !award.some((el) => el.title === 'Contribution Fanatic')
+      ) {
         award.push({
-          title: "Contribution Fanatic",
-          description: "300 comments. Impressive",
+          title: 'Contribution Fanatic',
+          description: '300 comments. Impressive',
           pointsToBeAdded: 15,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 15;
       }
       console.log(points);
 
       //updating userTitle based on Points
       if (points >= 0 && points <= 100) {
-        userTitle = "Beginner";
+        userTitle = 'Beginner';
       } else if (points > 100 && points <= 300) {
-        userTitle = "Intermediate"
+        userTitle = 'Intermediate';
       } else if (points > 300 && points <= 500) {
-        userTitle = "Expert"
+        userTitle = 'Expert';
       } else if (points > 500) {
-        userTitle = "Legend"
+        userTitle = 'Legend';
       }
       //updating userTitle based on Points
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(userId)
         .update({
           totalPoints: points,
           awards: award,
-          title: userTitle
+          title: userTitle,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //update totalPoints and awards based on the noOfComments
     }
     //update totalPoints and awards based on the noOfReplies
-    mainCommentOwner = allUsers.find(el => el.id === mainComment.userId);
+    mainCommentOwner = allUsers.find((el) => el.id === mainComment.userId);
     if (mainCommentOwner.status === 0) {
-
       if (userId === mainCommentOwner.id) {
         replyPoints = points;
         replyAward = award;
         replyUserTitle = userTitle;
-      }
-      else {
+      } else {
         replyPoints = mainCommentOwner.totalPoints;
         replyAward = mainCommentOwner.awards;
         replyUserTitle = mainCommentOwner.title;
       }
 
-
-      if (totalReply === 20 && !(replyAward.some(el => el.title === "Attracter"))) {
+      if (
+        totalReply === 20 &&
+        !replyAward.some((el) => el.title === 'Attracter')
+      ) {
         replyAward.push({
-          title: "Attracter",
-          description: "One of your main comments has obtained 20 replies ",
+          title: 'Attracter',
+          description: 'One of your main comments has obtained 20 replies ',
           pointsToBeAdded: 10,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         replyPoints = replyPoints + 10;
-      } else if (totalReply === 40 && !(replyAward.some(el => el.title === "Super Magnet"))) {
+      } else if (
+        totalReply === 40 &&
+        !replyAward.some((el) => el.title === 'Super Magnet')
+      ) {
         replyAward.push({
-          title: "Super Magnet",
-          description: "One of your main comments has obtained 50 replies ",
+          title: 'Super Magnet',
+          description: 'One of your main comments has obtained 50 replies ',
           pointsToBeAdded: 20,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         replyPoints = replyPoints + 20;
       }
 
       //updating userTitle based on Points
       if (replyPoints >= 0 && replyPoints <= 100) {
-        replyUserTitle = "Beginner";
+        replyUserTitle = 'Beginner';
       } else if (replyPoints > 100 && replyPoints <= 300) {
-        replyUserTitle = "Intermediate"
+        replyUserTitle = 'Intermediate';
       } else if (replyPoints > 300 && replyPoints <= 500) {
-        replyUserTitle = "Expert"
+        replyUserTitle = 'Expert';
       } else if (replyPoints > 500) {
-        replyUserTitle = "Legend"
+        replyUserTitle = 'Legend';
       }
       //updating userTitle based on Points
 
-
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(mainCommentUserId)
         .update({
           totalPoints: replyPoints,
           awards: replyAward,
-          title: replyUserTitle
+          title: replyUserTitle,
         })
         .then(() => {
-          console.log("done");
-        }).catch((err) => {
+          console.log('done');
+        })
+        .catch((err) => {
           console.log(err);
         });
 
@@ -476,33 +491,43 @@ function Reply(props) {
     //alteration needed
     //updating noOfComments under a specific discussion
     const discussionCommentNo = discussionData.noOfComments + 1;
-    const discussionOwner = allUsers.find(el => el.id === discussionData.userId);
+    const discussionOwner = allUsers.find(
+      (el) => el.id === discussionData.userId
+    );
     let discussionOwnerPoints;
     let discussionOwnerAwards;
     let discussionOwnerTitle;
 
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection('Discussion')
       .doc(mainComment.discussionId)
       .update({
-        noOfComments: discussionCommentNo
+        noOfComments: discussionCommentNo,
       })
       .then(() => {
-        console.log("done");
-      }).catch((err) => {
+        console.log('done');
+      })
+      .catch((err) => {
         console.log(err);
       });
 
     //updating noOfComments under a specific discussion
     if (discussionOwner.status === 0) {
       //updating totalPoints and awards based on the noOfComments in a discussion
-      if ((discussionOwner.id === userId && discussionOwner.id === mainCommentOwner.id) ||
-        (discussionOwner.id !== userId && discussionOwner.id === mainCommentOwner.id)) {
+      if (
+        (discussionOwner.id === userId &&
+          discussionOwner.id === mainCommentOwner.id) ||
+        (discussionOwner.id !== userId &&
+          discussionOwner.id === mainCommentOwner.id)
+      ) {
         discussionOwnerPoints = replyPoints;
         discussionOwnerAwards = replyAward;
         discussionOwnerTitle = replyUserTitle;
-      } else if (discussionOwner.id === userId && discussionOwner.id !== mainCommentOwner.id) {
+      } else if (
+        discussionOwner.id === userId &&
+        discussionOwner.id !== mainCommentOwner.id
+      ) {
         discussionOwnerPoints = points;
         discussionOwnerAwards = award;
         discussionOwnerTitle = userTitle;
@@ -512,73 +537,83 @@ function Reply(props) {
         discussionOwnerTitle = discussionOwner.title;
       }
 
-      if (discussionCommentNo === 30 && !(discussionOwnerAwards.some(el => el.title === "Interesting Topic"))) {
+      if (
+        discussionCommentNo === 30 &&
+        !discussionOwnerAwards.some((el) => el.title === 'Interesting Topic')
+      ) {
         discussionOwnerAwards.push({
-          title: "Interesting Topic",
-          description: "One of your posted disucssions has attracted 30 comments",
+          title: 'Interesting Topic',
+          description:
+            'One of your posted disucssions has attracted 30 comments',
           pointsToBeAdded: 15,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         discussionOwnerPoints = discussionOwnerPoints + 15;
-      } else if (discussionCommentNo === 60 && !(discussionOwnerAwards.some(el => el.title === "Super Interesting Topic"))) {
+      } else if (
+        discussionCommentNo === 60 &&
+        !discussionOwnerAwards.some(
+          (el) => el.title === 'Super Interesting Topic'
+        )
+      ) {
         discussionOwnerAwards.push({
-          title: "Super Interesting Topic",
-          description: "One of your posted disucssions has attracted 60 comments",
+          title: 'Super Interesting Topic',
+          description:
+            'One of your posted disucssions has attracted 60 comments',
           pointsToBeAdded: 25,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         discussionOwnerPoints = discussionOwnerPoints + 25;
       }
 
       //updating userTitle based on Points
       if (discussionOwnerPoints >= 0 && discussionOwnerPoints <= 100) {
-        discussionOwnerTitle = "Beginner";
+        discussionOwnerTitle = 'Beginner';
       } else if (discussionOwnerPoints > 100 && discussionOwnerPoints <= 300) {
-        discussionOwnerTitle = "Intermediate"
+        discussionOwnerTitle = 'Intermediate';
       } else if (discussionOwnerPoints > 300 && discussionOwnerPoints <= 500) {
-        discussionOwnerTitle = "Expert"
+        discussionOwnerTitle = 'Expert';
       } else if (discussionOwnerPoints > 500) {
-        discussionOwnerTitle = "Legend"
+        discussionOwnerTitle = 'Legend';
       }
       //updating userTitle based on Points
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(discussionOwner.id)
         .update({
           totalPoints: discussionOwnerPoints,
           awards: discussionOwnerAwards,
-          title: discussionOwnerTitle
+          title: discussionOwnerTitle,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating totalPoints and awards based on the noOfComments in a discussion
     }
     //change for contribution
 
     //  ------------------ Sending Push Notification To Author of Main Comment -----------------------
-    let notificationTitle = `${currentUser.name} replied to your comment`
+    let notificationTitle = `${currentUser.name} replied to your comment`;
 
     if (cu.status === 1) {
-      notificationTitle = `A lecturer replied to your comment`
+      notificationTitle = `A lecturer replied to your comment`;
     }
 
     // console.log(token);
     if (mainCommentUserId !== userId) {
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(mainCommentUserId)
-        .collection("Notifications")
+        .collection('Notifications')
         .add({
           title: notificationTitle,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           pageId: mainCommentId,
           description: newReply,
           userId: userId,
-          dataType: "cid"
+          dataType: 'cid',
         });
 
       fetch('https://exp.host/--/api/v2/push/send', {
@@ -586,21 +621,19 @@ function Reply(props) {
         headers: {
           Accept: 'application/json',
           'Accept-Encoding': 'gzip, deflate',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           to: pushToken,
           title: notificationTitle,
-          body: "Tap to see the comment",
-          priority: "normal",
-          data: { cid: mainCommentId, description: newReply, userId: userId }
-        })
+          body: 'Tap to see the comment',
+          priority: 'normal',
+          data: { cid: mainCommentId, description: newReply, userId: userId },
+        }),
       });
-
-
     }
 
-    //  ------------------ Sending Push Notification To Author of Main Comment  ----------------------- 
+    //  ------------------ Sending Push Notification To Author of Main Comment  -----------------------
   };
 
   const UploadCommentV2 = () => {
@@ -635,13 +668,13 @@ function Reply(props) {
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(userId)
         .update({
-          noOfComments: commentNo
+          noOfComments: commentNo,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating noOfComments under user
 
@@ -649,39 +682,52 @@ function Reply(props) {
       points = cu.totalPoints;
       userTitle = cu.title;
       award = cu.awards;
-     
-      if (commentNo === 1 && !(award.some(el => el.title === "First Comment"))) {
+
+      if (
+        commentNo === 1 &&
+        !award.some((el) => el.title === 'First Comment')
+      ) {
         award.push({
-          title: "First Comment",
-          description: "Post a comment on any discussion created to receive this",
+          title: 'First Comment',
+          description:
+            'Post a comment on any discussion created to receive this',
           pointsToBeAdded: 1,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 1;
-      }
-      else if (commentNo === 30 && !(award.some(el => el.title === "Keep Coming Back"))) {
+      } else if (
+        commentNo === 30 &&
+        !award.some((el) => el.title === 'Keep Coming Back')
+      ) {
         award.push({
-          title: "Keep Coming Back",
-          description: "30 comments posted! You must like it here!",
+          title: 'Keep Coming Back',
+          description: '30 comments posted! You must like it here!',
           pointsToBeAdded: 5,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 5;
-      } else if (commentNo === 100 && !(award.some(el => el.title === "Can't Stop"))) {
+      } else if (
+        commentNo === 100 &&
+        !award.some((el) => el.title === "Can't Stop")
+      ) {
         award.push({
           title: "Can't Stop",
-          description: "You've posted 100 comments. I hope this took you more than a day",
+          description:
+            "You've posted 100 comments. I hope this took you more than a day",
           pointsToBeAdded: 10,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 10;
-      } else if (commentNo === 300 && !(award.some(el => el.title === "Contribution Fanatic"))) {
+      } else if (
+        commentNo === 300 &&
+        !award.some((el) => el.title === 'Contribution Fanatic')
+      ) {
         award.push({
-          title: "Contribution Fanatic",
-          description: "300 comments. Impressive",
+          title: 'Contribution Fanatic',
+          description: '300 comments. Impressive',
           pointsToBeAdded: 15,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 15;
       }
 
@@ -689,33 +735,33 @@ function Reply(props) {
 
       //updating userTitle based on Points
       if (points >= 0 && points <= 100) {
-        userTitle = "Beginner";
+        userTitle = 'Beginner';
       } else if (points > 100 && points <= 300) {
-        userTitle = "Intermediate"
+        userTitle = 'Intermediate';
       } else if (points > 300 && points <= 500) {
-        userTitle = "Expert"
+        userTitle = 'Expert';
       } else if (points > 500) {
-        userTitle = "Legend"
+        userTitle = 'Legend';
       }
       //updating userTitle based on Points
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(userId)
         .update({
           totalPoints: points,
           awards: award,
-          title: userTitle
+          title: userTitle,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //update totalPoints and awards based on the noOfComments
     }
 
     //update totalPoints and awards based on the noOfReplies
-    mainCommentOwner = allUsers.find(el => el.id === mainComment.userId);
+    mainCommentOwner = allUsers.find((el) => el.id === mainComment.userId);
     // console.log(mainCommentOwner.name);
 
     if (mainCommentOwner.status === 0) {
@@ -723,84 +769,90 @@ function Reply(props) {
         replyPoints = points;
         replyAward = award;
         replyUserTitle = userTitle;
-      }
-      else {
+      } else {
         replyPoints = mainCommentOwner.totalPoints;
         replyAward = mainCommentOwner.awards;
         replyUserTitle = mainCommentOwner.title;
       }
 
-      if (totalReply === 20 && !(replyAward.some(el => el.title === "Attracter"))) {
+      if (
+        totalReply === 20 &&
+        !replyAward.some((el) => el.title === 'Attracter')
+      ) {
         replyAward.push({
-          title: "Attracter",
-          description: "One of your comments has obtained 20 replies ",
+          title: 'Attracter',
+          description: 'One of your comments has obtained 20 replies ',
           pointsToBeAdded: 10,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         replyPoints = replyPoints + 10;
-      } else if (totalReply === 40 && !(replyAward.some(el => el.title === "Super Magnet"))) {
+      } else if (
+        totalReply === 40 &&
+        !replyAward.some((el) => el.title === 'Super Magnet')
+      ) {
         replyAward.push({
-          title: "Super Magnet",
-          description: "One of your comments has obtained 50 replies ",
+          title: 'Super Magnet',
+          description: 'One of your comments has obtained 50 replies ',
           pointsToBeAdded: 20,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         replyPoints = replyPoints + 20;
       }
       // console.log(mainCommentUserId)
       // console.log(replyPoints);
       // console.log(replyAward);
 
-
       //updating userTitle based on Points
       if (replyPoints >= 0 && replyPoints <= 100) {
-        replyUserTitle = "Beginner";
+        replyUserTitle = 'Beginner';
       } else if (replyPoints > 100 && replyPoints <= 300) {
-        replyUserTitle = "Intermediate"
+        replyUserTitle = 'Intermediate';
       } else if (replyPoints > 300 && replyPoints <= 500) {
-        replyUserTitle = "Expert"
+        replyUserTitle = 'Expert';
       } else if (replyPoints > 500) {
-        replyUserTitle = "Legend"
+        replyUserTitle = 'Legend';
       }
       //updating userTitle based on Points
 
-
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(mainCommentUserId)
         .update({
           totalPoints: replyPoints,
           awards: replyAward,
-          title: replyUserTitle
+          title: replyUserTitle,
         })
         .then(() => {
-          console.log("done");
-        }).catch((err) => {
+          console.log('done');
+        })
+        .catch((err) => {
           console.log(err);
         });
 
       //update totalPoints and awards based on the noOfReplies
     }
-    console.log("hi");
+    console.log('hi');
     //updating noOfComments under a specific discussion
     const discussionCommentNo = discussionData.noOfComments + 1;
-    const discussionOwner = allUsers.find(el => el.id === discussionData.userId);
+    const discussionOwner = allUsers.find(
+      (el) => el.id === discussionData.userId
+    );
     let discussionOwnerPoints;
     let discussionOwnerAwards;
     let discussionOwnerTitle;
 
-
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection('Discussion')
       .doc(mainComment.discussionId)
       .update({
-        noOfComments: discussionCommentNo
+        noOfComments: discussionCommentNo,
       })
       .then(() => {
-        console.log("done");
-      }).catch((err) => {
+        console.log('done');
+      })
+      .catch((err) => {
         console.log(err);
       });
 
@@ -808,107 +860,128 @@ function Reply(props) {
 
     if (discussionOwner.status === 0) {
       //updating totalPoints and awards based on the noOfComments in a discussion
-      if ((discussionOwner.id === userId && discussionOwner.id === mainCommentOwner.id) ||
-        (discussionOwner.id !== userId && discussionOwner.id === mainCommentOwner.id)) {
+      if (
+        (discussionOwner.id === userId &&
+          discussionOwner.id === mainCommentOwner.id) ||
+        (discussionOwner.id !== userId &&
+          discussionOwner.id === mainCommentOwner.id)
+      ) {
         discussionOwnerPoints = replyPoints;
         discussionOwnerAwards = replyAward;
         discussionOwnerTitle = replyUserTitle;
-      } else if (discussionOwner.id === userId && discussionOwner.id !== mainCommentOwner.id) {
+      } else if (
+        discussionOwner.id === userId &&
+        discussionOwner.id !== mainCommentOwner.id
+      ) {
         discussionOwnerPoints = points;
         discussionOwnerAwards = award;
         discussionOwnerTitle = userTitle;
       } else {
         discussionOwnerPoints = discussionOwner.totalPoints;
         discussionOwnerAwards = discussionOwner.awards;
-        discussionOwnerTitle = discussionOwner.title
+        discussionOwnerTitle = discussionOwner.title;
       }
 
-      if (discussionCommentNo === 30 && !(discussionOwnerAwards.some(el => el.title === "Interesting Topic"))) {
+      if (
+        discussionCommentNo === 30 &&
+        !discussionOwnerAwards.some((el) => el.title === 'Interesting Topic')
+      ) {
         discussionOwnerAwards.push({
-          title: "Interesting Topic",
-          description: "One of your posted disucssions has attracted 30 comments",
+          title: 'Interesting Topic',
+          description:
+            'One of your posted disucssions has attracted 30 comments',
           pointsToBeAdded: 15,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         discussionOwnerPoints = discussionOwnerPoints + 15;
-      } else if (discussionCommentNo === 60 && !(discussionOwnerAwards.some(el => el.title === "Super Interesting Topic"))) {
+      } else if (
+        discussionCommentNo === 60 &&
+        !discussionOwnerAwards.some(
+          (el) => el.title === 'Super Interesting Topic'
+        )
+      ) {
         discussionOwnerAwards.push({
-          title: "Super Interesting Topic",
-          description: "One of your posted disucssions has attracted 60 comments",
+          title: 'Super Interesting Topic',
+          description:
+            'One of your posted disucssions has attracted 60 comments',
           pointsToBeAdded: 25,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         discussionOwnerPoints = discussionOwnerPoints + 25;
       }
 
       //updating userTitle based on Points
       if (discussionOwnerPoints >= 0 && discussionOwnerPoints <= 100) {
-        discussionOwnerTitle = "Beginner";
+        discussionOwnerTitle = 'Beginner';
       } else if (discussionOwnerPoints > 100 && discussionOwnerPoints <= 300) {
-        discussionOwnerTitle = "Intermediate"
+        discussionOwnerTitle = 'Intermediate';
       } else if (discussionOwnerPoints > 300 && discussionOwnerPoints <= 500) {
-        discussionOwnerTitle = "Expert"
+        discussionOwnerTitle = 'Expert';
       } else if (discussionOwnerPoints > 500) {
-        discussionOwnerTitle = "Legend"
+        discussionOwnerTitle = 'Legend';
       }
       //updating userTitle based on Points
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(discussionOwner.id)
         .update({
           totalPoints: discussionOwnerPoints,
           awards: discussionOwnerAwards,
-          title: discussionOwnerTitle
+          title: discussionOwnerTitle,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
 
       //updating totalPoints and awards based on the noOfComments in a discussion
     }
     //change for contribution
 
-    let notificationTitle = `${currentUser.name} replied to your comment`
-    console.log("hi");
+    let notificationTitle = `${currentUser.name} replied to your comment`;
+    console.log('hi');
     if (cu.status === 1) {
-      notificationTitle = `A lecturer replied to your comment`
+      notificationTitle = `A lecturer replied to your comment`;
     }
     //  ------------------ Sending Push Notification To Author of Reply Comment -----------------------
     if (repliedSubCommentUserId !== userId) {
-      console.log("hi");
+      console.log('hi');
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(repliedSubCommentUserId)
-        .collection("Notifications")
+        .collection('Notifications')
         .add({
           title: notificationTitle,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           pageId: mainCommentId,
           description: replyOfSubComment,
           userId: userId,
-          dataType: "cid"
+          dataType: 'cid',
         });
-     console.log("hi")
+      console.log('hi');
       fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Accept-Encoding': 'gzip, deflate',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           to: replyCommentToken,
           title: notificationTitle,
-          body: "Tap to see the comment",
-          priority: "normal",
-          data: { cid: mainCommentId, description: replyOfSubComment, userId: userId }
-        })
+          body: 'Tap to see the comment',
+          priority: 'normal',
+          data: {
+            cid: mainCommentId,
+            description: replyOfSubComment,
+            userId: userId,
+          },
+        }),
       });
 
-console.log("hi");
+      console.log('hi');
     }
 
     //  ------------------ Sending Push Notification To Author of Reply Comment -----------------------
@@ -942,8 +1015,9 @@ console.log("hi");
 
   const uploadImage = async () => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${firebase.auth().currentUser.uid
-      }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -996,8 +1070,9 @@ console.log("hi");
 
   const uploadImageV2 = async (docSnapshot) => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${firebase.auth().currentUser.uid
-      }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -1050,8 +1125,9 @@ console.log("hi");
 
   const uploadImageV1 = async () => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${firebase.auth().currentUser.uid
-      }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -1104,8 +1180,9 @@ console.log("hi");
 
   const uploadImageV3 = async (docSnapshot) => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${firebase.auth().currentUser.uid
-      }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -1130,8 +1207,8 @@ console.log("hi");
     task.on('state_changed', taskProgress, taskError, taskCompleted);
   };
 
-  const addLike = (nol) => {
-    const x = nol + 1;
+  const addLike = (nol, y, z) => {
+    const rnol = y + 1;
     if (mainComment.likeBy.includes(userId)) {
     } else {
       mainComment.likeBy.push(userId);
@@ -1142,18 +1219,17 @@ console.log("hi");
       .collection('Comment')
       .doc(mainCommentId)
       .update({
-        numOfLike: x,
+        numOfLike: rnol,
         likeBy: mainComment.likeBy,
       })
       .then(() => {
         setLikeBy(!likeBy);
       });
     setData(2);
-
     //change for contribution
     //updating number of likes under user
     const commentPostedBy = mainComment.userId;
-    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
     console.log(x);
 
     if (commentOwner.status === 0) {
@@ -1167,86 +1243,98 @@ console.log("hi");
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
-          noOfLikes: likesNo
+          noOfLikes: likesNo,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating number of likes under user
-
 
       //updating totalPoints and awards based on noOfLikes
       const award = commentOwner.awards;
       console.log(award);
       let creation = new Date();
-      if (likesNo === 1 && !(award.some(el => el.title === "Somebody Likes You"))) {
+      if (
+        likesNo === 1 &&
+        !award.some((el) => el.title === 'Somebody Likes You')
+      ) {
         award.push({
-          title: "Somebody Likes You",
-          description: "Somebody out there liked one of your comments. Keep posting for more",
+          title: 'Somebody Likes You',
+          description:
+            'Somebody out there liked one of your comments. Keep posting for more',
           pointsToBeAdded: 2,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 2;
-      } else if (likesNo === 25 && !(award.some(el => el.title === "I Like it A Lot"))) {
+      } else if (
+        likesNo === 25 &&
+        !award.some((el) => el.title === 'I Like it A Lot')
+      ) {
         award.push({
-          title: "I Like it A Lot",
-          description: "Your comments have been liked 25 times",
+          title: 'I Like it A Lot',
+          description: 'Your comments have been liked 25 times',
           pointsToBeAdded: 7,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 7;
-      } else if (likesNo === 50 && !(award.some(el => el.title === "Seriously Likeable"))) {
+      } else if (
+        likesNo === 50 &&
+        !award.some((el) => el.title === 'Seriously Likeable')
+      ) {
         award.push({
-          title: "Seriously Likeable",
-          description: "Your comments have been liked 50 times",
+          title: 'Seriously Likeable',
+          description: 'Your comments have been liked 50 times',
           pointsToBeAdded: 10,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 10;
-      } else if (x === 25 && !(award.some(el => el.title === "Helpful"))) {
+      } else if (x === 25 && !award.some((el) => el.title === 'Helpful')) {
         award.push({
-          title: "Helpful",
-          description: "One of your comments has attracted 25 likes",
+          title: 'Helpful',
+          description: 'One of your comments has attracted 25 likes',
           pointsToBeAdded: 15,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 15;
-      } else if (x === 50 && !(award.some(el => el.title === "Super Helpful"))) {
+      } else if (
+        x === 50 &&
+        !award.some((el) => el.title === 'Super Helpful')
+      ) {
         award.push({
-          title: "Super Helpful",
-          description: "One of your comments has attracted 50 likes",
+          title: 'Super Helpful',
+          description: 'One of your comments has attracted 50 likes',
           pointsToBeAdded: 25,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 25;
       }
 
       //updating userTitle based on Points
       if (points >= 0 && points <= 100) {
-        userTitle = "Beginner";
+        userTitle = 'Beginner';
       } else if (points > 100 && points <= 300) {
-        userTitle = "Intermediate"
+        userTitle = 'Intermediate';
       } else if (points > 300 && points <= 500) {
-        userTitle = "Expert"
+        userTitle = 'Expert';
       } else if (points > 500) {
-        userTitle = "Legend"
+        userTitle = 'Legend';
       }
       //updating userTitle based on Points
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
           totalPoints: points,
           awards: award,
-          title: userTitle
+          title: userTitle,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating totalPoints and awards based on noOfLikes
       //change for contribution
@@ -1258,26 +1346,24 @@ console.log("hi");
     let notificationTitle = `${currentUser.name} liked your comment`;
 
     if (cu.status === 1) {
-      notificationTitle = `A lecturer liked your comment`
+      notificationTitle = `A lecturer liked your comment`;
     }
 
     if (mainCommentUserId === userId) {
-      console.log("Same user")
-    }
-    else {
-
+      console.log('Same user');
+    } else {
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(mainCommentUserId)
-        .collection("Notifications")
+        .collection('Notifications')
         .add({
           title: notificationTitle,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           pageId: mainCommentId,
           description: mainComment.comment,
           userId: userId,
-          dataType: "cid"
+          dataType: 'cid',
         });
 
       fetch('https://exp.host/--/api/v2/push/send', {
@@ -1285,26 +1371,26 @@ console.log("hi");
         headers: {
           Accept: 'application/json',
           'Accept-Encoding': 'gzip, deflate',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           to: pushToken,
           title: notificationTitle,
-          body: "Tap to see the comment",
-          priority: "normal",
-          data: { cid: mainCommentId, description: mainComment.comment, userId: userId }
-
-        })
+          body: 'Tap to see the comment',
+          priority: 'normal',
+          data: {
+            cid: mainCommentId,
+            description: mainComment.comment,
+            userId: userId,
+          },
+        }),
       });
-
-
     }
-    //  ------------------ Sending Push Notification To Author of  Main Comment ----------------------- 
-
+    //  ------------------ Sending Push Notification To Author of  Main Comment -----------------------
   };
 
-  const removeLike = (nol) => {
-    const x = nol - 1;
+  const removeLike = (nol, y) => {
+    const x = y - 1;
     const indexx = mainComment.likeBy.indexOf(userId);
     if (indexx > -1) {
       mainComment.likeBy.splice(indexx, 1);
@@ -1329,7 +1415,7 @@ console.log("hi");
     const commentPostedBy = mainComment.userId;
     // console.log(commentPostedBy);
     // console.log(allUsers);
-    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
     // console.log(commentPostedBy);
     // console.log(commentOwner);
 
@@ -1341,13 +1427,13 @@ console.log("hi");
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
-          noOfLikes: likesNo
+          noOfLikes: likesNo,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating number of likes under user
       //change for contribution
@@ -1377,13 +1463,11 @@ console.log("hi");
 
             //change for contribution
 
-
             firebase
               .firestore()
-              .collection("Comment")
+              .collection('Comment')
               .doc(mainCommentId)
               .delete();
-
 
             //change for contribution
             if (currentUser.status === 0) {
@@ -1391,28 +1475,29 @@ console.log("hi");
               const commentNo = cu.noOfComments - 1;
               firebase
                 .firestore()
-                .collection("users")
+                .collection('users')
                 .doc(userId)
                 .update({
-                  noOfComments: commentNo
+                  noOfComments: commentNo,
                 })
                 .then(() => {
-                  console.log("done");
+                  console.log('done');
                 });
               //updating noOfComments under user
             }
 
             //updating noOfComments under discussion
-            const discussionCommentNo = discussionData.noOfComments - 1 - currentReplyNo;
+            const discussionCommentNo =
+              discussionData.noOfComments - 1 - currentReplyNo;
             firebase
               .firestore()
-              .collection("Discussion")
+              .collection('Discussion')
               .doc(discussionId)
               .update({
-                noOfComments: discussionCommentNo
+                noOfComments: discussionCommentNo,
               })
               .then(() => {
-                console.log("done");
+                console.log('done');
               });
             //updating noOfComments under discussion
 
@@ -1518,7 +1603,7 @@ console.log("hi");
           mainCommentId: idOfRepliedSubComment, // id of comment being replied
           attachedDocument: doc,
           attachedImage: img,
-          pushToken: currentUser.pushToken // change for notification
+          pushToken: currentUser.pushToken, // change for notification
         });
 
       totalReply = mainComment.numberOfReply + 1;
@@ -1553,7 +1638,7 @@ console.log("hi");
           mainCommentId,
           attachedDocument: doc,
           attachedImage: img,
-          pushToken: currentUser.pushToken  // change for notification
+          pushToken: currentUser.pushToken, // change for notification
         });
 
       totalReply = mainComment.numberOfReply + 1;
@@ -1587,12 +1672,12 @@ console.log("hi");
               .delete();
 
             //change for contribution
-             setData(20);
+            setData(20);
             //update noOfReplies for a mainComment // already changed
             const totalReply = mainComment.numberOfReply - 1;
             firebase
               .firestore()
-              .collection("Comment")
+              .collection('Comment')
               .doc(mainCommentId)
               .update({
                 numberOfReply: totalReply,
@@ -1604,13 +1689,13 @@ console.log("hi");
               const commentNo = cu.noOfComments - 1;
               firebase
                 .firestore()
-                .collection("users")
+                .collection('users')
                 .doc(userId)
                 .update({
-                  noOfComments: commentNo
+                  noOfComments: commentNo,
                 })
                 .then(() => {
-                  console.log("done");
+                  console.log('done');
                 });
               //update noOfComments under user
             }
@@ -1620,18 +1705,17 @@ console.log("hi");
             const discussionCommentNo = discussionData.noOfComments - 1;
             firebase
               .firestore()
-              .collection("Discussion")
+              .collection('Discussion')
               .doc(discussionId)
               .update({
-                noOfComments: discussionCommentNo
+                noOfComments: discussionCommentNo,
               })
               .then(() => {
-                console.log("done");
+                console.log('done');
               });
             //update noOfComments under discussion
 
             //change for contribution
-
 
             setData(4);
           },
@@ -1671,9 +1755,8 @@ console.log("hi");
 
     //updating number of likes under user
     const commentPostedBy = uid;
-    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
     console.log(x);
-
 
     if (commentOwner.status === 0) {
       let points = commentOwner.totalPoints;
@@ -1686,13 +1769,13 @@ console.log("hi");
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
-          noOfLikes: likesNo
+          noOfLikes: likesNo,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating number of likes under user
 
@@ -1700,71 +1783,84 @@ console.log("hi");
       const award = commentOwner.awards;
       console.log(award);
       let creation = new Date();
-      if (likesNo === 1 && !(award.some(el => el.title === "Somebody Likes You"))) {
+      if (
+        likesNo === 1 &&
+        !award.some((el) => el.title === 'Somebody Likes You')
+      ) {
         award.push({
-          title: "Somebody Likes You",
-          description: "Somebody out there liked one of your comments. Keep posting for more",
+          title: 'Somebody Likes You',
+          description:
+            'Somebody out there liked one of your comments. Keep posting for more',
           pointsToBeAdded: 2,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 2;
-      } else if (likesNo === 25 && !(award.some(el => el.title === "I Like it A Lot"))) {
+      } else if (
+        likesNo === 25 &&
+        !award.some((el) => el.title === 'I Like it A Lot')
+      ) {
         award.push({
-          title: "I Like it A Lot",
-          description: "Your comments have been liked 25 times",
+          title: 'I Like it A Lot',
+          description: 'Your comments have been liked 25 times',
           pointsToBeAdded: 7,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 7;
-      } else if (likesNo === 50 && !(award.some(el => el.title === "Seriously Likeable"))) {
+      } else if (
+        likesNo === 50 &&
+        !award.some((el) => el.title === 'Seriously Likeable')
+      ) {
         award.push({
-          title: "Seriously Likeable",
-          description: "Your comments have been liked 50 times",
+          title: 'Seriously Likeable',
+          description: 'Your comments have been liked 50 times',
           pointsToBeAdded: 10,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 10;
-      } else if (x === 25 && !(award.some(el => el.title === "Helpful"))) {
+      } else if (x === 25 && !award.some((el) => el.title === 'Helpful')) {
         award.push({
-          title: "Helpful",
-          description: "One of your comments has attracted 25 likes",
+          title: 'Helpful',
+          description: 'One of your comments has attracted 25 likes',
           pointsToBeAdded: 15,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 15;
-      } else if (x === 50 && !(award.some(el => el.title === "Super Helpful"))) {
+      } else if (
+        x === 50 &&
+        !award.some((el) => el.title === 'Super Helpful')
+      ) {
         award.push({
-          title: "Super Helpful",
-          description: "One of your comments has attracted 50 likes",
+          title: 'Super Helpful',
+          description: 'One of your comments has attracted 50 likes',
           pointsToBeAdded: 25,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 25;
       }
 
       //updating userTitle based on Points
       if (points >= 0 && points <= 100) {
-        userTitle = "Beginner";
+        userTitle = 'Beginner';
       } else if (points > 100 && points <= 300) {
-        userTitle = "Intermediate"
+        userTitle = 'Intermediate';
       } else if (points > 300 && points <= 500) {
-        userTitle = "Expert"
+        userTitle = 'Expert';
       } else if (points > 500) {
-        userTitle = "Legend"
+        userTitle = 'Legend';
       }
       //updating userTitle based on Points
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
           totalPoints: points,
           awards: award,
-          title: userTitle
+          title: userTitle,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating totalPoints and awards based on noOfLikes
     }
@@ -1772,32 +1868,31 @@ console.log("hi");
 
     let notificationTitle = `${currentUserName} liked your comment`;
     if (cu.status === 1) {
-      notificationTitle = `A lecturer liked to your comment`
+      notificationTitle = `A lecturer liked to your comment`;
     }
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(mainCommentId)
-      .collection("Reply")
+      .collection('Reply')
       .doc(rcid)
       .get()
       .then((snapshot) => {
         //  ------------------ Sending Push Notification To Author of ReplyComment -----------------------
         if (snapshot.data().postedBy !== currentUserName) {
-
           firebase
             .firestore()
-            .collection("users")
+            .collection('users')
             .doc(snapshot.data().userId)
-            .collection("Notifications")
+            .collection('Notifications')
             .add({
               title: notificationTitle,
               creation: firebase.firestore.FieldValue.serverTimestamp(),
               pageId: mainCommentId,
               description: snapshot.data().comment,
               userId: userId,
-              dataType: "cid"
+              dataType: 'cid',
             });
 
           fetch('https://exp.host/--/api/v2/push/send', {
@@ -1805,23 +1900,23 @@ console.log("hi");
             headers: {
               Accept: 'application/json',
               'Accept-Encoding': 'gzip, deflate',
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               to: snapshot.data().pushToken,
               title: notificationTitle,
-              body: "Tap to see the comment",
-              priority: "high",
-              data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
-
-            })
+              body: 'Tap to see the comment',
+              priority: 'high',
+              data: {
+                cid: mainCommentId,
+                description: snapshot.data().comment,
+                userId: userId,
+              },
+            }),
           });
-
-
         }
         //  ------------------ Sending Push Notification To Author of ReplyComment -----------------------
       });
-
   };
 
   const RemoveLikeToReplyComment = (rcid, nol, lb, uid) => {
@@ -1848,12 +1943,11 @@ console.log("hi");
 
     //change for contribution
 
-
     //updating number of likes under user
-    const commentPostedBy = uid
+    const commentPostedBy = uid;
     // console.log(commentPostedBy);
     // console.log(allUsers);
-    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
     // console.log(commentPostedBy);
     // console.log(commentOwner);
 
@@ -1865,13 +1959,13 @@ console.log("hi");
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
-          noOfLikes: likesNo
+          noOfLikes: likesNo,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating number of likes under user
     }
@@ -1934,41 +2028,40 @@ console.log("hi");
 
     const notificationTitle = `A lecturer verified your comment`;
     const notificationTitle2 = `A lecturer verfied a comment in your discussion thread`;
-    const mainDiscussion = posts.find(el => el.id === discussionId);
+    const mainDiscussion = posts.find((el) => el.id === discussionId);
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(mainCommentId)
       .get()
       .then((snapshot) => {
-
         firebase
           .firestore()
-          .collection("users")
+          .collection('users')
           .doc(snapshot.data().userId)
-          .collection("Notifications")
+          .collection('Notifications')
           .add({
             title: notificationTitle,
             creation: firebase.firestore.FieldValue.serverTimestamp(),
             pageId: mainCommentId,
             description: snapshot.data().comment,
             userId: userId,
-            dataType: "cid"
+            dataType: 'cid',
           });
 
         firebase
           .firestore()
-          .collection("users")
+          .collection('users')
           .doc(mainDiscussion.userId)
-          .collection("Notifications")
+          .collection('Notifications')
           .add({
             title: notificationTitle2,
             creation: firebase.firestore.FieldValue.serverTimestamp(),
             pageId: mainCommentId,
             description: snapshot.data().comment,
             userId: userId,
-            dataType: "cid"
+            dataType: 'cid',
           });
 
         fetch('https://exp.host/--/api/v2/push/send', {
@@ -1976,15 +2069,19 @@ console.log("hi");
           headers: {
             Accept: 'application/json',
             'Accept-Encoding': 'gzip, deflate',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             to: snapshot.data().pushToken,
             title: notificationTitle,
-            body: "Tap to see the comment",
-            priority: "normal",
-            data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
-          })
+            body: 'Tap to see the comment',
+            priority: 'normal',
+            data: {
+              cid: mainCommentId,
+              description: snapshot.data().comment,
+              userId: userId,
+            },
+          }),
         });
 
         fetch('https://exp.host/--/api/v2/push/send', {
@@ -1992,19 +2089,20 @@ console.log("hi");
           headers: {
             Accept: 'application/json',
             'Accept-Encoding': 'gzip, deflate',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             to: mainDiscussion.pushToken,
             title: notificationTitle2,
-            body: "Tap to see the comment",
-            priority: "normal",
-            data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
-          })
+            body: 'Tap to see the comment',
+            priority: 'normal',
+            data: {
+              cid: mainCommentId,
+              description: snapshot.data().comment,
+              userId: userId,
+            },
+          }),
         });
-
-
-
       });
     //  ------------------ Sending Push Notification To Author of Comment -----------------------
   };
@@ -2042,44 +2140,43 @@ console.log("hi");
     setData(70);
 
     //  ------------------ Sending Push Notification To Author of Comment -----------------------
-    const notificationTitle = `A lecturer verified your comment`
+    const notificationTitle = `A lecturer verified your comment`;
     const notificationTitle2 = `A lecturer verfied a comment in your discussion thread`;
-    const mainDiscussion = posts.find(el => el.id === discussionId);
+    const mainDiscussion = posts.find((el) => el.id === discussionId);
 
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(mainCommentId)
-      .collection("Reply")
+      .collection('Reply')
       .doc(rcid)
       .get()
       .then((snapshot) => {
-
         firebase
           .firestore()
-          .collection("users")
+          .collection('users')
           .doc(snapshot.data().userId)
-          .collection("Notifications")
+          .collection('Notifications')
           .add({
             title: notificationTitle,
             creation: firebase.firestore.FieldValue.serverTimestamp(),
             pageId: mainCommentId,
             description: snapshot.data().comment,
-            dataType: "cid"
+            dataType: 'cid',
           });
 
         firebase
           .firestore()
-          .collection("users")
+          .collection('users')
           .doc(mainDiscussion.userId)
-          .collection("Notifications")
+          .collection('Notifications')
           .add({
             title: notificationTitle2,
             creation: firebase.firestore.FieldValue.serverTimestamp(),
             pageId: mainCommentId,
             description: snapshot.data().comment,
             userId: userId,
-            dataType: "cid"
+            dataType: 'cid',
           });
 
         fetch('https://exp.host/--/api/v2/push/send', {
@@ -2087,15 +2184,19 @@ console.log("hi");
           headers: {
             Accept: 'application/json',
             'Accept-Encoding': 'gzip, deflate',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             to: snapshot.data().pushToken,
             title: notificationTitle,
-            body: "Tap to see the comment",
-            priority: "normal",
-            data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
-          })
+            body: 'Tap to see the comment',
+            priority: 'normal',
+            data: {
+              cid: mainCommentId,
+              description: snapshot.data().comment,
+              userId: userId,
+            },
+          }),
         });
 
         fetch('https://exp.host/--/api/v2/push/send', {
@@ -2103,19 +2204,20 @@ console.log("hi");
           headers: {
             Accept: 'application/json',
             'Accept-Encoding': 'gzip, deflate',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             to: mainDiscussion.pushToken,
             title: notificationTitle2,
-            body: "Tap to see the comment",
-            priority: "normal",
-            data: { cid: mainCommentId, description: snapshot.data().comment, userId: userId }
-          })
+            body: 'Tap to see the comment',
+            priority: 'normal',
+            data: {
+              cid: mainCommentId,
+              description: snapshot.data().comment,
+              userId: userId,
+            },
+          }),
         });
-
-
-
       });
     //  ------------------ Sending Push Notification To Author of Comment -----------------------
   };
@@ -2173,7 +2275,12 @@ console.log("hi");
                 )
               }
               toggleSubReplyComment={() =>
-                toggleSubReplyComment(item.id, item.postedBy, item.pushToken, item.userId)
+                toggleSubReplyComment(
+                  item.id,
+                  item.postedBy,
+                  item.pushToken,
+                  item.userId
+                )
               }
             />
           </View>
@@ -2231,8 +2338,8 @@ console.log("hi");
               </View>
             )}
             {replyComment.length != 0 &&
-              loadMoreLoading == false &&
-              totalComment > loadMore ? (
+            loadMoreLoading == false &&
+            totalComment > loadMore ? (
               <TouchableOpacity
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}

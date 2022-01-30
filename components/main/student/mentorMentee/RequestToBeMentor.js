@@ -4,9 +4,11 @@ import {
   Text,
   StyleSheet,
   TextInput,
+  ActivityIndicator,
   Dimensions,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { connect } from 'react-redux';
@@ -15,6 +17,7 @@ require('firebase/firestore');
 import * as DocumentPicker from 'expo-document-picker';
 import { FAB } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
 
 function requesttobementor(props) {
   const { currentUser } = props;
@@ -29,6 +32,7 @@ function requesttobementor(props) {
   const [name, setName] = useState(null);
   const [desc, setDesc] = useState('');
   const [qualification, setQualification] = useState('');
+  const [isModalVisible, setModalVisible] = useState(false);
   const userId = firebase.auth().currentUser.uid;
 
   const pickDocument = async () => {
@@ -42,13 +46,13 @@ function requesttobementor(props) {
   };
 
   const uploadDoc = async () => {
+    setModalVisible(!isModalVisible);
     if (name != null) {
       // if (name.includes('.docx')) {
       //   const childPath = `doc/${1234}/${name}`;
       //   console.log(childPath);
       // } else {
       const childPath = `doc/${1234}/${Math.random().toString(36)}`;
-      console.log(childPath);
       //}
 
       const response = await fetch(Doc);
@@ -109,10 +113,22 @@ function requesttobementor(props) {
         //commented out for testing purpose
         matricNumber: user.matricNumber,
         userId,
-        pushToken: user.pushToken //change for notification
+        pushToken: user.pushToken, //change for notification
       })
       .then(function () {
-        props.navigation.goBack();
+        setModalVisible(!isModalVisible);
+        return Alert.alert(
+          'Request send succeccfully',
+          'The lecture will review this requst for further action',
+          [
+            {
+              text: 'Ok',
+              onPress: () => {
+                props.navigation.goBack();
+              },
+            },
+          ]
+        );
       });
   };
 
@@ -145,7 +161,9 @@ function requesttobementor(props) {
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={{paddingBottom:10,...styles.label}}>Issue can handle: </Text>
+            <Text style={{ paddingBottom: 10, ...styles.label }}>
+              Issue can handle:{' '}
+            </Text>
             <View style={styles.row}>
               <CheckBox
                 value={problem1}
@@ -219,7 +237,11 @@ function requesttobementor(props) {
             <Text style={styles.label}>Proves: </Text>
           </View>
         </View>
-        {name ? (<View style={styles.attachment}><Text>{name}</Text></View>) : null}
+        {name ? (
+          <View style={styles.attachment}>
+            <Text>{name}</Text>
+          </View>
+        ) : null}
 
         <View
           style={{ justifyContent: 'center', marginLeft: 20, marginBottom: 10 }}
@@ -238,6 +260,11 @@ function requesttobementor(props) {
         onPress={() => uploadDoc()}
         icon={<Icon reverse name='send' type='font-awesome' color='#E3562A' />}
       />
+      <Modal isVisible={isModalVisible}>
+        <View style={{ justifyContent: 'center', flex: 1 }}>
+          <ActivityIndicator size='large' color='#E3562A' />
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -259,8 +286,8 @@ const styles = StyleSheet.create({
   label2: {
     fontFamily: 'Poppins',
     fontSize: 16,
-    marginLeft:5,
-    marginBottom:10,
+    marginLeft: 5,
+    marginBottom: 10,
   },
 
   row: {
@@ -278,12 +305,12 @@ const styles = StyleSheet.create({
   },
 
   attachment: {
-    backgroundColor: "#808080",
+    backgroundColor: '#808080',
     height: 45,
     marginHorizontal: 20,
-    borderColor: "#000",
+    borderColor: '#000',
     borderRadius: 5,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingLeft: 10,
     elevation: 2,
     marginVertical: 3,

@@ -87,25 +87,12 @@ function ViewDetailMentor(props) {
         {info.qualificationProof ? (
           <View style={styles.form}>
             <View style={styles.formControl}>
-              <Text style={styles.label}>
-                Qualification: {info.qualification}{' '}
-              </Text>
-              <Text style={styles.input}>
-                Qualification: {info.qualification}{' '}
-              </Text>
+            <Text style={styles.label}>Qualification :</Text>
+            <Text style={styles.input}>{info.qualification} </Text>
             </View>
           </View>
         ) : (
-          <View style={{...styles.form, marginBottom: 70}}>
-            <View style={styles.formControl}>
-              <Text style={styles.label}>
-                {info.qualification}{' '}
-              </Text>
-              <Text style={styles.input}>
-               {info.qualification}{' '}
-              </Text>
-            </View>
-          </View>
+          null
         )}
 
         {info.qualificationProof && (
@@ -143,7 +130,13 @@ function ViewDetailMentor(props) {
             uri: info.qualificationProof,
           }}
         />
-        <TouchableOpacity onPress={() => setIsVisible(false)}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#FFF',
+            alignItems: 'center'
+          }}
+          onPress={() => setIsVisible(false)}
+        >
           <Text>Cancel</Text>
         </TouchableOpacity>
       </Modal>
