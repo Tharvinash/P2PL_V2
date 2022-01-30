@@ -104,14 +104,9 @@ export class Register extends Component {
             // The "Yes" button
             {
               text: 'Contact Admin',
-              // onPress: () => {
-              //   firebase
-              //     .firestore()
-              //     .collection("Discussion")
-              //     .doc(discussionId)
-              //     .delete();
-
-              // },
+              onPress: () => {
+                this.props.navigation.navigate('ContactAdmin');
+              },
             },
             {
               text: 'Retry',

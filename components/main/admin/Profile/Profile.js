@@ -122,6 +122,19 @@ function Profile(props) {
           color='#3C3A36'
         />
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => props.navigation.navigate('IssueHandle')}
+      >
+        <Text style={styles.text}>Handle Issue</Text>
+        <Icon
+          style={styles.arrow}
+          name='chevron-forward-outline'
+          type='ionicon'
+          size={20}
+          color='#3C3A36'
+        />
+      </TouchableOpacity>
       {/* <View style={styles.bb}>
         <DropDownPicker
           placeholder="Edit"

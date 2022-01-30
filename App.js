@@ -5,7 +5,7 @@ import { Icon } from 'react-native-elements';
 import * as Font from 'expo-font';
 import * as Linking from 'expo-linking';
 import AppLoading from 'expo-app-loading';
-import * as Notifications from "expo-notifications"
+import * as Notifications from 'expo-notifications';
 //import AppLoading from 'expo-app-loading';
 //-----------------REDUX---------------//
 import { Provider } from 'react-redux';
@@ -45,8 +45,8 @@ import FavoriteDiscussion from './components/main/student/profile/FavoriteDiscus
 import EditProfile from './components/main/student/profile/EditProfile';
 import EditDeleteDiscussion from './components/main/student/profile/EditDeleteDiscussion';
 import EditPassword from './components/main/student/profile/EditPassword';
-import NotificationPage from "./components/main/student/Notification/NotificationPage";
-import FallBack from "./components/main/student/Notification/FallBack";
+import NotificationPage from './components/main/student/Notification/NotificationPage';
+import FallBack from './components/main/student/Notification/FallBack';
 
 //Auth
 import LandingScreen from './components/auth/Landing';
@@ -54,6 +54,7 @@ import RegisterScreen from './components/auth/Register';
 import LoginScreen from './components/auth/Login';
 import LectureRegister from './components/auth/LectureRegister';
 import ResetPassword from './components/auth/ResetPassword';
+import ContactAdmin from './components/auth/ContactAdmin';
 
 //Main Screen
 import MainScreen from './components/StudentMain';
@@ -103,6 +104,8 @@ import LectureData from './components/main/admin/StudentDataHandle/LectureData';
 import ViewLectureDetail from './components/main/admin/StudentDataHandle/ViewLectureDetail';
 import ViewStudentDetail from './components/main/admin/StudentDataHandle/ViewStudentDetail';
 import UploadStudentEmail from './components/main/admin/StudentDataHandle/UploadStudentEmail';
+import IssueHandle from './components/main/admin/Profile/IssueHandle';
+import ViewIssue from './components/main/admin/Profile/ViewIssue';
 
 //Contribution
 import ContributionPoints from './components/main/student/contribution/ContributionPoints';
@@ -121,8 +124,7 @@ Notifications.setNotificationHandler({
     return {
       shouldShowAlert: true,
       shouldPlaySound: true,
-      priority: "low",
-
+      priority: 'low',
     };
   },
 });
@@ -133,7 +135,7 @@ export class App extends Component {
     this.state = {
       loaded: false,
       fontsLoaded: false,
-      status: "" //changes
+      status: '', //changes
     };
   }
 
@@ -168,49 +170,52 @@ export class App extends Component {
               //changes for notification
               if (snapshot.data().status !== 1) {
                 Notifications.getPermissionsAsync()
-                  .then(statusObj => {
+                  .then((statusObj) => {
                     if (statusObj.status !== 'granted') {
-                      Notifications.requestPermissionsAsync()
+                      Notifications.requestPermissionsAsync();
                     }
-                    return statusObj
-                  }).then(statusObj => {
-                    if (statusObj.status !== "granted") {
-                      throw new Error("Permission not granted");
+                    return statusObj;
+                  })
+                  .then((statusObj) => {
+                    if (statusObj.status !== 'granted') {
+                      throw new Error('Permission not granted');
                     }
-                  }).then(() => {
+                  })
+                  .then(() => {
                     // should login to expo account
                     //get the pushtoken
                     return Notifications.getExpoPushTokenAsync();
-                  }).then((response) => {
+                  })
+                  .then((response) => {
                     //console.log(response): figure out ExpoPushToken[****]
                     firebase
                       .firestore()
-                      .collection("users")
+                      .collection('users')
                       .doc(firebase.auth().currentUser.uid)
                       .update({
-                        pushToken: response.data
+                        pushToken: response.data,
                       })
                       .then(() => {
-                        console.log("done");
-                      })
-                  }).catch((err) => {
-                    console.log(err);
+                        console.log('done');
+                      });
                   })
-              }
-              else {
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              } else {
                 firebase
                   .firestore()
-                  .collection("users")
+                  .collection('users')
                   .doc(firebase.auth().currentUser.uid)
                   .update({
-                    pushToken: null
+                    pushToken: null,
                   })
                   .then(() => {
-                    console.log("done");
-                  }).catch((err) => {
-                    console.log(err);
+                    console.log('done');
                   })
-
+                  .catch((err) => {
+                    console.log(err);
+                  });
               }
               // console.log(snapshot.data().status);
               //changes for notification
@@ -257,6 +262,14 @@ export class App extends Component {
               component={LectureRegister}
               options={{
                 headerTitle: 'Register',
+                headerBackTitleVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name='ContactAdmin'
+              component={ContactAdmin}
+              options={{
+                headerTitle: 'Contact Admin',
                 headerBackTitleVisible: false,
               }}
             />
@@ -412,7 +425,7 @@ export class App extends Component {
         </Provider>
       );
     }
-
+    //Admin
     if (status === 2) {
       return (
         <Provider store={store}>
@@ -505,6 +518,24 @@ export class App extends Component {
                 component={UploadStudentEmail}
                 navigation={this.props.navigation}
               />
+              <Stack.Screen
+                name='IssueHandle'
+                options={{
+                  headerTitle: 'Available Issue',
+                  headerBackTitleVisible: false,
+                }}
+                component={IssueHandle}
+                navigation={this.props.navigation}
+              />
+              <Stack.Screen
+                name='ViewIssue'
+                options={{
+                  headerTitle: 'Issue Details',
+                  headerBackTitleVisible: false,
+                }}
+                component={ViewIssue}
+                navigation={this.props.navigation}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </Provider>
@@ -582,16 +613,16 @@ export class App extends Component {
                 component={EditProfile}
                 navigation={this.props.navigation}
               />
-               <Stack.Screen
-                name="Notification"
-                options={{ headerTitle: "Notifications" }}
+              <Stack.Screen
+                name='Notification'
+                options={{ headerTitle: 'Notifications' }}
                 component={NotificationPage}
                 navigation={this.props.navigation}
                 options={{ headerBackTitleVisible: false }}
               />
               <Stack.Screen
-                name="FallBackPage"
-                options={{headerShown: false}}
+                name='FallBackPage'
+                options={{ headerShown: false }}
                 component={FallBack}
                 navigation={this.props.navigation}
               />

@@ -16,7 +16,6 @@ import 'firebase/firestore';
 export class Register extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       email: '',
       password: '',
@@ -43,39 +42,39 @@ export class Register extends Component {
 
   getData() {
     // setTimeout(() => {
-      firebase
-        .firestore()
-        .collection('Student')
-        .get()
-        .then((snapshot) => {
-          let studentEmail = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            return { ...data };
-          });
-          this.setState({
-            data: studentEmail,
-          });
+    firebase
+      .firestore()
+      .collection('Student')
+      .get()
+      .then((snapshot) => {
+        let studentEmail = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          return { ...data };
         });
+        this.setState({
+          data: studentEmail,
+        });
+      });
     // }, 1000);
   }
 
   getFac() {
     // setTimeout(() => {
-      firebase
-        .firestore()
-        .collection('Faculty')
-        .get()
-        .then((snapshot) => {
-          let faculty = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            const id = doc.id;
-            return { id, ...data };
-          });
-          //   console.log(faculty);
-          this.setState({
-            fac: faculty,
-          });
+    firebase
+      .firestore()
+      .collection('Faculty')
+      .get()
+      .then((snapshot) => {
+        let faculty = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const id = doc.id;
+          return { id, ...data };
         });
+        //   console.log(faculty);
+        this.setState({
+          fac: faculty,
+        });
+      });
     // }, 1000);
   }
 
@@ -108,14 +107,9 @@ export class Register extends Component {
             // The "Yes" button
             {
               text: 'Contact Admin',
-              // onPress: () => {
-              //   firebase
-              //     .firestore()
-              //     .collection("Discussion")
-              //     .doc(discussionId)
-              //     .delete();
-
-              // },
+              onPress: () => {
+                this.props.navigation.navigate('ContactAdmin');
+              },
             },
             {
               text: 'Retry',
@@ -169,8 +163,7 @@ export class Register extends Component {
       }
     }
 
-
-    if( password != Rpassword){
+    if (password != Rpassword) {
       return Alert.alert('Password does not match ', 'Please retry', [
         {
           text: 'Retry',
@@ -212,7 +205,7 @@ export class Register extends Component {
           .collection('users')
           .doc(firebase.auth().currentUser.uid)
           .set({
-            realName:name,
+            realName: name,
             name,
             email,
             matricNumber: mc,
