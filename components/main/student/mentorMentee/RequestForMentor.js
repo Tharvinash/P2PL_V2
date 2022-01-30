@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,15 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
-} from "react-native";
+} from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { Checkbox } from 'react-native-paper';
-import { connect } from "react-redux";
-import firebase from "firebase";
-require("firebase/firestore");
-import { FAB } from "react-native-elements";
-import { Icon } from "react-native-elements";
+import { connect } from 'react-redux';
+import firebase from 'firebase';
+require('firebase/firestore');
+import { FAB } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
+import SnackBar from 'react-native-snackbar-component';
 
 function requestformentor(props) {
   const { currentUser } = props;
@@ -25,29 +26,29 @@ function requestformentor(props) {
   const [problem5, setProblem5] = useState(false);
   const [finalValue, setFinalValue] = useState([]);
   const [user, setUser] = useState(currentUser);
-  const [desc, setDesc] = useState("");
+  const [desc, setDesc] = useState('');
   const userId = firebase.auth().currentUser.uid;
 
   const UploadReq = () => {
     if (problem1 === true) {
-      finalValue.push("Academic");
+      finalValue.push('Academic');
     }
     if (problem2 === true) {
-      finalValue.push("Internship");
+      finalValue.push('Internship');
     }
     if (problem3 === true) {
-      finalValue.push("Subject Registration");
+      finalValue.push('Subject Registration');
     }
     if (problem4 === true) {
-      finalValue.push("Club Activities");
+      finalValue.push('Club Activities');
     }
     if (problem5 === true) {
-      finalValue.push("Personal Projects");
+      finalValue.push('Personal Projects');
     }
 
     firebase
       .firestore()
-      .collection("RequestForMentor")
+      .collection('RequestForMentor')
       .add({
         name: user.realName,
         faculty: user.faculty,
@@ -59,7 +60,7 @@ function requestformentor(props) {
         //commenting out just for testing purpose
         matricNumber: user.matricNumber,
         userId,
-        pushToken: user.pushToken // change for notification
+        pushToken: user.pushToken, // change for notification
       })
       .then(function () {
         props.navigation.goBack();
@@ -67,7 +68,7 @@ function requestformentor(props) {
   };
 
   return (
-    <View style={{ flex: 1}}>
+    <View style={{ flex: 1 }}>
       <ScrollView>
         <View style={styles.form}>
           <View style={styles.formControl}>
@@ -95,7 +96,7 @@ function requestformentor(props) {
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
-            <Text style={{paddingBottom:10,...styles.label}}>Issue: </Text>
+            <Text style={{ paddingBottom: 10, ...styles.label }}>Issue: </Text>
             <View style={styles.row}>
               <CheckBox value={problem1} onValueChange={setProblem1} />
               <Text style={styles.label2}>Academic</Text>
@@ -118,12 +119,12 @@ function requestformentor(props) {
             </View>
           </View>
         </View>
-        <View style={{...styles.form, marginBottom:70}}>
+        <View style={{ ...styles.form, marginBottom: 70 }}>
           <View style={styles.formControl}>
             <Text style={styles.label}>Description: </Text>
             <TextInput
-              placeholder="Description"
-              autoCapitalize="sentences"
+              placeholder='Description'
+              autoCapitalize='sentences'
               style={styles.input}
               multiline={true}
               value={desc}
@@ -133,10 +134,10 @@ function requestformentor(props) {
         </View>
       </ScrollView>
       <FAB
-        placement="right"
-        color="#E3562A"
+        placement='right'
+        color='#E3562A'
         onPress={() => UploadReq()}
-        icon={<Icon reverse name="send" type="font-awesome" color="#E3562A" />}
+        icon={<Icon reverse name='send' type='font-awesome' color='#E3562A' />}
       />
     </View>
   );
@@ -148,23 +149,23 @@ const styles = StyleSheet.create({
     marginVertical: 3,
   },
   formControl: {
-    width: "100%",
+    width: '100%',
   },
   label: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     fontSize: 20,
     marginVertical: 5,
   },
 
   label2: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     fontSize: 16,
-    marginLeft:5,
-    marginBottom:10,
+    marginLeft: 5,
+    marginBottom: 10,
   },
 
   row: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
 
   input: {
@@ -176,7 +177,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     fontSize: 15,
   },
-
 });
 
 const mapStateToProps = (store) => ({

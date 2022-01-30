@@ -1,10 +1,20 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
-import { View, StyleSheet, FlatList, Dimensions, Alert, TouchableOpacity } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { connect } from "react-redux";
-import { Icon } from "react-native-elements";
-import firebase from "firebase";
-import ViewAvailableGroup from "../../component/viewAvailableGroup";
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { connect } from 'react-redux';
+import { Icon } from 'react-native-elements';
+import firebase from 'firebase';
+import ViewAvailableGroup from '../../component/viewAvailableGroup';
+
+// add remove ui not updating
+
 function AddInGroupV2(props) {
   const [data, setData] = useState(0);
   const [info, setInfo] = useState([]);
@@ -15,7 +25,7 @@ function AddInGroupV2(props) {
   const infoId = props.route.params.did;
 
   //changes
-  let roomTitle = "undefined";
+  let roomTitle = 'undefined';
   let roomId;
   const [rTitle, setRTitle] = useState();
   const [rId, setRId] = useState();
@@ -24,14 +34,13 @@ function AddInGroupV2(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", paddingRight: 15 }}>
-
+        <View style={{ flexDirection: 'row', paddingRight: 15 }}>
           <TouchableOpacity>
             <Icon
-              name="save-outline"
-              type="ionicon"
+              name='save-outline'
+              type='ionicon'
               size={30}
-              color="#000"
+              color='#000'
               onPress={() => {
                 checkOut();
               }}
@@ -46,7 +55,7 @@ function AddInGroupV2(props) {
     React.useCallback(() => {
       firebase
         .firestore()
-        .collection("DiscussionRoom")
+        .collection('DiscussionRoom')
         .get()
         .then((snapshot) => {
           let posts = snapshot.docs.map((doc) => {
@@ -62,14 +71,14 @@ function AddInGroupV2(props) {
 
       firebase
         .firestore()
-        .collection("RequestForMentor")
+        .collection('RequestForMentor')
         .doc(infoId)
         .get()
         .then((snapshot) => {
           if (snapshot.exists) {
             setInfo(snapshot.data());
           } else {
-            console.log("does not exist");
+            console.log('does not exist');
           }
         });
     }, [])
@@ -78,7 +87,7 @@ function AddInGroupV2(props) {
   useEffect(() => {
     firebase
       .firestore()
-      .collection("DiscussionRoom")
+      .collection('DiscussionRoom')
       .get()
       .then((snapshot) => {
         let posts = snapshot.docs.map((doc) => {
@@ -95,110 +104,109 @@ function AddInGroupV2(props) {
 
   const checkOut = () => {
     if (added) {
-      return Alert.alert(
-        "Save changes",
-        "Changes are saved !",
-        [
-          // The "Yes" button
-          {
-            text: "Yes",
-            onPress: () => {
-              const notificationTitle = `You have been added to a discussion room`;
+      return Alert.alert('Save changes', 'Changes are saved !', [
+        // The "Yes" button
+        {
+          text: 'Yes',
+          onPress: () => {
+            const notificationTitle = `You have been added to a discussion room`;
 
-              firebase
-                .firestore()
-                .collection("users")
-                .doc(info.userId)
-                .collection("Notifications")
-                .add({
-                  title: notificationTitle,
-                  creation: firebase.firestore.FieldValue.serverTimestamp(),
-                  pageId: "default",
-                  description: `${rTitle}`,
-                  userId: userId,
-                  dataType: "mmid"
-                });
-
-
-              fetch('https://exp.host/--/api/v2/push/send', {
-                method: 'POST',
-                headers: {
-                  Accept: 'application/json',
-                  'Accept-Encoding': 'gzip, deflate',
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  to: info.pushToken,
-                  title: notificationTitle,
-                  body: "Tap to see the rooms",
-                  priority: "normal",
-                  //changes
-                  data: { mmid: rId, description: `${rTitle}`, userId: userId }
-                })
+            firebase
+              .firestore()
+              .collection('users')
+              .doc(info.userId)
+              .collection('Notifications')
+              .add({
+                title: notificationTitle,
+                creation: firebase.firestore.FieldValue.serverTimestamp(),
+                pageId: 'default',
+                description: `${rTitle}`,
+                userId: userId,
+                dataType: 'mmid',
               });
 
-              firebase.firestore().collection("RequestForMentor").doc(infoId).delete();
-              props.navigation.navigate("ViewRequest")
-            },
+            fetch('https://exp.host/--/api/v2/push/send', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Accept-Encoding': 'gzip, deflate',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                to: info.pushToken,
+                title: notificationTitle,
+                body: 'Tap to see the rooms',
+                priority: 'normal',
+                //changes
+                data: { mmid: rId, description: `${rTitle}`, userId: userId },
+              }),
+            });
+
+            firebase
+              .firestore()
+              .collection('RequestForMentor')
+              .doc(infoId)
+              .delete();
+            props.navigation.navigate('ViewRequest');
           },
-          // The "No" button
-          // Does nothing but dismiss the dialog when tapped
-          {
-            text: "No",
-          },
-        ]
-      );
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: 'No',
+        },
+      ]);
     } else {
-      props.navigation.navigate("ViewRequest")
+      props.navigation.navigate('ViewRequest');
     }
-  }
+  };
 
   const AddInGroup = (gid, gm, rt) => {
-     //changes
-     roomId = gid;
-     console.log(roomId);
-     roomTitle = rt;
-     console.log(roomTitle);
-     setRTitle(roomTitle);
-     setRId(roomId);
-     //changes
-    setAdded(true)
+    //changes
+    roomId = gid;
+    console.log(roomId);
+    roomTitle = rt;
+    console.log(roomTitle);
+    setRTitle(roomTitle);
+    setRId(roomId);
+    //changes
+    setAdded(true);
     gm.push({
       userId: info.userId,
       name: info.name,
-      mc: "mc",
-      image: "image",
+      mc: 'mc',
+      image: 'image',
       status: 1,
-      pushToken: info.pushToken
+      pushToken: info.pushToken,
     });
 
-    firebase.firestore().collection("DiscussionRoom").doc(gid).update({
+    firebase.firestore().collection('DiscussionRoom').doc(gid).update({
       groupMember: gm,
     });
     setData(2);
   };
 
   const RemoveInGroup = (gid, gm) => {
-    setAdded(false)
+    setAdded(false);
     gm.splice(
       gm.findIndex((v) => v.userId === info.id),
       1
     );
 
-    firebase.firestore().collection("DiscussionRoom").doc(gid).update({
+    firebase.firestore().collection('DiscussionRoom').doc(gid).update({
       groupMember: gm,
     });
 
     setData(1);
   };
-  function yyy(member) {
+  const checkUserExsist = (member) => {
     let x = member.some((el) => el.userId === info.userId);
     return x;
-  }
+  };
 
   return (
     <View>
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
+      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <FlatList
           horizontal={false}
           extraData={post}
@@ -208,9 +216,11 @@ function AddInGroupV2(props) {
             <ViewAvailableGroup
               title={item.title}
               description={item.description}
-              added={yyy(item.groupMember)}
+              added={checkUserExsist(item.groupMember)}
               RemoveInGroup={() => RemoveInGroup(item.id, item.groupMember)}
-              AddInGroup={() => AddInGroup(item.id, item.groupMember, item.title)}
+              AddInGroup={() =>
+                AddInGroup(item.id, item.groupMember, item.title)
+              }
             />
           )}
         />
@@ -222,25 +232,25 @@ function AddInGroupV2(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   card: {
     borderRadius: 16,
     elevation: 5,
-    backgroundColor: "#003565",
+    backgroundColor: '#003565',
     shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.3,
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: Dimensions.get("window").width * 0.95,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    width: Dimensions.get('window').width * 0.95,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingRight: 6,
   },
 
@@ -250,20 +260,20 @@ const styles = StyleSheet.create({
   },
 
   faculty: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   title: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     lineHeight: 25,
   },
 });

@@ -67,22 +67,20 @@ function ViewDiscussion(props) {
 
   const userId = firebase.auth().currentUser.uid;
   const postedBy = currentUser.name;
-  const notificationId = props.route.params.notificationId;//notification //check for route later
+  const notificationId = props.route.params.notificationId; //notification //check for route later
   const ownerId = props.route.params.owner; // report
-
 
   const deleteNotifications = () => {
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(firebase.auth().currentUser.uid)
-      .collection("Notifications")
+      .collection('Notifications')
       .doc(notificationId)
       .delete();
 
-    console.log("deletion done");
-  }
-
+    console.log('deletion done');
+  };
 
   const list = [
     {
@@ -106,15 +104,17 @@ function ViewDiscussion(props) {
       headerRight: () => (
         <View style={{ flexDirection: 'row', paddingRight: 15 }}>
           <TouchableOpacity>
-            {ownerId != userId ? <Icon
-              name="alert-circle-outline"
-              type="ionicon"
-              size={30}
-              color="#000"
-              onPress={() => {
-                toggleReport();
-              }}
-            /> : null}
+            {ownerId != userId ? (
+              <Icon
+                name='alert-circle-outline'
+                type='ionicon'
+                size={30}
+                color='#000'
+                onPress={() => {
+                  toggleReport();
+                }}
+              />
+            ) : null}
           </TouchableOpacity>
         </View>
       ),
@@ -246,14 +246,12 @@ function ViewDiscussion(props) {
   }, [notificationId]);
   //notification
 
-
   useFocusEffect(
     React.useCallback(() => {
-
       //changes
       firebase
         .firestore()
-        .collection("Discussion")
+        .collection('Discussion')
         .doc(props.route.params.did)
         .get()
         .then((snapshot) => {
@@ -309,11 +307,9 @@ function ViewDiscussion(props) {
     console.log(reportData);
     const alert = () => {
       setReportVisible(!isReportVisible);
-      Alert.alert(
-        'Done',
-        'Your report has been sent and will be reviewed',
-        [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
-      );
+      Alert.alert('Done', 'Your report has been sent and will be reviewed', [
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
     };
 
     if (reportData.length > 0) {
@@ -416,19 +412,18 @@ function ViewDiscussion(props) {
         headers: {
           Accept: 'application/json',
           'Accept-Encoding': 'gzip, deflate',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           to: admin[i].token,
           title: `${cu.name} reported a discussion`,
-          body: "Tap to see the discussion",
-          priority: "normal",
-          data: { rdid: discussionId}
-        })
+          body: 'Tap to see the discussion',
+          priority: 'normal',
+          data: { rdid: discussionId },
+        }),
       });
-      //  ------------------ Sending Push Notification To Admin----------------------- 
+      //  ------------------ Sending Push Notification To Admin-----------------------
     }
-
   };
   const toggleEditComment = () => {
     setEditCommentModalVisible(!isEditCommentModalVisible);
@@ -468,7 +463,7 @@ function ViewDiscussion(props) {
           numberOfReply: 0,
           attachedDocument: doc,
           attachedImage: img,
-          pushToken: cu.pushToken // notification
+          pushToken: cu.pushToken, // notification
         })
         .then(function () {
           setLoading1(false);
@@ -501,24 +496,22 @@ function ViewDiscussion(props) {
 
     //change for contribution
 
-
     //updating noOfComments under user
     //not needed for lecturer
     const commentNo = cu.noOfComments + 1;
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(userId)
       .update({
-        noOfComments: commentNo
+        noOfComments: commentNo,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     console.log(commentNo);
     //not needed for lecturer
     //updating noOfComments under user
-
 
     //update totalPoints and awards based on the noOfComments
     //not needed for lecturer
@@ -527,66 +520,74 @@ function ViewDiscussion(props) {
     const award = cu.awards;
     let creation = new Date();
 
-    if (commentNo === 1 && !(award.some(el => el.title === "First Comment"))) {
+    if (commentNo === 1 && !award.some((el) => el.title === 'First Comment')) {
       award.push({
-        title: "First Comment",
-        description: "Post a comment on any discussion created to receive this",
+        title: 'First Comment',
+        description: 'Post a comment on any discussion created to receive this',
         pointsToBeAdded: 1,
-        creation: creation.toISOString()
-
-      })
+        creation: creation.toISOString(),
+      });
       points = points + 1;
-    }
-    else if (commentNo === 30 && !(award.some(el => el.title === "Keep Coming Back"))) {
+    } else if (
+      commentNo === 30 &&
+      !award.some((el) => el.title === 'Keep Coming Back')
+    ) {
       award.push({
-        title: "Keep Coming Back",
-        description: "30 comments posted! You must like it here!",
+        title: 'Keep Coming Back',
+        description: '30 comments posted! You must like it here!',
         pointsToBeAdded: 5,
-        creation: creation.toISOString()
-      })
+        creation: creation.toISOString(),
+      });
       points = points + 5;
-    } else if (commentNo === 100 && !(award.some(el => el.title === "Can't Stop"))) {
+    } else if (
+      commentNo === 100 &&
+      !award.some((el) => el.title === "Can't Stop")
+    ) {
       award.push({
         title: "Can't Stop",
-        description: "You've posted 100 comments. I hope this took you more than a day",
+        description:
+          "You've posted 100 comments. I hope this took you more than a day",
         pointsToBeAdded: 10,
-        creation: creation.toISOString()
-      })
+        creation: creation.toISOString(),
+      });
       points = points + 10;
-    } else if (commentNo === 300 && !(award.some(el => el.title === "Contribution Fanatic"))) {
+    } else if (
+      commentNo === 300 &&
+      !award.some((el) => el.title === 'Contribution Fanatic')
+    ) {
       award.push({
-        title: "Contribution Fanatic",
-        description: "300 comments. Impressive",
+        title: 'Contribution Fanatic',
+        description: '300 comments. Impressive',
         pointsToBeAdded: 15,
-        creation: creation.toISOString()
-      })
+        creation: creation.toISOString(),
+      });
       points = points + 15;
     }
     console.log(points);
 
     //updating userTitle based on Points
     if (points >= 0 && points <= 100) {
-      userTitle = "Beginner";
+      userTitle = 'Beginner';
     } else if (points > 100 && points <= 300) {
-      userTitle = "Intermediate"
+      userTitle = 'Intermediate';
     } else if (points > 300 && points <= 500) {
-      userTitle = "Expert";
+      userTitle = 'Expert';
     } else if (points > 500) {
-      userTitle = "Legend";
+      userTitle = 'Legend';
     }
     //updating userTitle based on Points
 
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(userId)
       .update({
         totalPoints: points,
         awards: award,
-        title: userTitle
+        title: userTitle,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     //update totalPoints and awards based on the noOfComments
 
@@ -595,24 +596,22 @@ function ViewDiscussion(props) {
     console.log(userPosts.noOfComments);
     const discussionCommentNo = userPosts.noOfComments + 1;
 
-
     firebase
       .firestore()
-      .collection("Discussion")
+      .collection('Discussion')
       .doc(discussionId)
       .update({
-        noOfComments: discussionCommentNo
+        noOfComments: discussionCommentNo,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     //neeeded for lecturer
     //updating noOfComments under a specific discussion
 
-
     //updating totalPoints and awards based on the noOfComments in a discussion
     //not needed for lecturer
-    const discussionOwner = allUsers.find(el => el.id === userPosts.userId);
+    const discussionOwner = allUsers.find((el) => el.id === userPosts.userId);
     let discussionOwnerPoints;
     let discussionOwnerAwards;
     let discussionOwnerTitle;
@@ -621,8 +620,7 @@ function ViewDiscussion(props) {
       discussionOwnerPoints = points;
       discussionOwnerAwards = award;
       discussionOwnerTitle = userTitle;
-    }
-    else {
+    } else {
       discussionOwnerPoints = discussionOwner.totalPoints;
       discussionOwnerAwards = discussionOwner.awards;
       discussionOwnerTitle = discussionOwner.title;
@@ -631,52 +629,58 @@ function ViewDiscussion(props) {
     console.log(discussionOwnerPoints);
     console.log(discussionOwnerAwards);
     console.log(discussionOwnerTitle);
-    if (discussionCommentNo === 30 && !(discussionOwnerAwards.some(el => el.title === "Interesting Topic"))) {
+    if (
+      discussionCommentNo === 30 &&
+      !discussionOwnerAwards.some((el) => el.title === 'Interesting Topic')
+    ) {
       discussionOwnerAwards.push({
-        title: "Interesting Topic",
-        description: "One of your posted disucssions has attracted 30 comments",
+        title: 'Interesting Topic',
+        description: 'One of your posted disucssions has attracted 30 comments',
         pointsToBeAdded: 15,
-        creation: creation.toISOString()
-      })
+        creation: creation.toISOString(),
+      });
       discussionOwnerPoints = discussionOwnerPoints + 15;
-    } else if (discussionCommentNo === 60 && !(discussionOwnerAwards.some(el => el.title === "Super Interesting Topic"))) {
+    } else if (
+      discussionCommentNo === 60 &&
+      !discussionOwnerAwards.some(
+        (el) => el.title === 'Super Interesting Topic'
+      )
+    ) {
       discussionOwnerAwards.push({
-        title: "Engaging Topic",
-        description: "One of your posted disucssions has attracted 60 comments",
+        title: 'Engaging Topic',
+        description: 'One of your posted disucssions has attracted 60 comments',
         pointsToBeAdded: 25,
-        creation: creation.toISOString()
-      })
+        creation: creation.toISOString(),
+      });
       discussionOwnerPoints = discussionOwnerPoints + 25;
     }
 
     //updating userTitle based on Points
     if (discussionOwnerPoints >= 0 && discussionOwnerPoints <= 100) {
-      discussionOwnerTitle = "Beginner";
+      discussionOwnerTitle = 'Beginner';
     } else if (discussionOwnerPoints > 100 && discussionOwnerPoints <= 300) {
-      discussionOwnerTitle = "Intermediate"
+      discussionOwnerTitle = 'Intermediate';
     } else if (discussionOwnerPoints > 300 && discussionOwnerPoints <= 500) {
-      discussionOwnerTitle = "Expert"
+      discussionOwnerTitle = 'Expert';
     } else if (discussionOwnerPoints > 500) {
-      discussionOwnerTitle = "Legend"
+      discussionOwnerTitle = 'Legend';
     }
     //updating userTitle based on Points
 
-
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(discussionOwner.id)
       .update({
         totalPoints: discussionOwnerPoints,
         awards: discussionOwnerAwards,
-        title: discussionOwnerTitle
+        title: discussionOwnerTitle,
       })
       .then(() => {
-        console.log("done");
+        console.log('done');
       });
     //not needed for lecturer
     //updating totalPoints and awards based on the noOfComments in a discussion
-
 
     // //change for contribution
 
@@ -688,16 +692,16 @@ function ViewDiscussion(props) {
     if (userPosts.userId !== userId) {
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(discussionOwner.id)
-        .collection("Notifications")
+        .collection('Notifications')
         .add({
           title: notificationTitle,
           creation: firebase.firestore.FieldValue.serverTimestamp(),
           pageId: discussionId,
           description: newComment,
           userId: userId,
-          dataType: "id"
+          dataType: 'id',
         });
 
       // console.log(token);
@@ -707,23 +711,18 @@ function ViewDiscussion(props) {
         headers: {
           Accept: 'application/json',
           'Accept-Encoding': 'gzip, deflate',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           to: discussionToken,
           title: notificationTitle,
-          body: "Tap to see the comments",
-          priority: "normal",
+          body: 'Tap to see the comments',
+          priority: 'normal',
           data: { id: discussionId, description: newComment, userId: userId },
-        })
+        }),
       });
-
-
-
     }
-    //  ------------------ Sending Push Notification To Author of Discussion ----------------------- 
-
-
+    //  ------------------ Sending Push Notification To Author of Discussion -----------------------
   };
 
   const pickDocument = async () => {
@@ -776,8 +775,9 @@ function ViewDiscussion(props) {
 
   const uploadImage = async () => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${firebase.auth().currentUser.uid
-      }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -830,8 +830,9 @@ function ViewDiscussion(props) {
 
   const uploadImageV2 = async (docSnapshot) => {
     //const uri = props.route.params.image;
-    const childPath = `attachedImage/${firebase.auth().currentUser.uid
-      }/${Math.random().toString(36)}`;
+    const childPath = `attachedImage/${
+      firebase.auth().currentUser.uid
+    }/${Math.random().toString(36)}`;
     console.log(childPath);
 
     const response = await fetch(image);
@@ -972,14 +973,16 @@ function ViewDiscussion(props) {
             const commentList = [...comment];
             //obtain noOfReplies for a mainComment
             //needed for lecturer
-            const currentReplyNo = commentList.find(el => el.id === cid).numberOfReply;
+            const currentReplyNo = commentList.find(
+              (el) => el.id === cid
+            ).numberOfReply;
             console.log(currentReplyNo);
             //needed for lecturer
             //obtain noOfReplies for a mainComment
 
             //change for contribution
 
-            firebase.firestore().collection("Comment").doc(cid).delete();
+            firebase.firestore().collection('Comment').doc(cid).delete();
             setData(4);
 
             //change for contribution
@@ -989,38 +992,36 @@ function ViewDiscussion(props) {
             const commentNo = cu.noOfComments - 1;
             firebase
               .firestore()
-              .collection("users")
+              .collection('users')
               .doc(userId)
               .update({
-                noOfComments: commentNo
+                noOfComments: commentNo,
               })
               .then(() => {
-                console.log("done");
+                console.log('done');
               });
-            //not needed for lecturer 
+            //not needed for lecturer
             //updating noOfComments under user
-
 
             //updating noOfComments under discussion
             //needed for lecturer
             console.log(userPosts.noOfComments);
-            const discussionCommentNo = userPosts.noOfComments - 1 - currentReplyNo;
+            const discussionCommentNo =
+              userPosts.noOfComments - 1 - currentReplyNo;
             firebase
               .firestore()
-              .collection("Discussion")
+              .collection('Discussion')
               .doc(discussionId)
               .update({
-                noOfComments: discussionCommentNo
+                noOfComments: discussionCommentNo,
               })
               .then(() => {
-                console.log("done");
+                console.log('done');
               });
             //needed for lecturer
             //updating noOfComments under discussion
 
-
             //change for contribution
-
           },
         },
         // The "No" button
@@ -1057,8 +1058,8 @@ function ViewDiscussion(props) {
     //updating number of likes under user
     //needed for lecturer
     const commentList = [...comment];
-    const commentPostedBy = commentList.find(el => el.id === cid).userId;
-    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    const commentPostedBy = commentList.find((el) => el.id === cid).userId;
+    const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
     console.log(x);
 
     if (commentOwner.status == 0) {
@@ -1072,13 +1073,13 @@ function ViewDiscussion(props) {
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
-          noOfLikes: likesNo
+          noOfLikes: likesNo,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating number of likes under user
 
@@ -1086,101 +1087,112 @@ function ViewDiscussion(props) {
       const award = commentOwner.awards;
       console.log(award);
       let creation = new Date();
-      if (likesNo === 1 && !(award.some(el => el.title === "Somebody Likes You"))) {
+      if (
+        likesNo === 1 &&
+        !award.some((el) => el.title === 'Somebody Likes You')
+      ) {
         award.push({
-          title: "Somebody Likes You",
-          description: "Somebody out there liked one of your comments. Keep posting for more",
+          title: 'Somebody Likes You',
+          description:
+            'Somebody out there liked one of your comments. Keep posting for more',
           pointsToBeAdded: 2,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 2;
-      } else if (likesNo === 25 && !(award.some(el => el.title === "I Like it A Lot"))) {
+      } else if (
+        likesNo === 25 &&
+        !award.some((el) => el.title === 'I Like it A Lot')
+      ) {
         award.push({
-          title: "I Like it A Lot",
-          description: "Your comments have been liked 25 times",
+          title: 'I Like it A Lot',
+          description: 'Your comments have been liked 25 times',
           pointsToBeAdded: 7,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 7;
-      } else if (likesNo === 50 && !(award.some(el => el.title === "Seriously Likeable"))) {
+      } else if (
+        likesNo === 50 &&
+        !award.some((el) => el.title === 'Seriously Likeable')
+      ) {
         award.push({
-          title: "Seriously Likeable",
-          description: "Your comments have been liked 50 times",
+          title: 'Seriously Likeable',
+          description: 'Your comments have been liked 50 times',
           pointsToBeAdded: 10,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 10;
-      } else if (x === 25 && !(award.some(el => el.title === "Helpful"))) {
+      } else if (x === 25 && !award.some((el) => el.title === 'Helpful')) {
         award.push({
-          title: "Helpful",
-          description: "One of your comments has attracted 25 likes",
+          title: 'Helpful',
+          description: 'One of your comments has attracted 25 likes',
           pointsToBeAdded: 15,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 15;
-      } else if (x === 50 && !(award.some(el => el.title === "Super Helpful"))) {
+      } else if (
+        x === 50 &&
+        !award.some((el) => el.title === 'Super Helpful')
+      ) {
         award.push({
-          title: "Super Helpful",
-          description: "One of your comments has attracted 50 likes",
+          title: 'Super Helpful',
+          description: 'One of your comments has attracted 50 likes',
           pointsToBeAdded: 25,
-          creation: creation.toISOString()
-        })
+          creation: creation.toISOString(),
+        });
         points = points + 25;
       }
 
       //updating userTitle based on Points
       if (points >= 0 && points <= 100) {
-        userTitle = "Beginner";
+        userTitle = 'Beginner';
       } else if (points > 100 && points <= 300) {
-        userTitle = "Intermediate"
+        userTitle = 'Intermediate';
       } else if (points > 300 && points <= 500) {
-        userTitle = "Expert"
+        userTitle = 'Expert';
       } else if (points > 500) {
-        userTitle = "Legend"
+        userTitle = 'Legend';
       }
       //updating userTitle based on Points
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
           totalPoints: points,
           awards: award,
-          title: userTitle
+          title: userTitle,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
 
       //updating totalPoints and awards based on noOfLikes
-
     }
     // change for contribution
 
     const notificationTitle = `${cu.name} liked your comment`;
 
-
     //  ------------------ Sending Push Notification To Author of Comment -----------------------
     firebase
       .firestore()
-      .collection("Comment")
+      .collection('Comment')
       .doc(cid)
       .get()
       .then((snapshot) => {
         if (snapshot.data().userId !== userId) {
           firebase
             .firestore()
-            .collection("users")
+            .collection('users')
             .doc(snapshot.data().userId)
-            .collection("Notifications")
+            .collection('Notifications')
             .add({
               title: notificationTitle,
               creation: firebase.firestore.FieldValue.serverTimestamp(),
               pageId: snapshot.data().discussionId,
               description: snapshot.data().comment,
               userId: userId,
-              dataType: "id"
+              dataType: 'id',
             });
 
           fetch('https://exp.host/--/api/v2/push/send', {
@@ -1188,24 +1200,24 @@ function ViewDiscussion(props) {
             headers: {
               Accept: 'application/json',
               'Accept-Encoding': 'gzip, deflate',
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               to: snapshot.data().pushToken,
               title: notificationTitle,
-              body: "Tap to see the comment",
-              priority: "high",
-              data: { id: snapshot.data().discussionId, description: snapshot.data().comment, userId: userId }
-
-            })
+              body: 'Tap to see the comment',
+              priority: 'high',
+              data: {
+                id: snapshot.data().discussionId,
+                description: snapshot.data().comment,
+                userId: userId,
+              },
+            }),
           });
           console.log(snapshot.data().pushToken);
-
-
         }
       });
-    //  ------------------ Sending Push Notification To Author of Comment ----------------------- 
-
+    //  ------------------ Sending Push Notification To Author of Comment -----------------------
   };
 
   const removeLike = (cid, nol, lb) => {
@@ -1232,8 +1244,8 @@ function ViewDiscussion(props) {
     //updating number of likes under user
     //needed for lecturer
     const commentList = [...comment];
-    const commentPostedBy = commentList.find(el => el.id === cid).userId;
-    const commentOwner = allUsers.find(el => el.id === commentPostedBy);
+    const commentPostedBy = commentList.find((el) => el.id === cid).userId;
+    const commentOwner = allUsers.find((el) => el.id === commentPostedBy);
 
     if (commentOwner.status == 0) {
       let likesNo = commentOwner.noOfLikes;
@@ -1243,13 +1255,13 @@ function ViewDiscussion(props) {
 
       firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(commentPostedBy)
         .update({
-          noOfLikes: likesNo
+          noOfLikes: likesNo,
         })
         .then(() => {
-          console.log("done");
+          console.log('done');
         });
       //updating number of likes under user
     }
@@ -1344,7 +1356,7 @@ function ViewDiscussion(props) {
                   //changes
                   pushToken: item.pushToken,
                   mainCommentUserId: item.userId,
-                  discussionId: discussionId
+                  discussionId: discussionId,
                   //changes
                 })
               }
@@ -1398,10 +1410,9 @@ function ViewDiscussion(props) {
                 />
               </View>
             )}
-
-            <View>
+            {userPosts.description ? (
               <Text style={styles.descT}>{userPosts.description}</Text>
-            </View>
+            ) : null}
             <View style={{ paddingBottom: 10 }}>
               <Text style={styles.comT}>Comments:</Text>
             </View>
@@ -1420,9 +1431,9 @@ function ViewDiscussion(props) {
               </View>
             )}
             {comment.length != 0 &&
-              loadMore >= 8 &&
-              totalComment > loadMore &&
-              loadMoreLoading == false ? (
+            loadMore >= 8 &&
+            totalComment > loadMore &&
+            loadMoreLoading == false ? (
               <TouchableOpacity
                 onPress={loadMoreComment}
                 style={{ marginLeft: 50, flex: 1 }}
