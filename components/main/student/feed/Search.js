@@ -8,17 +8,20 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
+import { connect } from 'react-redux';
 import { Icon } from 'react-native-elements';
 import SelectPicker from 'react-native-form-select-picker';
 
 import firebase from 'firebase';
 require('firebase/firestore');
 
-export default function Search(props) {
+function Search(props) {
+  const { posts } = props;
   const [users, setUsers] = useState(null);
   const [fac, setFac] = useState(' ');
   const [selected, setSelected] = useState();
   const [faculty, setFaculty] = useState('');
+  const [availableDiscussion, setAvailableDiscussion] = useState(posts);
   const userId = firebase.auth().currentUser.uid;
 
   useEffect(() => {
@@ -38,23 +41,11 @@ export default function Search(props) {
 
   const fetchUsers = (search) => {
     if (search != null) {
-      firebase
-        .firestore()
-        .collection('Discussion')
-        .where('title', '>=', search)
-        .get()
-        .then((snapshot) => {
-          let users = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            const id = doc.id;
-            return { id, ...data };
-          });
-          // console.log(users)
-          setUsers(users);
-        });
+      const result = availableDiscussion.filter(x => x.title.toUpperCase().includes(search.toUpperCase()));
+      setUsers(result);
     }
   };
-
+  //setUsers(users); <- pass final data into this
   const searchByCategory = (xxx) => {
     setFaculty(xxx);
     firebase
@@ -255,3 +246,11 @@ const styles = StyleSheet.create({
     lineHeight: 25,
   },
 });
+
+
+const mapStateToProps = (store) => ({
+  posts: store.userState.posts,
+  currentUser: store.userState.currentUser,
+});
+
+export default connect(mapStateToProps, null)(Search);
