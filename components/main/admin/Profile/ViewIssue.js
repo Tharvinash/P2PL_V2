@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import * as MailComposer from 'expo-mail-composer';
 import {
   View,
   Text,
   Alert,
   StyleSheet,
   ScrollView,
-  TextInput,
+  Button,
   TouchableOpacity,
 } from 'react-native';
-import { FAB } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
+import { FAB } from 'react-native-elements';
+import Modal from 'react-native-modal';
 import firebase from 'firebase';
-import SelectPicker from 'react-native-form-select-picker';
 require('firebase/firestore');
 
 function ViewIssue(props) {
@@ -20,7 +21,9 @@ function ViewIssue(props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [fac, setFac] = useState('');
+  const [probDesc, setProbDesc] = useState('');
   const [data, setData] = useState(0);
+  const [isModalVisible, setModalVisible] = useState(false);
   const infoId = props.route.params.did;
 
   useLayoutEffect(() => {
@@ -46,6 +49,14 @@ function ViewIssue(props) {
   useEffect(() => {
     fetchData();
   }, [data]);
+
+  const sendEmail = () => {
+    MailComposer.composeAsync({
+      recipients: [email],
+      subject: 'P2PL Admin - ' + probDesc,
+      body: '',
+    });
+  };
 
   const Resolve = () => {
     return Alert.alert('Issue Resolved ? ', 'If yes please press Resolved', [
@@ -79,6 +90,7 @@ function ViewIssue(props) {
           setName(snapshot.data().userName);
           setEmail(snapshot.data().email);
           setFac(snapshot.data().fac);
+          setProbDesc(snapshot.data().probDesc);
         } else {
           console.log('does not exist');
         }
@@ -128,6 +140,21 @@ function ViewIssue(props) {
             </View>
           </View>
         </ScrollView>
+        <FAB
+          placement='right'
+          color='#E3562A'
+          onPress={sendEmail}
+          size='large'
+          icon={
+            <Icon
+              reverse
+              name='mail-outline'
+              type='ionicon'
+              color='#E3562A'
+              size={35}
+            />
+          }
+        />
       </View>
     );
   };
