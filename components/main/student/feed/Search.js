@@ -19,7 +19,7 @@ function Search(props) {
   const { posts } = props;
   const [users, setUsers] = useState(null);
   const [fac, setFac] = useState(' ');
-  const [selected, setSelected] = useState();
+  const [selected, setSelected] = useState(null);
   const [faculty, setFaculty] = useState('');
   const [availableDiscussion, setAvailableDiscussion] = useState(posts);
   const userId = firebase.auth().currentUser.uid;
@@ -41,26 +41,31 @@ function Search(props) {
 
   const fetchUsers = (search) => {
     if (search != null) {
-      const result = availableDiscussion.filter(x => x.title.toUpperCase().includes(search.toUpperCase()));
+      const result = availableDiscussion.filter((x) =>
+        x.title.toUpperCase().includes(search.toUpperCase())
+      );
       setUsers(result);
     }
   };
   //setUsers(users); <- pass final data into this
   const searchByCategory = (xxx) => {
-    setFaculty(xxx);
-    firebase
-      .firestore()
-      .collection('Discussion')
-      .where('faculty', '==', selected)
-      .get()
-      .then((snapshot) => {
-        let users = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          return { id, ...data };
+    if (selected === null) {
+    } else {
+      setFaculty(xxx);
+      firebase
+        .firestore()
+        .collection('Discussion')
+        .where('faculty', '==', selected)
+        .get()
+        .then((snapshot) => {
+          let users = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            return { id, ...data };
+          });
+          setUsers(users);
         });
-        setUsers(users);
-      });
+    }
   };
 
   return (
@@ -246,7 +251,6 @@ const styles = StyleSheet.create({
     lineHeight: 25,
   },
 });
-
 
 const mapStateToProps = (store) => ({
   posts: store.userState.posts,
