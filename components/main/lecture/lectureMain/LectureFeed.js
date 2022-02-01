@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,13 +7,13 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
-  Dimensions
-} from "react-native";
-import { Icon } from "react-native-elements";
-import { connect } from "react-redux";
-import { timeDifference } from "../../../utils";
-import firebase from "firebase";
-require("firebase/firestore");
+  Dimensions,
+} from 'react-native';
+import { Icon } from 'react-native-elements';
+import { connect } from 'react-redux';
+import { timeDifference } from '../../../utils';
+import firebase from 'firebase';
+require('firebase/firestore');
 
 function LectureFeed(props) {
   const { posts, currentUser } = props;
@@ -32,8 +32,8 @@ function LectureFeed(props) {
 
     firebase
       .firestore()
-      .collection("Discussion")
-      .orderBy("creation", "desc")
+      .collection('Discussion')
+      .orderBy('creation', 'desc')
       .get()
       .then((snapshot) => {
         let posts = snapshot.docs.map((doc) => {
@@ -47,14 +47,14 @@ function LectureFeed(props) {
 
     firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(firebase.auth().currentUser.uid)
       .get()
       .then((snapshot) => {
         if (snapshot.exists) {
           setCu(snapshot.data().filteredFeed);
         } else {
-          console.log("does not exist");
+          console.log('does not exist');
         }
       });
     setRefreshing(false);
@@ -77,38 +77,58 @@ function LectureFeed(props) {
                     <TouchableOpacity
                       style={{ flex: 1 }}
                       onPress={() =>
-                        props.navigation.navigate("LectureDiscussionView", {
+                        props.navigation.navigate('LectureDiscussionView', {
                           did: item.id,
                         })
                       }
                     >
-                    <View style={{ flexDirection: "row" }}>
-                      <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                        <View style={{ flexDirection: "row", width: "100%" }}>
-                          <Image
-                            style={{
-                              width: 35,
-                              height: 35,
-                              borderRadius: 35 / 2,
-                              marginBottom: 10,
-                            }}
-                            source={{ uri: item.image }}
-                          />
-                          <View style={{ flex: 1, paddingLeft: 10 }}>
-                            <Text style={styles.userName}>{item.postedBy}</Text>
+                      <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+                          <View style={{ flexDirection: 'row', width: '100%' }}>
+                            <Image
+                              style={{
+                                width: 35,
+                                height: 35,
+                                borderRadius: 35 / 2,
+                                marginBottom: 10,
+                              }}
+                              source={{ uri: item.image }}
+                            />
+                            <View style={{ flex: 1, paddingLeft: 10 }}>
+                              <Text style={styles.userName}>
+                                {item.postedBy}
+                              </Text>
+                            </View>
                           </View>
                         </View>
-                      </View>
 
-                      <Text style={styles.postedTime}>
-                        {timeDifference(new Date(), item.creation.toDate())}
-                      </Text>
-                    </View>
+                        <Text style={styles.postedTime}>
+                          {timeDifference(new Date(), item.creation.toDate())}
+                        </Text>
+                      </View>
 
                       <Text numberOfLines={2} style={styles.title}>
                         {item.title}
                       </Text>
-                      <Text style={styles.faculty}>{item.faculty}</Text>
+                      <View
+                        style={{
+                          // position: 'absolute',
+                          bottom: 0,
+                          height: 45,
+                          // width: Dimensions.get('window').width * 0.4,
+                          backgroundColor: '#E3562A',
+                          borderTopRightRadius: 20,
+                          borderBottomRightRadius: 20,
+                          borderBottomLeftRadius: 20,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          paddingVertical: 5,
+                        }}
+                      >
+                        <Text style={{ color: '#fff', textAlign: 'center' }}>
+                          {item.faculty}
+                        </Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -136,14 +156,14 @@ function LectureFeed(props) {
                   <TouchableOpacity
                     style={{ flex: 1 }}
                     onPress={() =>
-                      props.navigation.navigate("LectureDiscussionView", {
+                      props.navigation.navigate('LectureDiscussionView', {
                         did: item.id,
                       })
                     }
                   >
-                    <View style={{ flexDirection: "row" }}>
-                      <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                        <View style={{ flexDirection: "row", width: "100%" }}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+                        <View style={{ flexDirection: 'row', width: '100%' }}>
                           <Image
                             style={{
                               width: 35,
@@ -167,7 +187,25 @@ function LectureFeed(props) {
                     <Text numberOfLines={2} style={styles.title}>
                       {item.title}
                     </Text>
-                    <Text style={styles.faculty}>{item.faculty}</Text>
+                    <View
+                      style={{
+                        // position: 'absolute',
+                        bottom: 0,
+                        height: 45,
+                        // width: Dimensions.get('window').width * 0.4,
+                        backgroundColor: '#E3562A',
+                        borderTopRightRadius: 20,
+                        borderBottomRightRadius: 20,
+                        borderBottomLeftRadius: 20,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingVertical: 5,
+                      }}
+                    >
+                      <Text style={{ color: '#fff', textAlign: 'center' }}>
+                        {item.faculty}
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -182,9 +220,9 @@ function LectureFeed(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   image: {
@@ -192,40 +230,40 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 1,
   },
   postedTime: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
   //name
   userName: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "PoppinsMedium",
+    fontFamily: 'PoppinsMedium',
   },
 
   //title
   title: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 25,
-    fontFamily: "PoppinsSemiBold",
+    fontFamily: 'PoppinsSemiBold',
     lineHeight: 30,
   },
 
   //faculty
   faculty: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   card: {
     //16
-    borderRadius: Dimensions.get("window").width / 24.5,
+    borderRadius: Dimensions.get('window').width / 24.5,
     elevation: 5,
-    backgroundColor: "#003565",
+    backgroundColor: '#003565',
     marginHorizontal: 4,
     marginVertical: 6,
-    width: Dimensions.get("window").width * 0.95,
+    width: Dimensions.get('window').width * 0.95,
   },
 
   cardContent: {
