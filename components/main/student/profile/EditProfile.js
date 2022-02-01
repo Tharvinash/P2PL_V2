@@ -310,7 +310,7 @@ function EditProfile(props) {
           <View style={styles.form}>
             <View style={styles.formControl}>
               <Text style={styles.label}>Full Name</Text>
-              <Text style={styles.input}>{rn}</Text>
+              <Text style={styles.inputfornotedit}>{rn}</Text>
             </View>
             <View style={styles.formControl}>
               <Text style={styles.label}>User Id</Text>
@@ -323,7 +323,7 @@ function EditProfile(props) {
             {status == 0 && (
               <View style={styles.formControl}>
                 <Text style={styles.label}>Matric Number </Text>
-                <Text style={styles.input}>{matricNum}</Text>
+                <Text style={styles.inputfornotedit}>{matricNum}</Text>
               </View>
             )}
 
@@ -356,7 +356,7 @@ function EditProfile(props) {
 
             <View style={styles.formControl}>
               <Text style={styles.label}>Faculty</Text>
-              <Text style={styles.input}>{fac}</Text>
+              <Text style={styles.inputfornotedit}>{fac}</Text>
               {/* <SelectPicker
                 placeholder={fac}
                 placeholderStyle={{
@@ -463,6 +463,15 @@ const styles = StyleSheet.create({
     borderColor: '#E3562A',
     borderWidth: 1,
     backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
+    fontFamily: 'Poppins',
+    fontSize: 15,
+  },
+  inputfornotedit: {
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#f3bba9',
     borderRadius: 12,
     padding: 10,
     fontFamily: 'Poppins',

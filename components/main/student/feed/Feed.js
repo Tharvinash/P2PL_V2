@@ -166,21 +166,40 @@ function Feed(props) {
               </Text>
             </View>
             <View
-              style={{
-                borderBottomColor: '#fff',
-                borderRightColor: '#003565',
-                borderLeftColor: '#003565',
-                borderWidth: 2,
-                borderTopColor:"#003565",
-                marginBottom:5
-              }}
+            // style={{
+            //   borderBottomColor: '#fff',
+            //   borderRightColor: '#003565',
+            //   borderLeftColor: '#003565',
+            //   borderWidth: 2,
+            //   borderTopColor:"#003565",
+            //   marginBottom:5
+            // }}
             >
               <Text numberOfLines={2} style={styles.title}>
                 {item.title}
               </Text>
             </View>
-            <View>
+            {/* <View>
               <Text style={{ color: '#fff' }}>{item.faculty}</Text>
+            </View> */}
+            <View
+              style={{
+                // position: 'absolute',
+                bottom: 0,
+                height: 45,
+                // width: Dimensions.get('window').width * 0.4,
+                backgroundColor: '#E3562A',
+                borderTopRightRadius: 20,
+                borderBottomRightRadius: 20,
+                borderBottomLeftRadius: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: 5,
+              }}
+            >
+              <Text style={{ color: '#fff', textAlign: 'center' }}>
+                {item.faculty}
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
