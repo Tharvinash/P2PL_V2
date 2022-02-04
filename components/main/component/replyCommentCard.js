@@ -115,40 +115,64 @@ const replyCommentCard = (props) => {
             onLongPress={props.xxx}
             delayLongPress={500}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                //justifyContent: "space-between",
-              }}
-            >
-              <Text style={styles.userName}>{props.postedBy} </Text>
-              {props.mainCommentIdV1 !== props.mainCommentIdV2 &&
-              props.repliedTo !== props.currentUserName ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}
-                >
-                  <Icon
-                    style={{
-                      paddingTop: 4,
-                    }}
-                    name='caret-forward-outline'
-                    type='ionicon'
-                    size={13}
-                    color='#000'
-                  />
-                  <Text style={styles.userName}>{props.repliedTo} </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <View style={{ width: '100%' }}>
+                  <Text style={styles.userName}>{props.postedBy} </Text>
+                  {props.mainCommentIdV1 !== props.mainCommentIdV2 &&
+                  props.repliedTo !== props.currentUserName ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        width: '100%',
+                      }}
+                    >
+                      <Icon
+                        style={{
+                          paddingTop: 4,
+                        }}
+                        name='caret-forward-outline'
+                        type='ionicon'
+                        size={13}
+                        color='#000'
+                      />
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: 'flex-start',
+                        }}
+                      >
+                        <Text style={styles.userName}>{props.repliedTo}</Text> 
+                        {/* No need to make changes here */}
+                      </View>
+
+                      <View
+                        style={{
+                          alignItems: 'flex-end',
+                          flexDirection: 'row',
+                        }}
+                      >
+                        {props.creation === null ? (
+                          <Text style={(styles.userC, { marginRight: 20 })}>
+                            Now
+                          </Text>
+                        ) : (
+                          <Text style={(styles.userC, { marginRight: 5 })}>
+                            {timeDifference(
+                              new Date(),
+                              props.creation.toDate()
+                            )}
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+                  ) : null}
                 </View>
-              ) : null}
-              <View style={{ alignItems: 'flex-end', flex: 1 }}>
-                {props.creation === null ? (
-                  <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
-                ) : (
-                  <Text style={(styles.userC, { marginRight: 5 })}>
-                    {timeDifference(new Date(), props.creation.toDate())}
-                  </Text>
-                )}
               </View>
             </View>
 
@@ -282,40 +306,63 @@ const replyCommentCard = (props) => {
           </TouchableOpacity>
         ) : (
           <View style={styles.mainBubble}>
-            <View
-              style={{
-                flexDirection: 'row',
-                //justifyContent: "space-between",
-              }}
-            >
-              <Text style={styles.userName}>{props.postedBy} </Text>
-              {props.maincommentIdV1 !== props.mainCommentIdV2 &&
-              props.repliedTo !== props.currentUserName ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}
-                >
-                  <Icon
-                    style={{
-                      paddingTop: 4,
-                    }}
-                    name='caret-forward-outline'
-                    type='ionicon'
-                    size={13}
-                    color='#000'
-                  />
-                  <Text style={styles.userName}>{props.repliedTo} </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <View style={{ width: '100%' }}>
+                  <Text style={styles.userName}>{props.postedBy} </Text>
+                  {props.mainCommentIdV1 !== props.mainCommentIdV2 &&
+                  props.repliedTo !== props.currentUserName ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        width: '100%',
+                      }}
+                    >
+                      <Icon
+                        style={{
+                          paddingTop: 4,
+                        }}
+                        name='caret-forward-outline'
+                        type='ionicon'
+                        size={13}
+                        color='#000'
+                      />
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: 'flex-start',
+                        }}
+                      >
+                        <Text style={styles.userName}>{props.repliedTo} </Text>
+                      </View>
+
+                      <View
+                        style={{
+                          alignItems: 'flex-end',
+                          flexDirection: 'row',
+                        }}
+                      >
+                        {props.creation === null ? (
+                          <Text style={(styles.userC, { marginRight: 20 })}>
+                            Now
+                          </Text>
+                        ) : (
+                          <Text style={(styles.userC, { marginRight: 5 })}>
+                            {timeDifference(
+                              new Date(),
+                              props.creation.toDate()
+                            )}
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+                  ) : null}
                 </View>
-              ) : null}
-              <View style={{ alignItems: 'flex-end', flex: 1 }}>
-                {props.creation === null ? (
-                  <Text style={(styles.userC, { marginRight: 20 })}>Now</Text>
-                ) : (
-                  <Text style={(styles.userC, { marginRight: 5 })}>
-                    {timeDifference(new Date(), props.creation.toDate())}
-                  </Text>
-                )}
               </View>
             </View>
 
@@ -465,6 +512,7 @@ const replyCommentCard = (props) => {
 const styles = StyleSheet.create({
   mainBubble: {
     borderColor: '#E3562A',
+    flex: 1,
     borderBottomWidth: 5,
     width: '85 %',
     padding: 5,

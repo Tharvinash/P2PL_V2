@@ -136,7 +136,7 @@ function ContactAdmin({ navigation }) {
       .then(function () {
         setModalVisible(!isModalVisible);
         return Alert.alert(
-          'Request send succeccfully',
+          'Request send successfully',
           'The Admin will review this requst for further action',
           [
             {

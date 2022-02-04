@@ -16,6 +16,7 @@ import { connect } from 'react-redux';
 import Modal from 'react-native-modal';
 import firebase from 'firebase';
 require('firebase/firestore');
+import { timeDifference } from '../../../utils';
 import { Icon } from 'react-native-elements';
 import { useFocusEffect } from '@react-navigation/native';
 import ParsedText from 'react-native-parsed-text';
@@ -42,6 +43,7 @@ function Reply(props) {
   const [idOfRepliedSubComment, setIdOfRepliedSubComment] = useState('');
   const [replyOfSubComment, setReplyOfSubComment] = useState('');
   const [newReply, setNewReply] = useState('');
+  const [screenLoading, setScreenLoading] = useState(true);
   const [replyComment, setReplyComment] = useState([]);
   const [likeBy, setLikeBy] = useState(props.route.params.xxx);
   const [isVisible, setIsVisible] = useState(false);
@@ -69,10 +71,9 @@ function Reply(props) {
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
   const [allUsers, setAllUsers] = useState([]); //change for contribution
   const [discussionData, setDiscussionData] = useState([]); //change for contribution
-
+  const [time, setTime] = useState('Now');
   const userId = firebase.auth().currentUser.uid;
   const userIdV2 = firebase.auth().currentUser.uid;
-  const time = props.route.params.time;
 
   //changes
   const pushToken = props.route.params.pushToken;
@@ -155,6 +156,7 @@ function Reply(props) {
       .get()
       .then((snapshot) => {
         setMainComment(snapshot.data());
+        setTime(timeDifference(new Date(), snapshot.data().creation.toDate()));
       });
 
     firebase
@@ -218,7 +220,7 @@ function Reply(props) {
     // setTimeout(function () {
     //   setLoadMoreLoading(false);
     // }, 2000);
-
+    setScreenLoading(false);
     setData(100); // changes
   }, [data]);
 
@@ -269,6 +271,7 @@ function Reply(props) {
     }, [data])
   );
 
+  // why got another useEffect
   useEffect(() => {
     if (notificationId) {
       deleteNotifications();
@@ -2229,220 +2232,238 @@ function Reply(props) {
     setData(9);
   };
 
-  return (
-    <View style={styles.container}>
-      <FlatList
-        horizontal={false}
-        extraData={replyComment}
-        data={replyComment}
-        renderItem={({ item }) => (
-          <View style={{ marginLeft: 30, marginTop: 5 }}>
-            <ReplyCommentCard
-              componentStatus={1}
-              removeVerifyReplyComment={() => removeVerifyReplyComment(item.id)}
-              verifyReplyComment={() => verifyReplyComment(item.id)}
-              image={item.image}
-              status={loginCurrentUser.status}
-              verify={item.verify}
-              firstUserId={item.userId}
-              secondUserId={userId}
-              xxx={() => toggleVisibilityV2(item.id)}
-              postedBy={item.postedBy}
-              maincommentIdV1={item.mainCommentId}
-              mainCommentIdV2={mainCommentId}
-              repliedTo={item.repliedTo}
-              currentUserName={currentUserName}
-              creation={item.creation}
-              comment={item.comment}
-              attachedImage={item.attachedImage}
-              attachedDocument={item.attachedDocument}
-              numOfLike={item.numOfLike}
-              likeBy={item.likeBy.includes(userId)}
-              RemoveLikeToReplyComment={() =>
-                RemoveLikeToReplyComment(
-                  item.id,
-                  item.numOfLike,
-                  item.likeBy,
-                  item.userId
-                )
-              }
-              AddLikeToReplyComment={() =>
-                AddLikeToReplyComment(
-                  item.id,
-                  item.numOfLike,
-                  item.likeBy,
-                  item.userId
-                )
-              }
-              toggleSubReplyComment={() =>
-                toggleSubReplyComment(
-                  item.id,
-                  item.postedBy,
-                  item.pushToken,
-                  item.userId
-                )
-              }
-            />
-          </View>
-        )}
-        ListHeaderComponent={
-          <View>
-            <MainCommentCard
-              componentStatus={1}
-              picture={mainComment.image}
-              time={time}
-              status={loginCurrentUser.status}
-              verify={mainComment.verify}
-              postedBy={mainComment.postedBy}
-              creation={mainComment.creation}
-              comment={mainComment.comment}
-              attachedDocument={mainComment.attachedDocument}
-              attachedImage={mainComment.attachedImage}
-              numOfLike={mainComment.numOfLike}
-              likeBy={likeBy}
-              removeVerifyComment={() => removeVerifyComment()}
-              verifyComment={() => verifyComment()}
-              removeLike={() =>
-                removeLike(
-                  mainComment.id,
-                  mainComment.numOfLike,
-                  mainComment.likeBy
-                )
-              }
-              xxx={() => toggleVisibility(mainComment.id)}
-              addLike={() =>
-                addLike(
-                  mainComment.id,
-                  mainComment.numOfLike,
-                  mainComment.likeBy
-                )
-              }
-              firstUserId={mainComment.userId}
-              secondUserId={userId}
-              delete={() => Delete(mainComment.id)}
-              editComment={() => EditComment(mainComment.id)}
-              toggleReplyComment={() => toggleReplyComment()}
-            />
-          </View>
-        }
-        ListFooterComponent={
-          <View>
-            {loadMoreLoading && (
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <ActivityIndicator size='large' color='#E3562A' />
-              </View>
-            )}
-            {replyComment.length != 0 &&
-            loadMoreLoading == false &&
-            totalComment > loadMore ? (
-              <TouchableOpacity
-                onPress={loadMoreComment}
-                style={{ marginLeft: 50, flex: 1 }}
-              >
-                <Text style={{ fontSize: 15, fontFamily: 'Poppins' }}>
-                  Load More ...
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-            {/* BottomSheet for main comment */}
-            <BottomSheet
-              isVisible={isVisible}
-              containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
-            >
-              {list.map((l, i) => (
-                <ListItem
-                  key={i}
-                  containerStyle={l.containerStyle}
-                  onPress={l.onPress}
-                >
-                  <ListItem.Content>
-                    <ListItem.Title style={l.titleStyle}>
-                      {l.title}
-                    </ListItem.Title>
-                  </ListItem.Content>
-                </ListItem>
-              ))}
-            </BottomSheet>
+  const renderLoadingScreen = () => {
+    return (
+      <View style={{ justifyContent: 'center', flex: 1 }}>
+        <ActivityIndicator size='large' color='#E3562A' />
+      </View>
+    );
+  };
 
-            {/* BottomSheet for sub comment */}
-            <BottomSheet
-              isVisible={isVisibleV2}
-              containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
-            >
-              {listV2.map((l, i) => (
-                <ListItem
-                  key={i}
-                  containerStyle={l.containerStyle}
-                  onPress={l.onPress}
-                >
-                  <ListItem.Content>
-                    <ListItem.Title style={l.titleStyle}>
-                      {l.title}
-                    </ListItem.Title>
-                  </ListItem.Content>
-                </ListItem>
-              ))}
-            </BottomSheet>
-
-            {/* Edit Reply Modal */}
-            <Modal isVisible={isEditCommentModalVisible}>
-              <EditCommentCom
-                editComment={editComment}
-                setEditComment={(editComment) => setEditComment(editComment)}
-                uploadUpdatedComment={() => uploadUpdatedComment()}
-                toggleEditComment={() => toggleEditComment()}
-              />
-            </Modal>
-
-            {/* Reply Comment Modal */}
-            <Modal isVisible={isReplyCommentModalVisible}>
-              <AddComment
-                setNewComment={(newReply) => setNewReply(newReply)}
-                pickDocument={() => pickDocument()}
-                pickImage={() => pickImage()}
-                UploadComment={() => UploadComment()}
-                toggleModal={() => toggleReplyComment()}
-                image={image}
-                Doc={Doc}
-              />
-            </Modal>
-
-            {/* Reply to Reply Comment Modal */}
-            <Modal isVisible={isReplySubCommentModalVisible}>
-              <AddComment
-                setNewComment={(replyOfSubComment) =>
-                  setReplyOfSubComment(replyOfSubComment)
+  const renderScreen = () => {
+    return (
+      <View style={styles.container}>
+        <FlatList
+          horizontal={false}
+          extraData={replyComment}
+          data={replyComment}
+          renderItem={({ item }) => (
+            <View style={{ marginLeft: 30, marginTop: 5 }}>
+              <ReplyCommentCard
+                componentStatus={1}
+                removeVerifyReplyComment={() =>
+                  removeVerifyReplyComment(item.id)
                 }
-                pickDocument={() => pickDocument()}
-                pickImage={() => pickImage()}
-                UploadComment={() => UploadCommentV2()}
-                toggleModal={() => toggleSubReplyComment()}
-                image={image}
-                Doc={Doc}
-              />
-            </Modal>
-
-            {/* Edit Reply Comment */}
-            <Modal isVisible={isEditReplyCommentModalVisible}>
-              <EditCommentCom
-                editComment={editReplyComment}
-                setEditComment={(editReplyComment) =>
-                  setEditReplyComment(editReplyComment)
+                verifyReplyComment={() => verifyReplyComment(item.id)}
+                image={item.image}
+                status={loginCurrentUser.status}
+                verify={item.verify}
+                firstUserId={item.userId}
+                secondUserId={userId}
+                xxx={() => toggleVisibilityV2(item.id)}
+                postedBy={item.postedBy}
+                maincommentIdV1={item.mainCommentId}
+                mainCommentIdV2={mainCommentId}
+                repliedTo={item.repliedTo}
+                currentUserName={currentUserName}
+                creation={item.creation}
+                comment={item.comment}
+                attachedImage={item.attachedImage}
+                attachedDocument={item.attachedDocument}
+                numOfLike={item.numOfLike}
+                likeBy={item.likeBy.includes(userId)}
+                RemoveLikeToReplyComment={() =>
+                  RemoveLikeToReplyComment(
+                    item.id,
+                    item.numOfLike,
+                    item.likeBy,
+                    item.userId
+                  )
                 }
-                uploadUpdatedComment={() => UploadEditSubComment()}
-                toggleEditComment={() => toggleReplyEditComment()}
+                AddLikeToReplyComment={() =>
+                  AddLikeToReplyComment(
+                    item.id,
+                    item.numOfLike,
+                    item.likeBy,
+                    item.userId
+                  )
+                }
+                toggleSubReplyComment={() =>
+                  toggleSubReplyComment(
+                    item.id,
+                    item.postedBy,
+                    item.pushToken,
+                    item.userId
+                  )
+                }
               />
-            </Modal>
-          </View>
-        }
-      />
-    </View>
-  );
+            </View>
+          )}
+          ListHeaderComponent={
+            <View>
+              <MainCommentCard
+                componentStatus={1}
+                picture={mainComment.image}
+                time={time}
+                status={loginCurrentUser.status}
+                verify={mainComment.verify}
+                postedBy={mainComment.postedBy}
+                creation={mainComment.creation}
+                comment={mainComment.comment}
+                attachedDocument={mainComment.attachedDocument}
+                attachedImage={mainComment.attachedImage}
+                numOfLike={mainComment.numOfLike}
+                likeBy={likeBy}
+                removeVerifyComment={() => removeVerifyComment()}
+                verifyComment={() => verifyComment()}
+                removeLike={() =>
+                  removeLike(
+                    mainComment.id,
+                    mainComment.numOfLike,
+                    mainComment.likeBy
+                  )
+                }
+                xxx={() => toggleVisibility(mainComment.id)}
+                addLike={() =>
+                  addLike(
+                    mainComment.id,
+                    mainComment.numOfLike,
+                    mainComment.likeBy
+                  )
+                }
+                firstUserId={mainComment.userId}
+                secondUserId={userId}
+                delete={() => Delete(mainComment.id)}
+                editComment={() => EditComment(mainComment.id)}
+                toggleReplyComment={() => toggleReplyComment()}
+              />
+            </View>
+          }
+          ListFooterComponent={
+            <View>
+              {loadMoreLoading && (
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <ActivityIndicator size='large' color='#E3562A' />
+                </View>
+              )}
+              {replyComment.length != 0 &&
+              loadMoreLoading == false &&
+              totalComment > loadMore ? (
+                <TouchableOpacity
+                  onPress={loadMoreComment}
+                  style={{ marginLeft: 50, flex: 1 }}
+                >
+                  <Text style={{ fontSize: 15, fontFamily: 'Poppins' }}>
+                    Load More ...
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+              {/* BottomSheet for main comment */}
+              <BottomSheet
+                isVisible={isVisible}
+                containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
+              >
+                {list.map((l, i) => (
+                  <ListItem
+                    key={i}
+                    containerStyle={l.containerStyle}
+                    onPress={l.onPress}
+                  >
+                    <ListItem.Content>
+                      <ListItem.Title style={l.titleStyle}>
+                        {l.title}
+                      </ListItem.Title>
+                    </ListItem.Content>
+                  </ListItem>
+                ))}
+              </BottomSheet>
+
+              {/* BottomSheet for sub comment */}
+              <BottomSheet
+                isVisible={isVisibleV2}
+                containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
+              >
+                {listV2.map((l, i) => (
+                  <ListItem
+                    key={i}
+                    containerStyle={l.containerStyle}
+                    onPress={l.onPress}
+                  >
+                    <ListItem.Content>
+                      <ListItem.Title style={l.titleStyle}>
+                        {l.title}
+                      </ListItem.Title>
+                    </ListItem.Content>
+                  </ListItem>
+                ))}
+              </BottomSheet>
+
+              {/* Edit Reply Modal */}
+              <Modal isVisible={isEditCommentModalVisible}>
+                <EditCommentCom
+                  editComment={editComment}
+                  setEditComment={(editComment) => setEditComment(editComment)}
+                  uploadUpdatedComment={() => uploadUpdatedComment()}
+                  toggleEditComment={() => toggleEditComment()}
+                />
+              </Modal>
+
+              {/* Reply Comment Modal */}
+              <Modal isVisible={isReplyCommentModalVisible}>
+                <AddComment
+                  setNewComment={(newReply) => setNewReply(newReply)}
+                  pickDocument={() => pickDocument()}
+                  pickImage={() => pickImage()}
+                  UploadComment={() => UploadComment()}
+                  toggleModal={() => toggleReplyComment()}
+                  image={image}
+                  Doc={Doc}
+                />
+              </Modal>
+
+              {/* Reply to Reply Comment Modal */}
+              <Modal isVisible={isReplySubCommentModalVisible}>
+                <AddComment
+                  setNewComment={(replyOfSubComment) =>
+                    setReplyOfSubComment(replyOfSubComment)
+                  }
+                  pickDocument={() => pickDocument()}
+                  pickImage={() => pickImage()}
+                  UploadComment={() => UploadCommentV2()}
+                  toggleModal={() => toggleSubReplyComment()}
+                  image={image}
+                  Doc={Doc}
+                />
+              </Modal>
+
+              {/* Edit Reply Comment */}
+              <Modal isVisible={isEditReplyCommentModalVisible}>
+                <EditCommentCom
+                  editComment={editReplyComment}
+                  setEditComment={(editReplyComment) =>
+                    setEditReplyComment(editReplyComment)
+                  }
+                  uploadUpdatedComment={() => UploadEditSubComment()}
+                  toggleEditComment={() => toggleReplyEditComment()}
+                />
+              </Modal>
+            </View>
+          }
+        />
+      </View>
+    );
+  };
+
+  if (screenLoading) {
+    return renderLoadingScreen();
+  } else {
+    return renderScreen();
+  }
 }
 
 const styles = StyleSheet.create({

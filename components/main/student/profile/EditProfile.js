@@ -21,6 +21,8 @@ import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 
 require('firebase/firestore');
+
+//copy paste whole thing
 function EditProfile(props) {
   const { currentUser, comments, posts } = props;
   const [nameToBeEditted, setNameToBeEditted] = useState(

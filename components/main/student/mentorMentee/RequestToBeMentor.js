@@ -188,25 +188,25 @@ function requesttobementor(props) {
         <View style={styles.form}>
           <View style={styles.formControl}>
             <Text style={styles.label}>Name :</Text>
-            <Text style={styles.input}>{user.realName}</Text>
+            <Text style={styles.inputfornotedit}>{user.realName}</Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
             <Text style={styles.label}>Matric Number :</Text>
-            <Text style={styles.input}>{user.matricNumber}</Text>
+            <Text style={styles.inputfornotedit}>{user.matricNumber}</Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
             <Text style={styles.label}>Faculty :</Text>
-            <Text style={styles.input}>{user.faculty}</Text>
+            <Text style={styles.inputfornotedit}>{user.faculty}</Text>
           </View>
         </View>
         <View style={styles.form}>
           <View style={styles.formControl}>
             <Text style={styles.label}>Year :</Text>
-            <Text style={styles.input}>{user.year}</Text>
+            <Text style={styles.inputfornotedit}>{user.year}</Text>
           </View>
         </View>
         <View style={styles.form}>
@@ -357,6 +357,16 @@ const styles = StyleSheet.create({
     borderColor: '#E3562A',
     borderWidth: 1,
     backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 10,
+    fontFamily: 'Poppins',
+    fontSize: 15,
+  },
+
+  inputfornotedit: {
+    borderColor: '#E3562A',
+    borderWidth: 1,
+    backgroundColor: '#f3bba9',
     borderRadius: 12,
     padding: 10,
     fontFamily: 'Poppins',

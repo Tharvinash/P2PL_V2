@@ -16,6 +16,7 @@ import { timeDifference } from '../../../utils';
 import firebase from 'firebase';
 require('firebase/firestore');
 
+// copy paste whole feed
 function Feed(props) {
   const { posts, currentUser } = props;
 

@@ -15,6 +15,7 @@ import { timeDifference } from '../../../utils';
 import firebase from 'firebase';
 require('firebase/firestore');
 
+// copy paste whole lecture feed
 function LectureFeed(props) {
   const { posts, currentUser } = props;
 

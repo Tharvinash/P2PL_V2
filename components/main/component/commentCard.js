@@ -244,7 +244,6 @@ const commentCard = (props) => {
                   type="ionicon"
                   size={20}
                   color="#000"
-                  a
                   onPress={props.onSelect}
                 />
                 <Text
