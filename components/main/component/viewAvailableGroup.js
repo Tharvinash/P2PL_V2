@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-} from "react-native";
-import { Icon } from "react-native-elements";
+} from 'react-native';
+import { Icon } from 'react-native-elements';
 
 const viewAvailableGroup = (props) => {
   return (
@@ -18,21 +18,21 @@ const viewAvailableGroup = (props) => {
           </Text>
           <Text style={styles.faculty}>{props.description}</Text>
         </View>
+        {props.added ? (
+          <TouchableOpacity onPress={props.RemoveInGroup}>
+            <Icon
+              name='remove-circle-outline'
+              type='ionicon'
+              size={30}
+              color='#fff'
+            />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={props.AddInGroup}>
+            <Icon name='add-outline' type='ionicon' size={30} color='#fff' />
+          </TouchableOpacity>
+        )}
       </View>
-      {props.added ? (
-        <TouchableOpacity onPress={props.RemoveInGroup}>
-          <Icon
-            name="remove-circle-outline"
-            type="ionicon"
-            size={30}
-            color="#fff"
-          />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity onPress={props.AddInGroup}>
-          <Icon name="add-outline" type="ionicon" size={30} color="#fff" />
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
@@ -40,25 +40,25 @@ const viewAvailableGroup = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#140F38",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#140F38',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   card: {
     borderRadius: 16,
     elevation: 5,
-    backgroundColor: "#003565",
+    backgroundColor: '#003565',
     shadowOffset: { width: 1, height: 1 },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.3,
     shadowRadius: 2,
     marginHorizontal: 4,
     marginVertical: 6,
-    width: Dimensions.get("window").width * 0.95,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    width: Dimensions.get('window').width * 0.95,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingRight: 6,
   },
 
@@ -68,20 +68,20 @@ const styles = StyleSheet.create({
   },
 
   faculty: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
   },
 
   title: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     paddingVertical: 0,
     //  marginVertical: -5,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     lineHeight: 25,
   },
 });
